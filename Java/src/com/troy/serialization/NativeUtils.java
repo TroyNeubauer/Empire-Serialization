@@ -8,6 +8,7 @@ public class NativeUtils {
 	
 	static {
 		System.load("C:\\C++\\Current Projects\\bin\\x64\\Release\\Serialization Natives.dll");
+		System.out.println("loading natives");
 	}
 	
 	public static final boolean NATIVES_ENABLED = true;
