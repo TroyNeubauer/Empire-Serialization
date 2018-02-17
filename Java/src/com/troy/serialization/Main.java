@@ -3,6 +3,8 @@ package com.troy.serialization;
 import java.io.*;
 import java.nio.charset.Charset;
 
+import com.troy.serialization.charset.TroyCharsets;
+import com.troy.serialization.util.SerializationUtils;
 import com.troyberry.util.StringFormatter;
 
 import net.didion.jwnl.JWNLException;
