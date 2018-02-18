@@ -11,15 +11,19 @@ public class Main {
 
 	public static void main(String[] args)
 			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, FileNotFoundException, IOException {
+		char[] src = new char[] { (char) 1, (char) 3, (char) 7, (char) 15 };
+		byte[] dest = new byte[3];
+		TroyCharsets.SIX_BIT_ENCODING.encode(src, dest, srcOffset, chars, checkForErrors);
+
 		SerializationUtils.init();
 		OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(new File("unicode test.txt")), Charset.forName("UTF-8"));
 		writer.write(0x1F957);
 		writer.close();
-		
-		/*char[] src = "eat".toCharArray();
-		byte[] dest = new byte[(src.length + 3) / 2 - 1];
-		TroyCharsets.FOUR_BIT_ENCODING.encode(src, dest, 0, 0, src.length, SerializationUtils.CHECK_CHARSET_PROBLEMS);
-		System.out.println(StringFormatter.toHexString(dest));*/
+
+		/*
+		 * char[] src = "eat".toCharArray(); byte[] dest = new byte[(src.length + 3) / 2 - 1]; TroyCharsets.FOUR_BIT_ENCODING.encode(src, dest, 0, 0,
+		 * src.length, SerializationUtils.CHECK_CHARSET_PROBLEMS); System.out.println(StringFormatter.toHexString(dest));
+		 */
 
 	}
 
