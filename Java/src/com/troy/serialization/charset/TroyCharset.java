@@ -9,9 +9,8 @@ public interface TroyCharset {
 	 * @param dest The resulting array to write to
 	 * @param destOffset The offset on where to start writing to into dest
 	 * @param chars The number of characters to decode
-	 * @return the number of bytes read by this method
 	 */
-	public int decode(Input src, final char[] dest, int destOffset, final int chars, boolean checkForErrors);
+	public void decode(Input src, final char[] dest, int destOffset, final int chars);
 	
 	/**
 	 * Encodes bytes from a char array into an output
@@ -19,9 +18,8 @@ public interface TroyCharset {
 	 * @param dest The destination to write to
 	 * @param srcOffset The offset to start reading from in the source array
 	 * @param chars The number of characters to encode
-	 * @return the number of bytes written into dest by this method
 	 */
-	public int encode(final char[] src, Output dest, int srcOffset, final int chars, boolean checkForErrors);
+	public void encode(final char[] src, Output dest, int srcOffset, final int chars, boolean checkForErrors);
 	
 	public float getMinCharactersPerByte();
 	

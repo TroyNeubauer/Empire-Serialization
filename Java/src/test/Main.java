@@ -16,10 +16,10 @@ public class Main {
 		writer.write(0x1F957);
 		writer.close();
 		
-		char[] src = "eat".toCharArray();
+		/*char[] src = "eat".toCharArray();
 		byte[] dest = new byte[(src.length + 3) / 2 - 1];
 		TroyCharsets.FOUR_BIT_ENCODING.encode(src, dest, 0, 0, src.length, SerializationUtils.CHECK_CHARSET_PROBLEMS);
-		System.out.println(StringFormatter.toHexString(dest));
+		System.out.println(StringFormatter.toHexString(dest));*/
 
 	}
 

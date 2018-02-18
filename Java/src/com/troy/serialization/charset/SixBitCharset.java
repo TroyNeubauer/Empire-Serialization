@@ -9,6 +9,7 @@ public class SixBitCharset implements TroyCharset {
 	}
 	public static final byte CODE = 0b01;
 	public static final int MIN_VALUE = 0, MAX_VALUE = 63;
+	private static final int MASK = 0b00111111;
 	// maps a four bit code -> java char value
 	//format:off
 	public static final char[] DECODING_CACHE = new char[] { 
@@ -22,15 +23,31 @@ public class SixBitCharset implements TroyCharset {
 	private static final int[] ENCODING_CACHE = SerializationUtils.constructEncodingFromDecoding(DECODING_CACHE);
 
 	@Override
-	public int decode(Input src, char[] dest, int destOffset, int chars, boolean checkForErrors) {
-
-		return 0;
+	public void decode(Input src, char[] dest, int destOffset, int chars) {
 	}
 
 	@Override
-	public int encode(char[] src, Output dest, int srcOffset, int chars, boolean checkForErrors) {
+	public void encode(char[] src, Output dest, int srcOffset, int chars, boolean checkForErrors) {
+		int i = srcOffset;
+		final int end = (chars / 4) * 4;// round down to next multiple of two
+		while (i < end) {
+			char c0 = src[i++];
+			char c1 = src[i++];
+			char c2 = src[i++];
+			char c3 = src[i++];
+			//format:off
+			byte b0 = (byte) ((ENCODING_CACHE[c0] << 2) & MASK   | (ENCODING_CACHE[c1] >>> 4) & 0b11);
+			byte b1 = (byte) ((ENCODING_CACHE[c1] << 4) & 0b1111 | (ENCODING_CACHE[c2] >>> 4) & 0b11);
+			byte b2 = (byte) ((ENCODING_CACHE[c2] << 6) & 0b11   | ENCODING_CACHE[c3] & MASK);
+			//format:on
 
-		return 0;
+			dest.writeByte(b0);
+			dest.writeByte(b1);
+			dest.writeByte(b2);
+		}
+		if (chars % 2 != 0) {// Write the remaining byte if there was an odd number
+			dest.writeByte((byte) (ENCODING_CACHE[src[end]] << 4));
+		}
 	}
 
 	@Override

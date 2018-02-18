@@ -18,25 +18,23 @@ final class FourBitCharset implements TroyCharset {
 	private static final int[] ENCODING_CACHE = SerializationUtils.constructEncodingFromDecoding(DECODING_CACHE);
 
 	@Override
-	public int decode(Input src, char[] dest, int destOffset, final int chars, boolean checkForErrors) {
-		int decodedBytes = 0;
-		int decodedChars = 0;
+	public void decode(Input src, char[] dest, int destOffset, final int chars) {
 		boolean shift = true;
-		while (decodedChars < chars) {
-			byte b = src.readByte();
+		final int end = destOffset + chars;
+		byte b = 0;
+		while (destOffset < end) {
 			if (shift) {
-				dest[decodedChars++] = (char) (b >>> 4);
+				b = src.readByte();
+				dest[destOffset++] = DECODING_CACHE[b >>> 4];
 			} else {
-				dest[decodedChars++] = (char) (b & MASK);
+				dest[destOffset++] = DECODING_CACHE[b & MASK];
 			}
 			shift = !shift;
 		}
-
-		return decodedBytes;
 	}
 
 	@Override
-	public int encode(final char[] src, Output dest, final int srcOffset, final int chars, boolean checkForErrors) {
+	public void encode(final char[] src, Output dest, final int srcOffset, final int chars, boolean checkForErrors) {
 		/*
 		 * if (NativeUtils.NATIVES_ENABLED) { int bytes = nEncode(src, dest, srcOffset, destOffset, chars, NativeUtils.getAddress(), checkForErrors); if
 		 * (bytes == -1) { switch (NativeUtils.getErrorCode()) { case (SerializationUtils.OUT_OF_MEMORY): throw new
@@ -44,7 +42,7 @@ final class FourBitCharset implements TroyCharset {
 		 * IllegalArgumentException("Invalid character\'" + NativeUtils.getInvalidChar() + "\' at index " + NativeUtils.getInvalidCharIndex() +
 		 * " for charset " + this.name()); } throw new RuntimeException("Error encoding characters!"); } return bytes; } else {
 		 */
-		if (checkForErrors) {//Scan for unsupported characters
+		if (checkForErrors) {// Scan for unsupported characters
 			for (int i = srcOffset; i < chars + srcOffset; i++) {
 				char c = src[i];
 				if (c >= ENCODING_CACHE.length)
@@ -54,18 +52,14 @@ final class FourBitCharset implements TroyCharset {
 					throw new UnsupportedCharacterException(c, i, this);
 			}
 		}
-		int bytesWritten = 0;
-		int i = 0;
+		int i = srcOffset;
 		final int end = (chars / 2) * 2;// round down to next multiple of two
 		while (i < end) {
-			int index = srcOffset + i;
-			dest.writeByte((byte) ((ENCODING_CACHE[src[index]] << 4) | ENCODING_CACHE[src[index + 1]]));
-			i += 2;
+			dest.writeByte((byte) ((ENCODING_CACHE[src[i++]] << 4) | ENCODING_CACHE[src[i++]]));
 		}
 		if (chars % 2 != 0) {// Write the remaining byte if there was an odd number
 			dest.writeByte((byte) (ENCODING_CACHE[src[end]] << 4));
 		}
-		return bytesWritten;
 		// }
 	}
 
