@@ -1,7 +1,6 @@
 package com.troy.serialization.charset;
 
-import com.troy.serialization.*;
-import com.troy.serialization.exception.UnsupportedCharacterException;
+import com.troy.serialization.io.*;
 import com.troy.serialization.util.*;
 
 public class SixBitCharset implements TroyCharset {
@@ -23,13 +22,13 @@ public class SixBitCharset implements TroyCharset {
 	private static final int[] ENCODING_CACHE = SerializationUtils.constructEncodingFromDecoding(DECODING_CACHE);
 
 	@Override
-	public int decode(byte[] source, char[] dest, int srcOffset, int destOffset, int chars, boolean checkForErrors) {
+	public int decode(Input src, char[] dest, int destOffset, int chars, boolean checkForErrors) {
 
 		return 0;
 	}
 
 	@Override
-	public int encode(char[] src, byte[] dest, int srcOffset, int destOffset, int chars, boolean checkForErrors) {
+	public int encode(char[] src, Output dest, int srcOffset, int chars, boolean checkForErrors) {
 
 		return 0;
 	}
@@ -41,28 +40,7 @@ public class SixBitCharset implements TroyCharset {
 
 	@Override
 	public int getCharsetCode() {
-
 		return CODE;
-	}
-
-	@Override
-	public int encode(char c, int index, boolean checkForErrors) {
-		if (SerializationUtils.CHECK_CHARSET_PROBLEMS) {
-			if (c >= ENCODING_CACHE.length)
-				throw new UnsupportedCharacterException(c, index, this);
-			int code = ENCODING_CACHE[c];
-			if (code < MIN_VALUE || code > MAX_VALUE) {
-				throw new UnsupportedCharacterException(c, this);
-			}
-			return code;
-		}
-		return ENCODING_CACHE[c];
-	}
-
-	@Override
-	public char decode(int encoded, boolean checkForErrors) {
-
-		return DECODING_CACHE[encoded];
 	}
 
 	@Override

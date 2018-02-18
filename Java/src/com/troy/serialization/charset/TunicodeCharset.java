@@ -1,20 +1,22 @@
 package com.troy.serialization.charset;
 
+import com.troy.serialization.io.*;
+
 public class TunicodeCharset implements TroyCharset {
 	public static final byte CODE = 0b10;
 	private static final int INFO_MASK = 0b10000000;
 
 	@Override
-	public int decode(byte[] src, char[] dest, int srcOffset, int destOffset, int chars, boolean checkForErrors) {
+	public int decode(Input src, char[] dest, int destOffset, int chars, boolean checkForErrors) {
 		int charsRead = 0;
 
 		return charsRead;
 	}
 
 	@Override
-	public int encode(char[] src, byte[] dest, int srcOffset, final int destOffset, int chars, boolean checkForErrors) {
+	public int encode(char[] src, Output dest, int srcOffset, int chars, boolean checkForErrors) {
 		final int end = srcOffset + chars;
-		int i = destOffset;
+		/*int i = destOffset;
 		while (srcOffset < end) {
 			char c = src[srcOffset++];
 			if ((c & INFO_MASK) == 0) {
@@ -30,7 +32,8 @@ public class TunicodeCharset implements TroyCharset {
 				}
 			}
 		}
-		return i - destOffset;
+		return i - destOffset;*/
+		return 0;
 	}
 
 	@Override
@@ -41,17 +44,6 @@ public class TunicodeCharset implements TroyCharset {
 	@Override
 	public int getCharsetCode() {
 		return CODE;
-	}
-
-	@Override
-	public int encode(char c, int index, boolean checkForErrors) {
-
-		return 0;
-	}
-
-	@Override
-	public char decode(int encoded, boolean checkForErrors) {
-		return 0;
 	}
 
 	@Override

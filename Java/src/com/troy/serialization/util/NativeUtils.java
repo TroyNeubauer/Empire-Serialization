@@ -5,13 +5,18 @@ import java.nio.*;
 import com.troyberry.util.MiscUtil;
 
 public class NativeUtils {
-	
+
 	static {
 		System.load("C:\\C++\\Current Projects\\bin\\x64\\Release\\Serialization Natives.dll");
 		System.out.println("loading natives");
 	}
-	
+
 	public static final boolean NATIVES_ENABLED = true;
+
+	// Small structure used for returning error information from native code
+	/* Composed like so:
+	 * struct info{ jbyte code; jchar badChar; jint index; };
+	 */
 	private static final ThreadLocal<ByteBuffer> NATIVE_RETURNS = new ThreadLocal<ByteBuffer>() {
 		protected ByteBuffer initialValue() {
 			return ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
@@ -36,7 +41,7 @@ public class NativeUtils {
 	public static long getAddress() {
 		return MiscUtil.address(NATIVE_RETURNS.get());
 	}
-	
+
 	public static void clearError() {
 		NATIVE_RETURNS.get().put(ERROR_CODE_OFFSET, (byte) 0);
 		NATIVE_RETURNS.get().putChar(INVALID_CHARACTER_OFFSET, (char) 0);
@@ -44,7 +49,7 @@ public class NativeUtils {
 	}
 
 	public static void init() {
-		NATIVE_RETURNS.get();//Create copy for this thread
+		NATIVE_RETURNS.get();// Create copy for this thread
 	}
 
 }

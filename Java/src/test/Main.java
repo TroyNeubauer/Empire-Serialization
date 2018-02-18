@@ -1,4 +1,4 @@
-package com.troy.serialization;
+package test;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -7,12 +7,10 @@ import com.troy.serialization.charset.TroyCharsets;
 import com.troy.serialization.util.SerializationUtils;
 import com.troyberry.util.StringFormatter;
 
-import net.didion.jwnl.JWNLException;
-
 public class Main {
 
 	public static void main(String[] args)
-			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, FileNotFoundException, IOException, JWNLException {
+			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, FileNotFoundException, IOException {
 		SerializationUtils.init();
 		OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(new File("unicode test.txt")), Charset.forName("UTF-8"));
 		writer.write(0x1F957);
