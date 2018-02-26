@@ -1,6 +1,5 @@
 package com.troy.serialization.util;
 
-import com.troy.serialization.*;
 import com.troy.serialization.charset.TroyCharsets;
 
 public class SerializationUtils {

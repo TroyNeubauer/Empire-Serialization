@@ -14,8 +14,8 @@ public class NativeUtils {
 	public static final boolean NATIVES_ENABLED = true;
 
 	// Small structure used for returning error information from native code
-	/* Composed like so:
-	 * struct info{ jbyte code; jchar badChar; jint index; };
+	/*
+	 * Composed like so: struct info{ jbyte code; jchar badChar; jint index; };
 	 */
 	private static final ThreadLocal<ByteBuffer> NATIVE_RETURNS = new ThreadLocal<ByteBuffer>() {
 		protected ByteBuffer initialValue() {

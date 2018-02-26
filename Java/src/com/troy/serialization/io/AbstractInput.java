@@ -22,9 +22,7 @@ public abstract class AbstractInput implements Input {
 		return null;
 	}
 
-	@Override
-	public void require(int bytes) {
-	}
+	public abstract void require(long bytes);
 
 	@Override
 	public byte readByte() {
@@ -70,14 +68,7 @@ public abstract class AbstractInput implements Input {
 
 	@Override
 	public boolean readBoolean() {
-
 		return false;
-	}
-
-	@Override
-	public String readString(TroyCharset charset, int length) {
-
-		return null;
 	}
 
 

@@ -1,11 +1,10 @@
 package com.troy.serialization.charset;
 
-import com.troy.serialization.*;
 import com.troy.serialization.exception.UnsupportedCharacterException;
 import com.troy.serialization.io.*;
 import com.troy.serialization.util.*;
 
-final class FourBitCharset implements TroyCharset {
+public final class FourBitCharset implements TroyCharset {
 	static {
 		NativeUtils.init();
 	}
@@ -35,27 +34,24 @@ final class FourBitCharset implements TroyCharset {
 
 	@Override
 	public void encode(final char[] src, Output dest, final int srcOffset, final int chars, boolean checkForErrors) {
-		/*
-		 * if (NativeUtils.NATIVES_ENABLED) { int bytes = nEncode(src, dest, srcOffset, destOffset, chars, NativeUtils.getAddress(), checkForErrors); if
-		 * (bytes == -1) { switch (NativeUtils.getErrorCode()) { case (SerializationUtils.OUT_OF_MEMORY): throw new
-		 * OutOfMemoryError("Unable to allocate buffer for copying to native memory"); case (SerializationUtils.UNSUPPORTED_CHARACTER): throw new
-		 * IllegalArgumentException("Invalid character\'" + NativeUtils.getInvalidChar() + "\' at index " + NativeUtils.getInvalidCharIndex() +
-		 * " for charset " + this.name()); } throw new RuntimeException("Error encoding characters!"); } return bytes; } else {
-		 */
-		if (checkForErrors) {// Scan for unsupported characters
-			for (int i = srcOffset; i < chars + srcOffset; i++) {
-				char c = src[i];
-				if (c >= ENCODING_CACHE.length)
-					throw new UnsupportedCharacterException(c, i, this);
-
-				if (ENCODING_CACHE[c] == -1)
-					throw new UnsupportedCharacterException(c, i, this);
-			}
-		}
 		int i = srcOffset;
 		final int end = (chars / 2) * 2;// round down to next multiple of two
-		while (i < end) {
-			dest.writeByte((byte) ((ENCODING_CACHE[src[i++]] << 4) | ENCODING_CACHE[src[i++]]));
+		if (checkForErrors) {
+			while (i < end) {
+				char c = src[i++];
+				if (c >= ENCODING_CACHE.length || ENCODING_CACHE[c] == -1)
+					throw new UnsupportedCharacterException(c, i, this);
+				char d = src[i++];
+				if (d >= ENCODING_CACHE.length || ENCODING_CACHE[d] == -1)
+					throw new UnsupportedCharacterException(c, i, this);
+				dest.writeByte((byte) ((ENCODING_CACHE[c] << 4) | ENCODING_CACHE[d]));
+			}
+		} else {
+			while (i < end) {
+				char c = src[i++];
+				char d = src[i++];
+				dest.writeByte((byte) ((ENCODING_CACHE[c] << 4) | ENCODING_CACHE[d]));
+			}
 		}
 		if (chars % 2 != 0) {// Write the remaining byte if there was an odd number
 			dest.writeByte((byte) (ENCODING_CACHE[src[end]] << 4));

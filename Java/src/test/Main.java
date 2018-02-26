@@ -1,9 +1,10 @@
 package test;
 
 import java.io.*;
-import java.nio.charset.Charset;
+import java.util.Arrays;
 
 import com.troy.serialization.charset.TroyCharsets;
+import com.troy.serialization.io.ByteArrayOutput;
 import com.troy.serialization.util.SerializationUtils;
 import com.troyberry.util.StringFormatter;
 
@@ -11,20 +12,24 @@ public class Main {
 
 	public static void main(String[] args)
 			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, FileNotFoundException, IOException {
-		char[] src = new char[] { (char) 1, (char) 3, (char) 7, (char) 15 };
-		byte[] dest = new byte[3];
-		TroyCharsets.SIX_BIT_ENCODING.encode(src, dest, srcOffset, chars, checkForErrors);
+
+		char[] src = new char[] { 'a', 'a', 'a', 'a' };
 
 		SerializationUtils.init();
-		OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(new File("unicode test.txt")), Charset.forName("UTF-8"));
-		writer.write(0x1F957);
-		writer.close();
+		ByteArrayOutput out = new ByteArrayOutput();
+		TroyCharsets.FOUR_BIT_ENCODING.encode(src, out, 0, src.length, true);
+		byte[] buf = Arrays.copyOf(out.getBuffer(), out.getBufferPosition());
+		new FileOutputStream(new File("test.dat")).write(buf);
+		System.out.println(StringFormatter.toBinaryString(buf));
 
 		/*
-		 * char[] src = "eat".toCharArray(); byte[] dest = new byte[(src.length + 3) / 2 - 1]; TroyCharsets.FOUR_BIT_ENCODING.encode(src, dest, 0, 0,
-		 * src.length, SerializationUtils.CHECK_CHARSET_PROBLEMS); System.out.println(StringFormatter.toHexString(dest));
+		 * char[] src = new char[] { 'T', 'r', 'o', 'y' , '!'};
+		 * 
+		 * 
+		 * SerializationUtils.init(); ByteArrayOutput out = new ByteArrayOutput(); TroyCharsets.SIX_BIT_ENCODING.encode(src, out, 0, src.length, true);
+		 * byte[] buf = Arrays.copyOf(out.getBuffer(), out.getBufferPosition()); new FileOutputStream(new File("test.dat")).write(buf);
+		 * System.out.println(StringFormatter.toBinaryString(buf));
 		 */
-
 	}
 
 	/*

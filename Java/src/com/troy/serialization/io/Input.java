@@ -1,9 +1,23 @@
 package com.troy.serialization.io;
 
-import com.troy.serialization.charset.TroyCharset;
 import com.troy.serialization.exception.*;
 
+/**
+ * Allows for reading primitive types from a linear input source.
+ * 
+ * @author Troy Neubauer
+ *
+ */
 public interface Input extends TroyIO {
+	/**
+	 * Reads the next byte in this input without checking for errors. This method should be used to implement reading primitives. This method should
+	 * be called any number of times to retrieve the required data after checking for errors because this method reads data without checking for
+	 * errors. This method will block until input is available if reading from a stream.
+	 * 
+	 * @return The next byte
+	 */
+	byte readByteImpl();
+
 	/**
 	 * Reads the next byte in this input. This method will block until input is available if reading from a stream.
 	 * 
@@ -74,8 +88,7 @@ public interface Input extends TroyIO {
 	public char readChar();
 
 	/**
-	 * Reads a string using a charset and the character count
-	 * This method will block until input is available if reading from a stream.
+	 * Reads a string using a charset and the character count This method will block until input is available if reading from a stream.
 	 * 
 	 * @return A string based on the number of characters and the charset to use to decode
 	 * @throws EndOfInputException If the end of input was reached while attempting to read the next bytes
@@ -83,6 +96,12 @@ public interface Input extends TroyIO {
 	 */
 	public boolean readBoolean();
 
-	public String readString(TroyCharset charset, int characters);
+	public short readVLEShort();
+
+	public short readVLEInt();
+
+	public short readVLELong();
+
+	public short readVLEChar();
 
 }

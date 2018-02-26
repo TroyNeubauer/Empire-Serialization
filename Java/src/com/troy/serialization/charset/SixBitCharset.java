@@ -1,5 +1,6 @@
 package com.troy.serialization.charset;
 
+import com.troy.serialization.exception.UnsupportedCharacterException;
 import com.troy.serialization.io.*;
 import com.troy.serialization.util.*;
 
@@ -12,11 +13,13 @@ public class SixBitCharset implements TroyCharset {
 	private static final int MASK = 0b00111111;
 	// maps a four bit code -> java char value
 	//format:off
-	public static final char[] DECODING_CACHE = new char[] { 
-			'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ')', '!', '@', '#', '$', '%', '^', '&','\"', 
-			'(', ' ','\0', '+', '-', '*', '/', '<', '>', '?', ',', '.','\'', ';', ':', '[', ']', '{', '}',
-			'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
-			't', 'u', 'v', 'w', 'x', 'y', 'z' };
+	public static final char[] DECODING_CACHE = new char[] {
+		' ', '.', '!', '?', ',', '\'', '\"', ';', ':', '+', '-', '_', 
+		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 
+		'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+		'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 
+	};
 	//format:on
 
 	// maps a java char -> four bit code
@@ -24,29 +27,75 @@ public class SixBitCharset implements TroyCharset {
 
 	@Override
 	public void decode(Input src, char[] dest, int destOffset, int chars) {
+
 	}
+
+	private static native void encode(char[] src, long dest, int srcOffset, int chars, boolean chackForErrors);
 
 	@Override
 	public void encode(char[] src, Output dest, int srcOffset, int chars, boolean checkForErrors) {
-		int i = srcOffset;
-		final int end = (chars / 4) * 4;// round down to next multiple of two
-		while (i < end) {
-			char c0 = src[i++];
-			char c1 = src[i++];
-			char c2 = src[i++];
-			char c3 = src[i++];
-			//format:off
-			byte b0 = (byte) ((ENCODING_CACHE[c0] << 2) & MASK   | (ENCODING_CACHE[c1] >>> 4) & 0b11);
-			byte b1 = (byte) ((ENCODING_CACHE[c1] << 4) & 0b1111 | (ENCODING_CACHE[c2] >>> 4) & 0b11);
-			byte b2 = (byte) ((ENCODING_CACHE[c2] << 6) & 0b11   | ENCODING_CACHE[c3] & MASK);
-			//format:on
+		if (NativeUtils.NATIVES_ENABLED) {
+			
+		} else {
+			int i = srcOffset;
+			int result;
+			final int end = (chars / 4) * 4;// round down to next multiple of two
+			while (i < end) {
+				int c0 = ENCODING_CACHE[src[i++]];
+				if (c0 == -1)
+					throw new UnsupportedCharacterException(src[--i], i, this);
+				int c1 = ENCODING_CACHE[src[i++]];
+				if (c1 == -1)
+					throw new UnsupportedCharacterException(src[--i], i, this);
+				int c2 = ENCODING_CACHE[src[i++]];
+				if (c2 == -1)
+					throw new UnsupportedCharacterException(src[--i], i, this);
+				int c3 = ENCODING_CACHE[src[i++]];
+				if (c3 == -1)
+					throw new UnsupportedCharacterException(src[--i], i, this);
+				result = c3;
+				result |= c2 << 6;
+				result |= c1 << 12;
+				result |= c0 << 18;
 
-			dest.writeByte(b0);
-			dest.writeByte(b1);
-			dest.writeByte(b2);
-		}
-		if (chars % 2 != 0) {// Write the remaining byte if there was an odd number
-			dest.writeByte((byte) (ENCODING_CACHE[src[end]] << 4));
+				dest.writeByte((byte) ((result >> 16) & 0xFF));
+				dest.writeByte((byte) ((result >> 8) & 0xFF));
+				dest.writeByte((byte) ((result >> 0) & 0xFF));
+			}
+			if (chars % 4 == 3) {// Write the remaining byte if there was an odd number
+				int c0 = ENCODING_CACHE[src[i++]];
+				if (c0 == -1)
+					throw new UnsupportedCharacterException(src[--i], i, this);
+				int c1 = ENCODING_CACHE[src[i++]];
+				if (c1 == -1)
+					throw new UnsupportedCharacterException(src[--i], i, this);
+				int c2 = ENCODING_CACHE[src[i++]];
+				if (c2 == -1)
+					throw new UnsupportedCharacterException(src[--i], i, this);
+				result = 0;
+				result |= c2 << 0;
+				result |= c1 << 6;
+				result |= c0 << 12;
+
+				dest.writeByte((byte) ((result >> 16) & 0xFF));
+				dest.writeByte((byte) ((result >> 8) & 0xFF));
+				dest.writeByte((byte) ((result >> 0) & 0xFF));
+			} else if (chars % 4 == 2) {// Write the remaining byte if there was an odd number
+				int c0 = ENCODING_CACHE[src[i++]];
+				if (c0 == -1)
+					throw new UnsupportedCharacterException(src[--i], i, this);
+				int c1 = ENCODING_CACHE[src[i++]];
+				if (c1 == -1)
+					throw new UnsupportedCharacterException(src[--i], i, this);
+				result = c1 << 0;
+				result |= c0 << 6;
+
+				dest.writeByte((byte) ((result >> 8) & 0xFF));
+				dest.writeByte((byte) ((result >> 0) & 0xFF));
+			} else if (chars % 4 == 1) {// Write the remaining byte if there was an odd number
+				System.out.println("one char remain " + src[end]);
+				dest.writeByte((byte) (ENCODING_CACHE[src[end]]));
+			}
 		}
 	}
 
