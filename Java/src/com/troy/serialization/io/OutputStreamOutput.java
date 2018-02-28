@@ -80,4 +80,15 @@ public class OutputStreamOutput extends AbstractOutput {
 	public void unmapOutputImpl(AbstractMappedIO out, long numBytesWritten) {
 	}
 
+	@Override
+	public void writeBytes(byte[] src, int offset, int bytes) {
+		try {
+			out.write(src, offset, bytes);
+		} catch (NullPointerException e) {
+			throw new AlreadyClosedException();
+		} catch (IOException e) {
+			throw new TroySerializationIOException(e);
+		}
+	}
+
 }

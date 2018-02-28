@@ -10,9 +10,10 @@ import com.troy.serialization.exception.*;
  */
 public interface Input extends TroyIO {
 	/**
-	 * Reads the next byte in this input without checking for errors. This method should be used to implement reading primitives. This method should
-	 * be called any number of times to retrieve the required data after checking for errors because this method reads data without checking for
-	 * errors. This method will block until input is available if reading from a stream.
+	 * Reads the next byte in this input without checking for errors. This method should be used as the base method to implement reading primitives.
+	 * This method should be called any number of times to retrieve the required data for reading higher level primitives after checking for errors.
+	 * 
+	 * This method will block until input is available if reading from a stream.
 	 * 
 	 * @return The next byte
 	 */

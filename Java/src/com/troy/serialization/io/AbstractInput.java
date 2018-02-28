@@ -1,75 +1,61 @@
 package com.troy.serialization.io;
 
-import com.troy.serialization.charset.TroyCharset;
-
 public abstract class AbstractInput implements Input {
 
-	@Override
-	public boolean hasBuffer() {
+	public abstract boolean hasBuffer();
 
-		return false;
-	}
+	public abstract int getBufferPosition();
 
-	@Override
-	public int getBufferPosition() {
-
-		return 0;
-	}
-
-	@Override
-	public byte[] getBuffer() {
-
-		return null;
-	}
+	public abstract byte[] getBuffer();
 
 	public abstract void require(long bytes);
 
 	@Override
 	public byte readByte() {
-
-		return 0;
+		require(Byte.BYTES);
+		return readByteImpl();
 	}
 
 	@Override
 	public short readShort() {
-
-		return 0;
+		require(Short.BYTES);
+		return (short) (readByteImpl() << 8 | readByteImpl());
 	}
 
 	@Override
 	public int readInt() {
-
-		return 0;
+		require(Integer.BYTES);
+		return (int) (readByteImpl() << 24 | readByteImpl() << 16 | readByteImpl() << 8 | readByteImpl());
 	}
 
 	@Override
 	public long readLong() {
-
-		return 0;
+		require(Long.BYTES);
+		return (long) (readByteImpl() << 56 | readByteImpl() << 48 | readByteImpl() << 40 | readByteImpl() << 32 | readByteImpl() << 24 | readByteImpl() << 16 | readByteImpl() << 8 | readByteImpl());
 	}
 
 	@Override
 	public float readFloat() {
-
-		return 0;
+		require(Float.BYTES);
+		return Float.intBitsToFloat(readInt());
 	}
 
 	@Override
 	public double readDouble() {
-
-		return 0;
+		require(Double.BYTES);
+		return Double.longBitsToDouble(readLong());
 	}
 
 	@Override
 	public char readChar() {
-
-		return 0;
+		require(Character.BYTES);
+		return (char) (readByteImpl() << 8 | readByteImpl());
 	}
 
 	@Override
 	public boolean readBoolean() {
-		return false;
+		require(1);
+		return readByteImpl() != 0;
 	}
-
 
 }

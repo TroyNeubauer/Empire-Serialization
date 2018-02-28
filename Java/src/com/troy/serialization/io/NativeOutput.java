@@ -1,12 +1,17 @@
 package com.troy.serialization.io;
 
 import com.troy.serialization.exception.*;
+import com.troy.serialization.util.*;
 import com.troyberry.util.MiscUtil;
 
 import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
 public class NativeOutput extends AbstractOutput {
+	
+	static {
+		SerializationUtils.init();
+	}
 
 	private static final Unsafe unsafe = MiscUtil.getUnsafe();
 	private static final long DEFAULT_CAPACITY = 128;
@@ -56,7 +61,7 @@ public class NativeOutput extends AbstractOutput {
 		return array;
 	}
 
-	private static native byte[] ngetBuffer(long address, int capacity);
+	public static native byte[] ngetBuffer(long address, int capacity);
 
 	@Override
 	public void require(long bytes) {
@@ -82,10 +87,24 @@ public class NativeOutput extends AbstractOutput {
 
 	@Override
 	public AbstractMappedIO newMappedOutput(long minSize) {
-		return null;
+		return new MappedOutput(address, size, capacity);
 	}
 
 	@Override
 	public void unmapOutputImpl(AbstractMappedIO out, long numBytesWritten) {
+		require(numBytesWritten);
+		// FIXME actually copy bytes
+		// nmemcpy(address, position, out.address, out.offset, numBytesWritten);
+		size += numBytesWritten;
+	}
+
+	@Override
+	public void writeBytes(byte[] src, int offset, int bytes) {
+		require(bytes);
+		// FIXME switch to more efficient native approach later
+		final int end = offset + bytes;
+		for (int i = offset; i < end; i++) {
+			writeByteImpl(src[i]);
+		}
 	}
 }

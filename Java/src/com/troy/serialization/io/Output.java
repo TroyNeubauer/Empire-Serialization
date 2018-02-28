@@ -2,6 +2,7 @@ package com.troy.serialization.io;
 
 /**
  * Allows for writing primitives to a linear output
+ * 
  * @author Troy Neubauer
  *
  */
@@ -73,30 +74,35 @@ public interface Output extends TroyIO {
 
 	/**
 	 * Writes a variable length encoded 16 bit big endian integer to this output
+	 * 
 	 * @param b The short to write using variable length encoding
 	 */
 	public void writeVLEShort(short b);
 
 	/**
 	 * Writes a variable length encoded 32 bit big endian integer to this output
+	 * 
 	 * @param b The int to write using variable length encoding
 	 */
 	public void writeVLEInt(int b);
 
 	/**
 	 * Writes a variable length encoded 64 bit big endian integer to this output
+	 * 
 	 * @param b The long to write using variable length encoding
 	 */
 	public void writeVLELong(long b);
 
 	/**
 	 * Writes a variable length encoded 16 bit big unicode character to this output
+	 * 
 	 * @param b The char to write using variable length encoding
 	 */
 	public void writeVLEChar(char b);
 
 	/**
-	 * Returns a MappedOutput object which contains a pointer to 
+	 * Returns a MappedOutput object which contains a pointer to
+	 * 
 	 * @param bytes
 	 * @return
 	 */
@@ -115,5 +121,11 @@ public interface Output extends TroyIO {
 	 * <p>
 	 */
 	public void flush();
+
+	public default void writeBytes(byte[] src) {
+		writeBytes(src, 0, src.length);
+	}
+
+	public void writeBytes(byte[] src, int offset, int bytes);
 
 }

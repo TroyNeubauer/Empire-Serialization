@@ -89,4 +89,11 @@ public class ByteArrayOutput extends AbstractOutput {
 		}
 	}
 
+	@Override
+	public void writeBytes(byte[] src, int offset, int bytes) {
+		require(bytes);
+		System.arraycopy(src, offset, buffer, position, bytes);
+		position += bytes;
+	}
+
 }

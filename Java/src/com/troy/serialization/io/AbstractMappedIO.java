@@ -16,7 +16,7 @@ public class AbstractMappedIO {
 	protected long address;
 
 	/**
-	 * The index of the first valid byte. Always positive, zero or negative one. A value of negative one indicates that this mapped output object is
+	 * The index of the first byte that the receiver should write to. Always positive, zero or negative one. A value of negative one indicates that this mapped output object is
 	 * invalid, and not attached to any output.
 	 */
 	protected long offset;

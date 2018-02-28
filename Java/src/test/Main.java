@@ -1,33 +1,48 @@
 package test;
 
 import java.io.*;
-import java.util.Arrays;
 
-import com.troy.serialization.charset.TroyCharsets;
-import com.troy.serialization.io.ByteArrayOutput;
-import com.troy.serialization.util.SerializationUtils;
-import com.troyberry.util.StringFormatter;
+import com.troy.serialization.io.*;
 
 public class Main {
 
 	public static void main(String[] args)
 			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, FileNotFoundException, IOException {
+		File file = new File("./test.dat");
 
-		char[] src = new char[] { 'a', 'a', 'a', 'a' };
+		NativeFileOutput n = new NativeFileOutput(file);
 
-		SerializationUtils.init();
-		ByteArrayOutput out = new ByteArrayOutput();
-		TroyCharsets.FOUR_BIT_ENCODING.encode(src, out, 0, src.length, true);
-		byte[] buf = Arrays.copyOf(out.getBuffer(), out.getBufferPosition());
-		new FileOutputStream(new File("test.dat")).write(buf);
-		System.out.println(StringFormatter.toBinaryString(buf));
+		n.writeInt(0x0FFFFFA0);
+		n.close();
 
 		/*
-		 * char[] src = new char[] { 'T', 'r', 'o', 'y' , '!'};
+		 * System.exit(0);
+		 * 
+		 * char[] src = new char[] { 'a', 'a', 'a', 'a' };
+		 * 
+		 * SerializationUtils.init(); ByteArrayOutput out = new ByteArrayOutput();
+		 * 
+		 * TroyCharsets.FOUR_BIT_ENCODING.encode(src, out, 0, src.length, true);
+		 * 
+		 * byte[] buf = Arrays.copyOf(out.getBuffer(), out.getBufferPosition());
+		 * 
+		 * new FileOutputStream(new File("test.dat")).write(buf);
+		 * 
+		 * System.out.println(StringFormatter.toBinaryString(buf));
+		 * 
+		 * /* char[] src = new char[] { 'T', 'r', 'o', 'y' , '!'};
 		 * 
 		 * 
-		 * SerializationUtils.init(); ByteArrayOutput out = new ByteArrayOutput(); TroyCharsets.SIX_BIT_ENCODING.encode(src, out, 0, src.length, true);
-		 * byte[] buf = Arrays.copyOf(out.getBuffer(), out.getBufferPosition()); new FileOutputStream(new File("test.dat")).write(buf);
+		 * SerializationUtils.init();
+		 * 
+		 * ByteArrayOutput out = new ByteArrayOutput();
+		 * 
+		 * TroyCharsets.SIX_BIT_ENCODING.encode(src, out, 0, src.length, true);
+		 * 
+		 * byte[] buf = Arrays.copyOf(out.getBuffer(), out.getBufferPosition());
+		 * 
+		 * new FileOutputStream(new File("test.dat")).write(buf);
+		 * 
 		 * System.out.println(StringFormatter.toBinaryString(buf));
 		 */
 	}
