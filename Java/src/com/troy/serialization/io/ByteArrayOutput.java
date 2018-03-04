@@ -3,6 +3,7 @@ package com.troy.serialization.io;
 import java.util.Arrays;
 
 import com.troy.serialization.exception.*;
+import com.troy.serialization.util.*;
 
 public class ByteArrayOutput extends AbstractOutput {
 
@@ -90,10 +91,88 @@ public class ByteArrayOutput extends AbstractOutput {
 	}
 
 	@Override
-	public void writeBytes(byte[] src, int offset, int bytes) {
-		require(bytes);
-		System.arraycopy(src, offset, buffer, position, bytes);
-		position += bytes;
+	public void writeBytes(byte[] src, int offset, int elements) {
+		require(elements);
+		System.arraycopy(src, offset, buffer, position, elements);
+		position += elements;
+	}
+
+	@Override
+	public void writeShorts(short[] src, int offset, int elements) {
+		if(NativeUtils.NATIVES_ENABLED) {
+			NativeUtils.shortsToBytes(buffer, src, offset, position, elements, swapEndianess);
+		} else {
+			//FIXME provide non native alternative
+		}
+	}
+
+	@Override
+	public void writeInts(int[] src, int offset, int elements) {
+		if(NativeUtils.NATIVES_ENABLED) {
+			NativeUtils.intsToBytes(buffer, src, offset, position, elements, swapEndianess);
+		} else {
+			
+		}
+	}
+
+	@Override
+	public void writeLongs(long[] src, int offset, int elements) {
+		if(NativeUtils.NATIVES_ENABLED) {
+			NativeUtils.longsToBytes(buffer, src, offset, position, elements, swapEndianess);
+		} else {
+			
+		}
+	}
+
+	@Override
+	public void writeFloats(float[] src, int offset, int elements) {
+		if(NativeUtils.NATIVES_ENABLED) {
+			NativeUtils.floatsToBytes(buffer, src, offset, position, elements, swapEndianess);
+		} else {
+			
+		}
+	}
+
+	@Override
+	public void writeDoubles(double[] src, int offset, int elements) {
+		if(NativeUtils.NATIVES_ENABLED) {
+			NativeUtils.doublesToBytes(buffer, src, offset, position, elements, swapEndianess);
+		} else {
+			
+		}
+	}
+
+	@Override
+	public void writeChars(char[] src, int offset, int elements) {
+		if(NativeUtils.NATIVES_ENABLED) {
+			NativeUtils.charsToBytes(buffer, src, offset, position, elements, swapEndianess);
+		} else {
+			
+		}
+	}
+
+	@Override
+	public void writeBooleans(boolean[] src, int offset, int elements) {
+		if(NativeUtils.NATIVES_ENABLED) {
+			NativeUtils.booleansToBytes(buffer, src, offset, position, elements, swapEndianess);
+			position += elements;
+		} else {
+			
+		}
+	}
+
+	@Override
+	public void writeBooleansCompact(boolean[] src, int offset, int elements) {
+		if(NativeUtils.NATIVES_ENABLED) {
+			int result = NativeUtils.booleansToBytesCompact(buffer, src, offset, position, elements);
+			if(result < 0) {//Error happened
+				
+			} else {
+				position += result;//If result is positive, it holds the number of bytes written
+			}
+		} else {
+			
+		}
 	}
 
 }

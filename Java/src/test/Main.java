@@ -2,18 +2,48 @@ package test;
 
 import java.io.*;
 
-import com.troy.serialization.io.*;
+import com.troy.serialization.util.*;
+import com.troyberry.util.StringFormatter;
 
 public class Main {
 
 	public static void main(String[] args)
 			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, FileNotFoundException, IOException {
-		File file = new File("./test.dat");
+		SerializationUtils.init();
+		boolean[] bools = new boolean[8];
+		bools[0] = true;
+		bools[5] = true;
+		bools[7] = true;
+		byte[] dest = new byte[(bools.length + 7) / 8];
+		
+		NativeUtils.booleansToBytesCompact(dest, bools, 0, 0, bools.length);
+		System.out.println(StringFormatter.toBinaryString(dest));
+		
+		System.exit(0);
+		/*System.out.println();
 
-		NativeFileOutput n = new NativeFileOutput(file);
+		FieldSerializer<TestSub> tst = new FieldSerializer<TestSub>(TestSub.class);
+		int[] src = new int[1];
+		src[0] = 0x12345678;
+		byte[] dest = new byte[src.length * Integer.BYTES];
 
-		n.writeInt(0x0FFFFFA0);
-		n.close();
+		long start;
+		start = System.nanoTime();
+		NativeUtils.intsToBytes(dest, src, 0, 0, src.length, true);
+		System.out.println((System.nanoTime() - start) + " nanos for native");
+
+		start = System.nanoTime();
+		intsToBytes(dest, src, 0, 0, src.length, true);
+		System.out.println((System.nanoTime() - start) + " nanos for java");
+*/
+		/*
+		 * File file = new File("./test.dat");
+		 * 
+		 * NativeFileOutput n = new NativeFileOutput(file); long size = 1000; long address = MiscUtil.getUnsafe().allocateMemory(size); short[] array =
+		 * new short[10]; array[0] = 10; array[1] = 10010; NativeUtils.shortArrayToNative(address, array, 0, array.length);
+		 * System.out.println(MiscUtil.getUnsafe().getShort(address)); System.out.println(MiscUtil.getUnsafe().getShort(address +
+		 * sun.misc.Unsafe.ARRAY_SHORT_INDEX_SCALE)); n.close();
+		 */
 
 		/*
 		 * System.exit(0);
@@ -45,6 +75,21 @@ public class Main {
 		 * 
 		 * System.out.println(StringFormatter.toBinaryString(buf));
 		 */
+	}
+
+	private static void intsToBytes(byte[] dest, int[] src, int srcOffset, int destOffset, int elements, boolean swapEndianess) {
+		if (swapEndianess) {
+			for (int i = 0; i < elements; i++) {
+				int srcIndex = i + srcOffset;
+				int obj = src[srcIndex];
+				dest[destOffset + i * 4 + 0] = (byte) (obj & 0xFF000000);
+				dest[destOffset + i * 4 + 1] = (byte) (obj & 0x00FF0000);
+				dest[destOffset + i * 4 + 2] = (byte) (obj & 0x0000FF00);
+				dest[destOffset + i * 4 + 3] = (byte) (obj & 0x000000FF);
+			}
+		} else {
+			System.arraycopy(src, srcOffset, dest, destOffset, elements);
+		}
 	}
 
 	/*

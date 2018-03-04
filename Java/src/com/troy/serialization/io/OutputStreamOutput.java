@@ -4,6 +4,9 @@ import java.io.*;
 import java.util.Objects;
 
 import com.troy.serialization.exception.*;
+import com.troyberry.util.MiscUtil;
+
+import sun.misc.Unsafe;
 
 public class OutputStreamOutput extends AbstractOutput {
 
@@ -41,7 +44,7 @@ public class OutputStreamOutput extends AbstractOutput {
 
 	@Override
 	public void require(long bytes) {
-		// Nop we don't need to tell the stream anything
+		// Nop
 	}
 
 	@Override
@@ -69,11 +72,20 @@ public class OutputStreamOutput extends AbstractOutput {
 
 	@Override
 	public void resetMappedOutputImpl(AbstractMappedIO out, long minSize) {
+		out.offset = 0;
+		if (out.capacity < minSize) {
+			Unsafe unsafe = MiscUtil.getUnsafe();
+			if (out.address != 0)
+				unsafe.freeMemory(out.address);
+			out.address = unsafe.allocateMemory(minSize);
+			out.capacity = minSize;
+		}
 	}
 
 	@Override
 	public AbstractMappedIO newMappedOutput(long minSize) {
-		return new AbstractMappedIO(0, 0, 0);
+		long address = MiscUtil.getUnsafe().allocateMemory(minSize);
+		return new AbstractMappedIO(address, 0, minSize);
 	}
 
 	@Override
@@ -89,6 +101,38 @@ public class OutputStreamOutput extends AbstractOutput {
 		} catch (IOException e) {
 			throw new TroySerializationIOException(e);
 		}
+	}
+	
+	@Override
+	public void writeShorts(short[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeInts(int[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeLongs(long[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeFloats(float[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeDoubles(double[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeChars(char[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeBooleans(boolean[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeBooleansCompact(boolean[] src, int offset, int bytes) {
 	}
 
 }

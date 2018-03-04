@@ -1,11 +1,16 @@
-package com.troy.serialization.util;
+package com.troy.serialization.serializers;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-public class ClassInfo<T> {
+import com.troy.serialization.io.*;
+import com.troyberry.util.MiscUtil;
 
-	private Class<T> type;
+import sun.misc.Unsafe;
+
+public class FieldSerializer<T> extends AbstractSerializer<T> {
+	private static final Unsafe unsafe = MiscUtil.getUnsafe();
+
 	private String[] fieldNames;
 	private Class<?>[] fieldTypes;
 	private long[] fieldOffsets;
@@ -14,8 +19,12 @@ public class ClassInfo<T> {
 	private static final Class[] EMPTY_FIELD_TYPES = new Class[0];
 	private static final long[] EMPTY_FIELD_OFFSETS = new long[0];
 
-	private ClassInfo(Class<T> type) {
-		this.type = type;
+	public FieldSerializer(Class<T> type) {
+		super(type);
+		init();
+	}
+
+	private void init() {
 		Class<?> superType = type.getSuperclass();
 		if (type == null) {
 			setEmptyFields();
@@ -31,20 +40,30 @@ public class ClassInfo<T> {
 					this.fieldOffsets = new long[fieldsLength];
 					for (int i = 0; i < fieldsLength; i++)
 						addField(fields[i], i);
-						
+
 				}
 			} else {// There are other classes between out super and the object class. We must account for fields in superclasses
 				ArrayList<Field> fieldsList = new ArrayList<Field>();
-				for (int i = 0; i < fieldsLength; i++)//Dump all into arraylist
+				for (int i = 0; i < fieldsLength; i++)// Dump all into arraylist
 					fieldsList.add(fields[i]);
-				while(superType != null && superType != Object.class) {
+				while (superType != null && superType != Object.class) {
 					fields = superType.getDeclaredFields();
 					fieldsLength = fields.length;
-					for (int i = 0; i < fieldsLength; i++)//Dump all into arraylist
+					for (int i = 0; i < fieldsLength; i++)// Dump all into arraylist
 						fieldsList.add(fields[i]);
+					superType = superType.getSuperclass();
 				}
-				System.out.println("Fields list " + fieldsList);
+				this.fieldNames = new String[fieldsList.size()];
+				this.fieldTypes = new Class[fieldsList.size()];
+				if (unsafe == null)
+					this.fieldOffsets = EMPTY_FIELD_OFFSETS;
+				else
+					this.fieldOffsets = new long[fieldsList.size()];
 				
+				int i = 0;
+				for (Field field : fieldsList) {
+					addField(field, i++);
+				}
 			}
 		}
 	}
@@ -56,7 +75,11 @@ public class ClassInfo<T> {
 	}
 
 	private void addField(Field field, int index) {
-
+		System.out.println("adding field " + field + " index " + index);
+		fieldNames[index] = field.getName();
+		fieldTypes[index] = field.getType();
+		if (unsafe != null)
+			fieldOffsets[index] = unsafe.objectFieldOffset(field);
 	}
 
 	public T newInstance() {
@@ -65,6 +88,15 @@ public class ClassInfo<T> {
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public void writeFields(Output out) {
+
+	}
+
+	@Override
+	public void readFields(Input in) {
 	}
 
 }

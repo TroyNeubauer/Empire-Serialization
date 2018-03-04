@@ -107,4 +107,36 @@ public class NativeOutput extends AbstractOutput {
 			writeByteImpl(src[i]);
 		}
 	}
+	
+	@Override
+	public void writeShorts(short[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeInts(int[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeLongs(long[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeFloats(float[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeDoubles(double[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeChars(char[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeBooleans(boolean[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public void writeBooleansCompact(boolean[] src, int offset, int bytes) {
+	}
 }

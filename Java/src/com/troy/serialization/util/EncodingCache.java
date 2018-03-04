@@ -37,18 +37,18 @@ public class EncodingCache<E> extends Cache<IntValue<E>> {
 		size++;
 	}
 
-	public int get(E key) {
+	public IntValue get(Object key) {
 		int index = key.hashCode() % table.length;
 		IntValue entry = table[index];
 		if (entry != null) {
 			while (entry.next != null) {
 				if (entry.equals(key))
-					return entry.value;
+					return entry;
 				entry = entry.next;
 			}
 		}
 
-		return Integer.MIN_VALUE;
+		return null;
 	}
 
 	protected void resize(int newSize) {

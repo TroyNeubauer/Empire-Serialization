@@ -1,13 +1,16 @@
 package com.troy.serialization.io;
 
+import java.nio.ByteOrder;
+
 import com.troy.serialization.exception.AlreadyMappedException;
 import com.troy.serialization.util.TroyStreamSettings;
 
 public abstract class AbstractOutput implements Output {
-	private TroyStreamSettings settings;
-	private AbstractMappedIO mapped;
+	protected TroyStreamSettings settings;
+	protected AbstractMappedIO mapped;
+	protected boolean swapEndianess = ByteOrder.nativeOrder() != ByteOrder.BIG_ENDIAN;
 
-	private static final int NEXT_BYTE_VLE = 0b10000000, VLE_MASK = 0b01111111;
+	protected static final int NEXT_BYTE_VLE = 0b10000000, VLE_MASK = 0b01111111;
 
 	@Override
 	public void writeByte(byte b) {

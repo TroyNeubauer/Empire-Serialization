@@ -15,5 +15,7 @@ public abstract class Cache<Entry> {
 	
 	protected abstract void resize(int newSize);
 	
+	public abstract Entry get(Object key);
+	
 
 }

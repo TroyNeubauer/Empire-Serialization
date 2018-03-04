@@ -6,7 +6,7 @@ package com.troy.serialization.io;
  * @author Troy Neubauer
  *
  */
-public interface Output extends TroyIO {
+public interface Output extends TroyIO, ArrayOutput {
 
 	/**
 	 * Writes a byte to the output without checking for overflow with require(). This function should be called by every write function after
