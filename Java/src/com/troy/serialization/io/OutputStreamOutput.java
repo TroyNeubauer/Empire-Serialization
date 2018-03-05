@@ -1,10 +1,13 @@
 package com.troy.serialization.io;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Objects;
 
-import com.troy.serialization.exception.*;
-import com.troyberry.util.MiscUtil;
+import com.troy.serialization.exception.AlreadyClosedException;
+import com.troy.serialization.exception.NoBufferException;
+import com.troy.serialization.exception.TroySerializationIOException;
+import com.troy.serialization.util.MiscUtil;
 
 import sun.misc.Unsafe;
 

@@ -3,8 +3,9 @@ package com.troy.serialization.serializers;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-import com.troy.serialization.io.*;
-import com.troyberry.util.MiscUtil;
+import com.troy.serialization.io.Input;
+import com.troy.serialization.io.Output;
+import com.troy.serialization.util.MiscUtil;
 
 import sun.misc.Unsafe;
 

@@ -1,8 +1,8 @@
 package com.troy.serialization.io;
 
-import com.troy.serialization.exception.*;
-import com.troy.serialization.util.*;
-import com.troyberry.util.MiscUtil;
+import com.troy.serialization.exception.AlreadyClosedException;
+import com.troy.serialization.util.MiscUtil;
+import com.troy.serialization.util.SerializationUtils;
 
 import sun.misc.Unsafe;
 

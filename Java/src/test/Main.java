@@ -3,7 +3,6 @@ package test;
 import java.io.*;
 
 import com.troy.serialization.util.*;
-import com.troyberry.util.StringFormatter;
 
 public class Main {
 

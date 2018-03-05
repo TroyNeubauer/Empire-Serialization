@@ -4,7 +4,6 @@ import java.lang.reflect.*;
 import java.nio.*;
 
 import com.troy.serialization.nativelibrary.LibraryProvider;
-import com.troyberry.util.MiscUtil;
 
 public class NativeUtils {
 
