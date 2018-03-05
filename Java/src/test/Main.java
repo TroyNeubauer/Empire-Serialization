@@ -13,6 +13,7 @@ public class Main {
 		bools[0] = true;
 		bools[5] = true;
 		bools[7] = true;
+		
 		byte[] dest = new byte[(bools.length + 7) / 8];
 		
 		NativeUtils.booleansToBytesCompact(dest, bools, 0, 0, bools.length);
