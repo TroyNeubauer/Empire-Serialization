@@ -200,5 +200,4 @@ public class ByteArrayOutput extends AbstractOutput {
 	private void addRequested() {
 		position += requested;
 	}
-
 }

@@ -3,7 +3,6 @@ package com.troy.serialization.charset;
 import com.troy.serialization.exception.UnsupportedCharacterException;
 import com.troy.serialization.io.*;
 import com.troy.serialization.util.*;
-
 public final class FourBitCharset implements TroyCharset {
 	static {
 		NativeUtils.init();

@@ -120,7 +120,7 @@ public class NativeOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.intsToNative(address + position, src, offset, elements, swapEndianess);
 		} else {
-			
+
 		}
 	}
 
@@ -130,7 +130,7 @@ public class NativeOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.longsToNative(address + position, src, offset, elements, swapEndianess);
 		} else {
-			
+
 		}
 		addRequested();
 	}
@@ -141,7 +141,7 @@ public class NativeOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.floatsToNative(address + position, src, offset, elements, swapEndianess);
 		} else {
-			
+
 		}
 		addRequested();
 	}
@@ -152,7 +152,7 @@ public class NativeOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.doublesToNative(address + position, src, offset, elements, swapEndianess);
 		} else {
-			
+
 		}
 		addRequested();
 	}
@@ -163,7 +163,7 @@ public class NativeOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.charsToNative(address + position, src, offset, elements, swapEndianess);
 		} else {
-			
+
 		}
 		addRequested();
 	}
@@ -174,8 +174,7 @@ public class NativeOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.booleansToNative(address + position, src, offset, elements, swapEndianess);
 		} else {
-			
-			
+
 		}
 		addRequested();
 	}
@@ -183,7 +182,7 @@ public class NativeOutput extends AbstractOutput {
 	@Override
 	public void writeBooleansCompact(boolean[] src, int offset, int elements) {
 	}
-	
+
 	private void addRequested() {
 		position += requested;
 	}

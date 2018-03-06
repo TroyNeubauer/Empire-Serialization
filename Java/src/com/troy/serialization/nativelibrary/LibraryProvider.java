@@ -30,7 +30,6 @@ public abstract class LibraryProvider {
 					provider.load(lib);
 					return isLibraryLoaded();
 				} catch (Exception e) {
-					e.printStackTrace();
 				}
 			}
 		}

@@ -15,6 +15,7 @@ public abstract class AbstractOutput implements Output {
 	public AbstractOutput() {
 	}
 
+
 	@Override
 	public void writeByte(byte b) {
 		require(Byte.BYTES);

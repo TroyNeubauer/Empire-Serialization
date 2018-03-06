@@ -28,7 +28,8 @@ public class NativeUtils {
 		NATIVE_RETURNS.get();
 		long start = System.nanoTime();
 		int count = 0;
-		//Call all the static native methods in thic class to link them to the native code so calls will be faster later
+		// Call all the static native methods in thic class to link them to the native
+		// code so calls will be faster later
 		for (Method method : NativeUtils.class.getDeclaredMethods()) {
 			int mods = method.getModifiers();
 			if (Modifier.isStatic(mods) && Modifier.isNative(mods)) {

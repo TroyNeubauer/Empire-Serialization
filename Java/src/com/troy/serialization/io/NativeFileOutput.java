@@ -138,6 +138,7 @@ public class NativeFileOutput extends AbstractNativeOutput {
 	@Override
 	public void writeBooleans(boolean[] src, int offset, int bytes) {
 		NativeUtils.booleansToFWrite(fd, src, offset, bytes, swapEndianess);
+
 	}
 
 	@Override

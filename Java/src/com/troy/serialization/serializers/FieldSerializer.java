@@ -43,7 +43,8 @@ public class FieldSerializer<T> extends AbstractSerializer<T> {
 						addField(fields[i], i);
 
 				}
-			} else {// There are other classes between out super and the object class. We must account for fields in superclasses
+			} else {// There are other classes between out super and the object class. We must
+					// account for fields in superclasses
 				ArrayList<Field> fieldsList = new ArrayList<Field>();
 				for (int i = 0; i < fieldsLength; i++)// Dump all into arraylist
 					fieldsList.add(fields[i]);
@@ -60,7 +61,7 @@ public class FieldSerializer<T> extends AbstractSerializer<T> {
 					this.fieldOffsets = EMPTY_FIELD_OFFSETS;
 				else
 					this.fieldOffsets = new long[fieldsList.size()];
-				
+
 				int i = 0;
 				for (Field field : fieldsList) {
 					addField(field, i++);
