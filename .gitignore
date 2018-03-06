@@ -1,0 +1,8 @@
+/.metadata/
+/.git/
+/.recommenders/
+**.class
+**/bin
+RemoteSystemsTempFiles/
+.*
+!/.gitignore
