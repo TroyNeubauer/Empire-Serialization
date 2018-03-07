@@ -49,6 +49,11 @@ public class OutputStreamOutput extends AbstractOutput {
 	public void require(long bytes) {
 		// Nop
 	}
+	
+	@Override
+	public void addRequired() {
+		// Nop
+	}
 
 	@Override
 	public void close() {
@@ -137,5 +142,7 @@ public class OutputStreamOutput extends AbstractOutput {
 	@Override
 	public void writeBooleansCompact(boolean[] src, int offset, int bytes) {
 	}
+
+
 
 }

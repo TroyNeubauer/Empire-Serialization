@@ -205,6 +205,63 @@ public abstract class AbstractOutput implements Output {
 			writeByteImpl((byte) (c & VLE_MASK));
 		}
 	}
+	
+	@Override
+	public void writeBytes(byte[] src, int offset, int bytes) {
+		require(bytes);
+		for(int i = offset; i < offset + bytes; i++) {
+			writeByteImpl(src[i]);
+		}
+	}
+
+	@Override
+	public void writeShorts(short[] src, int offset, int elements) {
+		
+	}
+
+
+	@Override
+	public void writeInts(int[] src, int offset, int elements) {
+		
+	}
+
+
+	@Override
+	public void writeLongs(long[] src, int offset, int elements) {
+		
+	}
+
+
+	@Override
+	public void writeFloats(float[] src, int offset, int elements) {
+		
+	}
+
+
+	@Override
+	public void writeDoubles(double[] src, int offset, int elements) {
+		
+	}
+
+
+	@Override
+	public void writeChars(char[] src, int offset, int elements) {
+		
+	}
+
+
+	@Override
+	public void writeBooleans(boolean[] src, int offset, int elements) {
+		
+	}
+
+
+	@Override
+	public void writeBooleansCompact(boolean[] src, int offset, int elements) {
+		
+	}
+
+
 
 	public void setSettings(TroyStreamSettings settings) {
 		this.settings = settings;

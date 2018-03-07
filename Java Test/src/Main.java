@@ -1,31 +1,32 @@
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import com.troy.serialization.io.NativeFileOutput;
 import com.troy.serialization.io.NativeOutput;
+import com.troy.serialization.util.InternalLog;
 import com.troy.serialization.util.SerializationUtils;
 import com.troy.serialization.util.StringFormatter;
 
 public class Main {
 
-	public static void main(String[] args) throws Throwable {
+	private static void test() {
 		SerializationUtils.init();
 		NativeOutput o = new NativeOutput();
 		o.writeInts(new int[] { 0x12, 0x324, 0x432, 0x123, 0x324 });
 		System.out.println(StringFormatter.toHexString(o.toByteArray()));
-		System.exit(0);
-		NativeFileOutput out = new NativeFileOutput(new File("./test.dat"));
-		byte[] bytes = new byte[10000000];
-		for (int i = 0; i < bytes.length; i++) {
-			bytes[i] = (byte) ((i % 256) & 0xFF);
-		}
-		long start = System.nanoTime();
-		out.writeBytes(bytes);
-		long end = System.nanoTime();
-		System.out.println((end - start) / 1000000.0 + " millis");
-		out.close();
+		o.close();
+	}
 
-		System.exit(0);
+	public static void main(String[] args) throws Throwable {
+		test();
+		long start = System.currentTimeMillis();
+		while (System.currentTimeMillis() < start + TimeUnit.SECONDS.toMillis(5)) {
+			System.gc();
+			InternalLog.dumpToError();
+			InternalLog.clear();
+		}
+		System.out.println();
 		/*
 		 * System.out.println();
 		 * 
@@ -84,8 +85,7 @@ public class Main {
 		 */
 	}
 
-	private static void intsToBytes(byte[] dest, int[] src, int srcOffset, int destOffset, int elements,
-			boolean swapEndianess) {
+	private static void intsToBytes(byte[] dest, int[] src, int srcOffset, int destOffset, int elements, boolean swapEndianess) {
 		if (swapEndianess) {
 			for (int i = 0; i < elements; i++) {
 				int srcIndex = i + srcOffset;

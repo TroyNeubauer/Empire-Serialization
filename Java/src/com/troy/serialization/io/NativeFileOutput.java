@@ -8,7 +8,7 @@ import com.troy.serialization.exception.TroySerializationIOException;
 import com.troy.serialization.util.NativeUtils;
 import com.troy.serialization.util.SerializationUtils;
 
-public class NativeFileOutput extends AbstractNativeOutput {
+public class NativeFileOutput extends AbstractNativeOutput<com.troy.serialization.io.NativeFileOutput.Deallocator> {
 
 	static {
 		SerializationUtils.init();
@@ -24,7 +24,7 @@ public class NativeFileOutput extends AbstractNativeOutput {
 		this(path.toAbsolutePath().toString());
 	}
 
-	private class Deallocator implements Runnable {
+	class Deallocator implements Runnable {
 		private long fd;
 
 		public Deallocator(long fd) {
@@ -85,6 +85,12 @@ public class NativeFileOutput extends AbstractNativeOutput {
 
 	@Override
 	public void require(long bytes) {
+		//fwrite does everything for us so we don't need to insure anything
+	}
+	
+	@Override
+	public void addRequired() {
+		//Do nothing
 	}
 
 	@Override

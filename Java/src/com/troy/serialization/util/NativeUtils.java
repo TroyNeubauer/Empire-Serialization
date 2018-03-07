@@ -26,6 +26,7 @@ public class NativeUtils {
 	static {
 		LibraryProvider.loadLibrary();
 		NATIVE_RETURNS.get();
+		InternalLog.log("Beginning to link native methods in Native Utils by calling them");
 		long start = System.nanoTime();
 		int count = 0;
 		// Call all the static native methods in thic class to link them to the native
@@ -34,11 +35,12 @@ public class NativeUtils {
 			int mods = method.getModifiers();
 			if (Modifier.isStatic(mods) && Modifier.isNative(mods)) {
 				MiscUtil.callMethod(method, null);
+				InternalLog.log("\tCalling method " + method);
 				count++;
 			}
 		}
 		long end = System.nanoTime();
-		System.out.println("Called " + count + " methods in " + (end - start) / 1000000.0 + " milliseconds");
+		InternalLog.log("Called " + count + " methods in " + (end - start) / 1000000.0 + " milliseconds");
 	}
 
 	public static final boolean NATIVES_ENABLED = true;

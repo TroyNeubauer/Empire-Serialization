@@ -100,7 +100,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeBytes(byte[] src, int offset, int elements) {
 		require(elements * Byte.BYTES);
 		System.arraycopy(src, offset, buffer, position, elements);
-		addRequested();
+		addRequired();
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		} else {
 			// FIXME provide non native alternative
 		}
-		addRequested();
+		addRequired();
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		} else {
 
 		}
-		addRequested();
+		addRequired();
 	}
 
 	@Override
@@ -133,7 +133,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		} else {
 
 		}
-		addRequested();
+		addRequired();
 	}
 
 	@Override
@@ -142,9 +142,11 @@ public class ByteArrayOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.floatsToBytes(buffer, src, offset, position, elements, swapEndianess);
 		} else {
-
+			for(int i = 0; i < src.length; i++) {
+				writeFloat(src[i]);
+			}
 		}
-		addRequested();
+		addRequired();
 	}
 
 	@Override
@@ -155,7 +157,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		} else {
 
 		}
-		addRequested();
+		addRequired();
 	}
 
 	@Override
@@ -166,7 +168,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		} else {
 
 		}
-		addRequested();
+		addRequired();
 	}
 
 	@Override
@@ -178,7 +180,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		} else {
 
 		}
-		addRequested();
+		addRequired();
 	}
 
 	@Override
@@ -192,12 +194,12 @@ public class ByteArrayOutput extends AbstractOutput {
 				position += result;// If result is positive, it holds the number of bytes written
 			}
 		} else {
-			addRequested();
+			addRequired();
 		}
 
 	}
 
-	private void addRequested() {
+	public void addRequired() {
 		position += requested;
 	}
 }

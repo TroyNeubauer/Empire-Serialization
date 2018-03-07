@@ -1,6 +1,5 @@
 package com.troy.serialization.io;
 
-import com.troy.serialization.exception.AlreadyClosedException;
 import com.troy.serialization.exception.NoBufferException;
 import com.troy.serialization.util.MiscUtil;
 import com.troy.serialization.util.NativeUtils;
@@ -8,7 +7,7 @@ import com.troy.serialization.util.SerializationUtils;
 
 import sun.misc.Unsafe;
 
-public class NativeOutput extends AbstractOutput {
+public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io.NativeOutput.Deallocator> {
 
 	static {
 		SerializationUtils.init();
@@ -23,11 +22,28 @@ public class NativeOutput extends AbstractOutput {
 	public NativeOutput() {
 		this(DEFAULT_CAPACITY);
 	}
+	
+	class Deallocator implements Runnable {
+		private long addressToFree;
+
+		public Deallocator(long address) {
+			this.addressToFree = address;
+		}
+
+		@Override
+		public void run() {
+			if (addressToFree != 0) {
+				unsafe.freeMemory(addressToFree);
+				addressToFree = 0;
+			}
+		}
+	}
 
 	public NativeOutput(long capacity) {
 		this.address = unsafe.allocateMemory(capacity);
 		this.capacity = capacity;
 		this.size = 0;
+		setDeallocator(new Deallocator(address));
 	}
 
 	@Override
@@ -66,19 +82,16 @@ public class NativeOutput extends AbstractOutput {
 		if (bytes + size > capacity) {
 			long newSize = (bytes / 2 + 1) / 2;// Round up to next power of two
 			address = unsafe.reallocateMemory(address, newSize);
+			getDeallocator().addressToFree = this.address;
 		}
 		requested = bytes;
 	}
-
+	
 	@Override
-	public void close() {
-		if (address == -1)
-			throw new AlreadyClosedException();
-		unsafe.freeMemory(address);
-		address = -1;
-		capacity = 0;
-		size = 0;
+	public void addRequired() {
+		position += requested;
 	}
+
 
 	@Override
 	public void resetMappedOutputImpl(AbstractMappedIO out, long minSize) {
@@ -105,13 +118,13 @@ public class NativeOutput extends AbstractOutput {
 		for (int i = offset; i < end; i++) {
 			writeByteImpl(src[i]);
 		}
-		addRequested();
+		addRequired();
 	}
 
 	@Override
 	public void writeShorts(short[] src, int offset, int elements) {
 		NativeUtils.shortsToNative(address + position, src, offset, elements, swapEndianess);
-		addRequested();
+		addRequired();
 	}
 
 	@Override
@@ -132,7 +145,7 @@ public class NativeOutput extends AbstractOutput {
 		} else {
 
 		}
-		addRequested();
+		addRequired();
 	}
 
 	@Override
@@ -143,7 +156,7 @@ public class NativeOutput extends AbstractOutput {
 		} else {
 
 		}
-		addRequested();
+		addRequired();
 	}
 
 	@Override
@@ -154,7 +167,7 @@ public class NativeOutput extends AbstractOutput {
 		} else {
 
 		}
-		addRequested();
+		addRequired();
 	}
 
 	@Override
@@ -165,7 +178,7 @@ public class NativeOutput extends AbstractOutput {
 		} else {
 
 		}
-		addRequested();
+		addRequired();
 	}
 
 	@Override
@@ -174,16 +187,14 @@ public class NativeOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.booleansToNative(address + position, src, offset, elements, swapEndianess);
 		} else {
-
+			super.writeBooleans(src, offset, elements);
 		}
-		addRequested();
+		addRequired();
 	}
 
 	@Override
 	public void writeBooleansCompact(boolean[] src, int offset, int elements) {
 	}
 
-	private void addRequested() {
-		position += requested;
-	}
+
 }
