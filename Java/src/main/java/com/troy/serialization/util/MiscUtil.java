@@ -598,4 +598,8 @@ public class MiscUtil {
 		}
 		// format:on
 	}
+
+	public static void init() {
+		//Nothing. Forces static inatilizer to be called if it hasnt already
+	}
 }

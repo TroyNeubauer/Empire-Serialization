@@ -24,6 +24,7 @@ public class NativeUtils {
 	};
 
 	static {
+		MiscUtil.init();
 		LibraryProvider.loadLibrary();
 		NATIVE_RETURNS.get();
 		InternalLog.log("Beginning to link native methods in Native Utils by calling them");
@@ -35,7 +36,6 @@ public class NativeUtils {
 			int mods = method.getModifiers();
 			if (Modifier.isStatic(mods) && Modifier.isNative(mods)) {
 				MiscUtil.callMethod(method, null);
-				InternalLog.log("\tCalling method " + method);
 				count++;
 			}
 		}

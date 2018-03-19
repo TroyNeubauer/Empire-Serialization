@@ -14,6 +14,6 @@ public class Main {
 		System.out.println(StringFormatter.toHexString(o.toByteArray()));
 		
 		o.close();
-		//InternalLog.dumpToError();
+		InternalLog.dumpToOut();
 	}
 }
