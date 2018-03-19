@@ -8,6 +8,23 @@
 #define ERROR -1
 #define INVALID_ARGUMENT -10
 
+JNIEXPORT jint JNICALL
+JNI_OnLoad(JavaVM *vm, void *reserved)
+{
+	int* ptr = 0;
+	*ptr = 3;
+	printf("HELO WORLD!!!");
+	/*
+	void** envRaw = NULL;
+	(*vm)->GetEnv(vm, envRaw, JNI_VERSION_1_8);
+	JNIEnv* env = *(envRaw);
+	jclass cls = (*env)->FindClass(env, "com/troy/serialization/nativelibrary/LibraryProvider");
+	jfieldID id = (*env)->GetStaticFieldID(env, cls, "native_load", "Z");
+	(*env)->SetStaticBooleanField(env, cls, id, JNI_TRUE);
+	*/
+	return JNI_VERSION_1_8;
+}
+
 const jbyte FOUR_BIT_ENCODING_CACHE[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 2, -1, 11, 9, 0, 15, -1, 7, 4, -1, -1, 10, 13, 5, 3, -1, -1, 8, 6, 1, 12, -1, 14 };
 
 void putError(jlong pointer, jbyte code, jchar character, jint index) {
@@ -45,6 +62,43 @@ JNIEXPORT jlong JNICALL Java_com_troy_serialization_io_NativeFileOutput_fopen
 
 }
 
+
+
+inline jshort swapJshort(jshort value) {
+#ifdef VISUAL_CPP
+	return _byteswap_ushort(value);
+#else
+	return  ((value & 0x00FF) << 8) |
+		((value & 0xFF00) >> 8);
+#endif
+}
+
+inline jint swapJint(jint value) {
+#ifdef VISUAL_CPP
+	return _byteswap_ulong(value);
+#else
+	return  ((value & 0x000000FF) << 24) |
+		((value & 0x0000FF00) << 8) |
+		((value & 0x00FF0000) >> 8) |
+		((value & 0xFF000000) >> 24);
+#endif
+}
+
+inline jlong swapJlong(jlong value) {
+#ifdef VISUAL_CPP
+	return _byteswap_uint64(value);
+#else
+	return  ((value & 0x00000000000000FF) << 56) |
+		((value & 0x000000000000FF00) << 40) |
+		((value & 0x0000000000FF0000) << 24) |
+		((value & 0x00000000FF000000) << 8) |
+		((value & 0x000000FF00000000) >> 8) |
+		((value & 0x0000FF0000000000) >> 24) |
+		((value & 0x00FF000000000000) >> 40) |
+		((value & 0xFF00000000000000) >> 56);
+#endif
+}
+
 #define xsToFWrite(type, swapFunc) \
 JNIEXPORT j##type JNICALL Java_com_troy_serialization_util_NativeUtils_##type##sToFWrite(JNIEnv * env, jclass class, jlong fd, j##type##Array srcJ, jint srcOffset, jint elements, jboolean swapEndianess) {\
 	if (fd == 0 || srcJ == NULL) {											\
@@ -79,7 +133,7 @@ xsToFWrite(char, swapJshort)
 
 
 #define xToFWrite(type, swapFunc) \
-JNIEXPORT j##type JNICALL Java_com_troy_serialization_util_NativeUtils_##type##sToFWrite(JNIEnv * env, jclass class, jlong fd, j##type value, jboolean swapEndianess) {\
+JNIEXPORT j##type JNICALL Java_com_troy_serialization_util_NativeUtils_##type##ToFWrite(JNIEnv * env, jclass class, jlong fd, j##type value, jboolean swapEndianess) {\
 	if (fd == 0) {													\
 		return INVALID_ARGUMENT;									\
 	}																\
@@ -149,44 +203,6 @@ JNIEXPORT jint JNICALL Java_com_troy_serialization_io_FourBitEncodingCharset_nEn
 }
 #define VISUAL_CPP
 
-inline jshort swapJshort(jshort value) {
-	#ifdef VISUAL_CPP
-		return _byteswap_ushort(value);
-	#else
-		return  ((value & 0x00FF) << 8) |
-				((value & 0xFF00) >> 8);
-	#endif
-}
-
-inline jint swapJint(jint value) {
-	#ifdef VISUAL_CPP
-		return _byteswap_ulong(value);
-	#else
-		return  ((value & 0x000000FF) << 24) |
-		    	((value & 0x0000FF00) << 8) |
-		    	((value & 0x00FF0000) >> 8) |
-		    	((value & 0xFF000000) >> 24);
-	#endif
-}
-
-inline jlong swapJlong(jlong value) {
-	#ifdef VISUAL_CPP
-		return _byteswap_uint64(value);
-	#else
-		return  ((value & 0x00000000000000FF) << 56) |
-				((value & 0x000000000000FF00) << 40) |
-				((value & 0x0000000000FF0000) << 24) |
-				((value & 0x00000000FF000000) <<  8) |
-				((value & 0x000000FF00000000) >>  8) |
-				((value & 0x0000FF0000000000) >> 24) |
-				((value & 0x00FF000000000000) >> 40) |
-				((value & 0xFF00000000000000) >> 56);
-	#endif
-}
-
-JNIEXPORT void JNICALL Java_com_troy_serialization_util_NativeUtils_nothing(JNIEnv * env, jclass class) {
-	
-}
 
 //public static native void shortsToBytes(byte[] dest, short[] src, int srcOffset, int destOffset, int elements);
 
