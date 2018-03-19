@@ -70,8 +70,6 @@ public class NativeUtils {
 	public static void init() {
 	}
 
-	public static native void nothing();
-
 	// Copies data from a primitive array to a byte array. The byte array must be at
 	// least bytes long
 	public static native int shortsToBytes(byte[] dest, short[] src, int srcOffset, int destOffset, int elements, boolean swapEndianess);
