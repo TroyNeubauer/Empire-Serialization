@@ -1,8 +1,9 @@
 package com.troy.serialization.util;
 
-public class OpCodes {
+public interface OpCodes {
+	
 	//format:off
-	public static final int NULL_REF 					= 0x00;
+	public static final int NULL_REF_CONST 				= 0x00;
 	public static final int FLAGS_TYPE	 				= 0x01;
 	public static final int OBJ_DEF_TYPE_DEF_TYPE 		= 0x02;
 	public static final int OBJ_DEF_TYPE_REF_TYPE 		= 0x03;
@@ -10,6 +11,7 @@ public class OpCodes {
 	public static final int STRING_REF_TYPE 			= 0x05;
 	public static final int BOOLEAN_FALSE_CONST 		= 0x06;
 	public static final int BOOLEAN_TRUE_CONST 			= 0x07;
+	
 	//8 Unassigned
 	//9 Unassigned
 	public static final int UNSIGNED_BYTE_TYPE 			= 0x0A;
@@ -51,8 +53,8 @@ public class OpCodes {
 	public static final int VLE_SIGNED_LONG_TYPE 		= 0x29;
 	
 	public static final int HELLO_WORLD_STRING_CONST 	= 0x32;//Represents the familiar string "Hello World!"
-
-	
-	
 	//format:on
+	
+	
+	
 }

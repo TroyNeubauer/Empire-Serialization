@@ -1,10 +1,13 @@
-package com.troy.serialization.io;
+package com.troy.serialization;
 
 import java.io.File;
 
-import com.troy.serialization.util.*;
+import com.troy.serialization.io.NativeFileOutput;
+import com.troy.serialization.io.Output;
+import com.troy.serialization.util.EncodingCache;
+import com.troy.serialization.util.OpCodes;
 
-public class OutputSerializationStream {
+public class OutputSerializationStream implements ObjectOut {
 
 	private Output out;
 	private EncodingCache<String> stringCache;
