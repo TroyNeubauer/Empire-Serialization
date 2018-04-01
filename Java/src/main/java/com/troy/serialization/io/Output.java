@@ -28,13 +28,9 @@ public interface Output extends TroyIO, ArrayOutput {
 
 	/**
 	 * Writes a byte to this output<br>
-	 * Note, this method takes in an int, this is solely for convince. If a value
-	 * less than {@link Byte#MIN_VALUE} or a value greater than
-	 * {@link Byte#MAX_VALUE} is passed in, an {@link IllegalArgumentException} will
-	 * be thrown
+	 * Note, this method takes in an int, this is solely for convince. 
+	 * This method ignores the 24 high bits of the argument
 	 * 
-	 * @throws IllegalArgumentException
-	 *             If the value is out of range
 	 */
 	public void writeByte(int b);
 

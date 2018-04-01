@@ -21,7 +21,13 @@ public interface TroyCharset {
 	 */
 	public void encode(final char[] src, Output dest, int srcOffset, final int chars, boolean checkForErrors);
 	
+	public char[] getDecodingCache();
+	
+	public int[] getEncodingCache();
+	
 	public float getMinCharactersPerByte();
+	
+	public byte getOpCode();
 	
 	default public float getBytesPerCharacter() {
 		return 1.0f / getMinCharactersPerByte();

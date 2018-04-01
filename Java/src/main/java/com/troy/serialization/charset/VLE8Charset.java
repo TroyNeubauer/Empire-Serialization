@@ -2,7 +2,7 @@ package com.troy.serialization.charset;
 
 import com.troy.serialization.io.*;
 
-public class TunicodeCharset implements TroyCharset {
+public class VLE8Charset implements TroyCharset {
 	public static final byte CODE = 0b10;
 	private static final int INFO_MASK = 0b10000000;
 	private static final int DATA_MASK = 0b01111111;
@@ -58,11 +58,27 @@ public class TunicodeCharset implements TroyCharset {
 
 	@Override
 	public String name() {
-		return "Tunicode";
+		return "VLE8";
+	}
+	
+	@Override
+	public byte getOpCode() {
+		return 0b10;
 	}
 
 	@Override
 	public void init() {
+	}
+	
+	@Override
+	public char[] getDecodingCache() {
+		//FIXME
+		return null;
+	}
+
+	@Override
+	public int[] getEncodingCache() {
+		return null;
 	}
 
 }

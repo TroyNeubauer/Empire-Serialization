@@ -1,10 +1,7 @@
 package com.troy.serialization;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.math.*;
+import java.util.*;
 
 public interface ObjectOut {
 
@@ -18,6 +15,14 @@ public interface ObjectOut {
 
 	public void writeLong(long l);
 
+	public void writeUnsignedByte(byte b);
+
+	public void writeUnsignedShort(short s);
+
+	public void writeUnsignedInt(int i);
+
+	public void writeUnsignedLong(long l);
+
 	public void writeFloat(float f);
 
 	public void writeDouble(double d);
@@ -25,6 +30,8 @@ public interface ObjectOut {
 	public void writeChar(char c);
 
 	public void writeBoolean(boolean b);
+	
+	public void writeString(String str);
 
 	public void writeBigInteger(BigInteger integer);
 

@@ -79,4 +79,19 @@ public final class FourBitCharset implements TroyCharset {
 	public void init() {
 	}
 
+	@Override
+	public byte getOpCode() {
+		return 0b00;
+	}
+
+	@Override
+	public char[] getDecodingCache() {
+		return DECODING_CACHE;
+	}
+
+	@Override
+	public int[] getEncodingCache() {
+		return ENCODING_CACHE;
+	}
+
 }

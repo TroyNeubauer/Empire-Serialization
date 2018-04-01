@@ -111,9 +111,24 @@ public class SixBitCharset implements TroyCharset {
 
 		return "6Bit-Encoding";
 	}
+	
+	@Override
+	public byte getOpCode() {
+		return 0b01;
+	}
 
 	@Override
 	public void init() {
+	}
+	
+	@Override
+	public char[] getDecodingCache() {
+		return DECODING_CACHE;
+	}
+
+	@Override
+	public int[] getEncodingCache() {
+		return ENCODING_CACHE;
 	}
 
 }
