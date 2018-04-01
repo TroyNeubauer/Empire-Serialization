@@ -1,16 +1,16 @@
 package com.troy.serialization.util;
 
-public class EncodingCache<E> extends Cache<IntValue<E>> {
+public class IntCache<E> extends Cache<IntValue<E>> {
 
-	public EncodingCache() {
+	public IntCache() {
 		this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
 	}
 
-	public EncodingCache(int initalCapacity) {
+	public IntCache(int initalCapacity) {
 		this(initalCapacity, DEFAULT_LOAD_FACTOR);
 	}
 
-	public EncodingCache(int initalCapacity, double loadFactor) {
+	public IntCache(int initalCapacity, double loadFactor) {
 		super(initalCapacity, loadFactor);
 
 	}
@@ -19,7 +19,7 @@ public class EncodingCache<E> extends Cache<IntValue<E>> {
 		if ((double) size / table.length >= loadFactor) {
 			resize(size * 2);
 		}
-		int index = key.hashCode() % table.length;
+		int index = hash(key);
 		IntValue<E> se = new IntValue<E>(key, value, null);
 		if (table[index] == null) {
 			table[index] = se;

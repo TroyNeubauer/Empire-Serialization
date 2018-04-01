@@ -7,15 +7,18 @@ public abstract class Cache<Entry> {
 	protected Entry[] table;
 	protected double loadFactor;
 	protected int size = 0;
-	
+
 	public Cache(int initalCapacity, double loadFactor) {
 		this.loadFactor = loadFactor;
 		resize(initalCapacity);
 	}
-	
+
 	protected abstract void resize(int newSize);
-	
+
 	public abstract Entry get(Object key);
-	
+
+	public int hash(Object key) {
+		return key.hashCode() % table.length;
+	}
 
 }
