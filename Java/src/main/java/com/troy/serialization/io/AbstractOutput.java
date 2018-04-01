@@ -18,7 +18,6 @@ public abstract class AbstractOutput implements Output {
 	
 	@Override
 	public void writeByte(int b) {
-		if(b < Byte.MIN_VALUE || b > Byte.MAX_VALUE) throw new IllegalArgumentException("Value is our of range for a byte: " + b);
 		require(Byte.BYTES);
 		writeByteImpl((byte) b);
 	}

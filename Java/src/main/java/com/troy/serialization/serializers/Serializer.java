@@ -35,4 +35,12 @@ public interface Serializer<T> {
 	 * @return A new instance of the type represented by this serializer
 	 */
 	public T newInstance();
+
+	/**
+	 * Writes a TS Standard compliant type definition for the type this serializer represents
+	 * 
+	 * @param out
+	 *            The output to write the definition to
+	 */
+	public void writeTypeDefinition(Output out);
 }

@@ -17,9 +17,6 @@ public class FieldSerializer<T> extends AbstractSerializer<T> {
 	private Class<?>[] fieldTypes;
 	private long[] fieldOffsets;
 
-	private static final String[] EMPTY_FIELD_NAMES = new String[0];
-	private static final Class<?>[] EMPTY_FIELD_TYPES = new Class[0];
-	private static final long[] EMPTY_FIELD_OFFSETS = new long[0];
 
 	public FieldSerializer(Class<T> type) {
 		super(type);
@@ -29,14 +26,11 @@ public class FieldSerializer<T> extends AbstractSerializer<T> {
 	private void init() {
 		Class<?> superType = type.getSuperclass();
 		if (type == null) {
-			setEmptyFields();
 		} else {
 			Field[] fields = type.getDeclaredFields();
 			int fieldsLength = fields.length;
 			if (superType == Object.class) {// We are a child of the object class the only fields are in this class
-				if (fieldsLength == 0) {// We safely know that this object has no fields
-					setEmptyFields();
-				} else {
+				if (fieldsLength != 0) {
 					this.fieldNames = new String[fieldsLength];
 					this.fieldTypes = new Class[fieldsLength];
 					this.fieldOffsets = new long[fieldsLength];
@@ -58,9 +52,7 @@ public class FieldSerializer<T> extends AbstractSerializer<T> {
 				}
 				this.fieldNames = new String[fieldsList.size()];
 				this.fieldTypes = new Class[fieldsList.size()];
-				if (unsafe == null)
-					this.fieldOffsets = EMPTY_FIELD_OFFSETS;
-				else
+				if (unsafe != null)
 					this.fieldOffsets = new long[fieldsList.size()];
 
 				int i = 0;
@@ -69,12 +61,6 @@ public class FieldSerializer<T> extends AbstractSerializer<T> {
 				}
 			}
 		}
-	}
-
-	private void setEmptyFields() {
-		this.fieldNames = EMPTY_FIELD_NAMES;
-		this.fieldTypes = EMPTY_FIELD_TYPES;
-		this.fieldOffsets = EMPTY_FIELD_OFFSETS;
 	}
 
 	private void addField(Field field, int index) {
@@ -91,7 +77,9 @@ public class FieldSerializer<T> extends AbstractSerializer<T> {
 
 	@Override
 	public void writeFields(Object obj, Output out) {
-
+		if(unsafe != null) {
+			
+		}
 	}
 
 	@Override
