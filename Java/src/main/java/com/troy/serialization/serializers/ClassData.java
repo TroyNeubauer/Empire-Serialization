@@ -21,6 +21,7 @@ public class ClassData<T> {
 	private byte[] typeDefinition;
 
 	public ClassData(Class<T> type) {
+		this.type = type;
 		init();
 	}
 
@@ -72,13 +73,12 @@ public class ClassData<T> {
 
 	private void writeTypeDefinition() {
 		ByteArrayOutput out = new ByteArrayOutput();
-
+		//Write it
 		typeDefinition = Arrays.copyOf(out.getBuffer(), out.getBufferPosition());
 		out.close();
 	}
 
 	private void addField(Field field, int index) {
-		System.out.println("adding field " + field + " index " + index);
 		fieldNames[index] = field.getName();
 		fieldTypes[index] = field.getType();
 		if (unsafe != null)

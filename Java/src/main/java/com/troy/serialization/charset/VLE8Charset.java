@@ -32,7 +32,7 @@ public class VLE8Charset implements TroyCharset {
 	public void encode(char[] src, Output dest, int srcOffset, int chars, boolean checkForErrors) {
 		final int end = srcOffset + chars;
 		while (srcOffset < end) {
-			char value = src[srcOffset];
+			char value = src[srcOffset++];
 			if (value >>> 7 == 0) {
 				dest.writeByte((byte) value);
 			} else if (value >>> 14 == 0) {

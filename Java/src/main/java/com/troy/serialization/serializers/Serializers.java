@@ -41,5 +41,9 @@ public class Serializers {
 
 		return null;// TODO create dynamic serializer creation system
 	}
+	
+	public static void init() {
+		
+	}
 
 }

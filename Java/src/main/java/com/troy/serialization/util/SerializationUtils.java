@@ -1,6 +1,7 @@
 package com.troy.serialization.util;
 
 import com.troy.serialization.charset.TroyCharsets;
+import com.troy.serialization.serializers.*;
 
 public class SerializationUtils {
 
@@ -9,7 +10,7 @@ public class SerializationUtils {
 	public static final int ERROR = -1;
 	public static final int OUT_OF_MEMORY = -1, UNSUPPORTED_CHARACTER = -2, INVALID_ARGUMENT = -10;
 
-	public static final boolean DYNAMIC_CLASS_LOADING_ENABLED = true;
+	public static final boolean DYNAMIC_CLASS_LOADING_ENABLED = false;
 
 	/**
 	 * Constructs an array that maps the values of decodingCache to the indices of decodingCache. Used for creating an array that maps custom values
@@ -38,6 +39,7 @@ public class SerializationUtils {
 	public static void init() {
 		NativeUtils.init();
 		TroyCharsets.init();
+		Serializers.init();
 	}
 
 }

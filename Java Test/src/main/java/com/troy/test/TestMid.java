@@ -1,3 +1,4 @@
+package com.troy.test;
 
 
 public class TestMid extends TestSuper {

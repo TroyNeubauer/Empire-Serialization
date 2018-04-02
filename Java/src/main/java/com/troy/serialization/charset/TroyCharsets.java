@@ -21,17 +21,21 @@ public class TroyCharsets {
 		int len = str.length();
 		int[] fourEncoding = FOUR_BIT_CHARSET.getEncodingCache();
 		int[] sixEncoding = SIX_BIT_CHARSET.getEncodingCache();
+		int line = 1;
 		for (int i = 0; i < len; i++) {
 			char c = str.charAt(i);
-			if (fourOK && fourEncoding[c] == -1) {
+			if (fourOK && (c > fourEncoding.length || fourEncoding[c] == -1)) {
 				fourOK = false;
+				//System.out.println("four failed on character: " +c + " ("+((int)c)+")line " + line);
 			}
-			if (sixOK && sixEncoding[c] == -1) {
+			if (sixOK && (c > sixEncoding.length || sixEncoding[c] == -1)) {
 				sixOK = false;
+				//System.out.println("six failed on character: " +c + " ("+((int)c)+")line " + line);
 			}
 			if (!fourOK && !sixOK) {
 				break;
 			}
+			if(c == '\n') line++;
 		}
 
 		if (fourOK)

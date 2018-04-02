@@ -16,6 +16,10 @@ public abstract class AbstractSerializer<T> implements Serializer<T> {
 		return type;
 	}
 	
+	public T newInstance() {
+		return null;//Delegate. Sub classes can override this if necessary
+	}
+	
 	@Override
 	public void writeTypeDefinition(Output out) {
 		out.writeBytes(data.getTypeDefinition());

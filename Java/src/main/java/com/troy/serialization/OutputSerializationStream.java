@@ -29,28 +29,57 @@ public class OutputSerializationStream implements ObjectOut {
 
 	public void writeObject(Object obj) {
 		Class<?> clazz = obj.getClass();
-		//format:off
-		if (
-				clazz == Byte.class      || clazz == Byte.TYPE      || clazz == Short.class   || clazz == Short.TYPE || 
-				clazz == Integer.class   || clazz == Integer.TYPE   || clazz == Long.class    || clazz == Long.TYPE || 
-				clazz == Float.class     || clazz == Float.TYPE     || clazz == Double.class  || clazz == Double.TYPE || 
-				clazz == Character.class || clazz == Character.TYPE || clazz == Boolean.class || clazz == Boolean.TYPE || 
-				clazz == String.class    ||clazz == List.class      || clazz == Set.class) 
-		{
-			throw new IllegalArgumentException("The class " + clazz +" is primitive. Cannot be written as an object! Use writeX(obj) method instead!");
-		}
-		//format:on
-
-		if (obj instanceof List) {
-
-		} else if (obj instanceof Set) {
-
-		} else if (obj instanceof Map) {
-
-		} else {
+		if (checkForPrimitive(obj, clazz))
+			return;
+		else
 			writeObjectImpl(obj, clazz);
-		}
 
+	}
+
+	/**
+	 * Handles cases where the user passes a "primitive" into the write object method
+	 * @return {@code true} If the type passed in was a primitive and was written using the correct writeX() method 
+	 * {@code false} otherwise
+	 */
+	private boolean checkForPrimitive(Object obj, Class<?> clazz) {
+		if (clazz == Byte.class) {
+			writeByte(((Byte) obj).byteValue());
+			return true;
+		} else if (clazz == Short.class) {
+			writeShort(((Short) obj).shortValue());
+			return true;
+		} else if (clazz == Integer.class) {
+			writeInt(((Integer) obj).intValue());
+			return true;
+		} else if (clazz == Long.class) {
+			writeLong(((Long) obj).longValue());
+			return true;
+		} else if (clazz == Float.class) {
+			writeFloat(((Float) obj).floatValue());
+			return true;
+		} else if (clazz == Double.class) {
+			writeDouble(((Double) obj).doubleValue());
+			return true;
+		} else if (clazz == Character.class) {
+			writeChar(((Character) obj).charValue());
+			return true;
+		} else if (clazz == Boolean.class) {
+			writeBoolean(((Boolean) obj).booleanValue());
+			return true;
+		} else if (clazz == String.class) {
+			writeString((String) obj);
+			return true;
+		} else if (clazz == List.class) {
+			writeList((List<?>) obj);
+			return true;
+		} else if (clazz == Set.class) {
+			writeSet((Set<?>) obj);
+			return true;
+		} else if (clazz == Map.class) {
+			writeMap((Map<?, ?>) obj);
+			return true;
+		}
+		return false;
 	}
 
 	private void writeObjectImpl(Object obj, Class<?> clazz) {
@@ -151,11 +180,17 @@ public class OutputSerializationStream implements ObjectOut {
 				TroyCharset charset = TroyCharsets.identifyCharset(str);
 				int opCode = OpCodes.STRING_TYPE_MAJOR_CODE;
 				opCode |= (charset.getCharsetCode() & 0b11) << 4;
-				boolean lengthFitsIntoOpCode = len < 16;
+				boolean lengthFitsIntoOpCode = len < (1 << 4);
 				if (lengthFitsIntoOpCode) {
 					opCode |= len;
+				} else {
+					opCode |= 0b0000;
 				}
 				out.writeByte(opCode);
+				if (!lengthFitsIntoOpCode) {
+					out.writeVLEInt(len);
+				}
+				charset.encode(str.toCharArray(), out, 0, len, false);
 			}
 		}
 	}
@@ -191,9 +226,14 @@ public class OutputSerializationStream implements ObjectOut {
 	}
 
 	@Override
-	public void writeMap(Map<?, ?> set) {
+	public void writeMap(Map<?, ?> map) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void close() {
+		out.close();
 	}
 
 }

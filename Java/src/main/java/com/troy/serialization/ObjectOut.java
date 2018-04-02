@@ -43,6 +43,8 @@ public interface ObjectOut {
 
 	public void writeSet(Set<?> set);
 
-	public void writeMap(Map<?, ?> set);
+	public void writeMap(Map<?, ?> map);
+	
+	public void close();
 
 }

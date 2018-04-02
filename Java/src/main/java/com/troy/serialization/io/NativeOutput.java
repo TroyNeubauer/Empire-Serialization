@@ -72,7 +72,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	}
 
 	public byte[] toByteArray() {
-		if (capacity > Long.MAX_VALUE)
+		if (capacity > Integer.MAX_VALUE)
 			throw new RuntimeException("Cannot represent this buffer as a byte array. The capacity is to big");
 		return ngetBuffer(address, (int) capacity);
 	}
