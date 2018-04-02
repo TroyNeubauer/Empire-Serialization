@@ -108,42 +108,42 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 	
 	@Override
 	public void writeBytes(byte[] src, int offset, int bytes) {
-		NativeUtils.bytesToFWrite(fd, src, offset, bytes, swapEndianess);
+		NativeUtils.bytesToFWrite(fd, src, offset, bytes, bigEndian);
 	}
 
 	@Override
 	public void writeShorts(short[] src, int offset, int bytes) {
-		NativeUtils.shortsToFWrite(fd, src, offset, bytes, swapEndianess);
+		NativeUtils.shortsToFWrite(fd, src, offset, bytes, bigEndian);
 	}
 
 	@Override
 	public void writeInts(int[] src, int offset, int bytes) {
-		NativeUtils.intsToFWrite(fd, src, offset, bytes, swapEndianess);
+		NativeUtils.intsToFWrite(fd, src, offset, bytes, bigEndian);
 	}
 
 	@Override
 	public void writeLongs(long[] src, int offset, int bytes) {
-		NativeUtils.longsToFWrite(fd, src, offset, bytes, swapEndianess);
+		NativeUtils.longsToFWrite(fd, src, offset, bytes, bigEndian);
 	}
 
 	@Override
 	public void writeFloats(float[] src, int offset, int bytes) {
-		NativeUtils.floatsToFWrite(fd, src, offset, bytes, swapEndianess);
+		NativeUtils.floatsToFWrite(fd, src, offset, bytes, bigEndian);
 	}
 
 	@Override
 	public void writeDoubles(double[] src, int offset, int bytes) {
-		NativeUtils.doublesToFWrite(fd, src, offset, bytes, swapEndianess);
+		NativeUtils.doublesToFWrite(fd, src, offset, bytes, bigEndian);
 	}
 
 	@Override
 	public void writeChars(char[] src, int offset, int bytes) {
-		NativeUtils.charsToFWrite(fd, src, offset, bytes, swapEndianess);
+		NativeUtils.charsToFWrite(fd, src, offset, bytes, bigEndian);
 	}
 
 	@Override
 	public void writeBooleans(boolean[] src, int offset, int bytes) {
-		NativeUtils.booleansToFWrite(fd, src, offset, bytes, swapEndianess);
+		NativeUtils.booleansToFWrite(fd, src, offset, bytes, bigEndian);
 
 	}
 

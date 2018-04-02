@@ -1,5 +1,6 @@
 package com.troy.serialization.io;
 
+import java.nio.*;
 import java.util.Arrays;
 
 import com.troy.serialization.exception.*;
@@ -96,7 +97,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void unmapOutputImpl(MappedIO out, long numBytesWritten) {
 		if (numBytesWritten > Integer.MAX_VALUE)
 			throw new IllegalStateException("Buffer capacity exceeded! " + ((long) position + numBytesWritten));
-		NativeUtils.nativeToBytes(buffer, out.address, position, (int) numBytesWritten, swapEndianess);
+		NativeUtils.nativeToBytes(buffer, out.address, position, (int) numBytesWritten, bigEndian);
 	}
 
 	@Override
@@ -110,7 +111,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeShorts(short[] src, int offset, int elements) {
 		require(elements * Short.BYTES);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.shortsToBytes(buffer, src, offset, position, elements, swapEndianess);
+			NativeUtils.shortsToBytes(buffer, src, offset, position, elements, bigEndian);
 		} else {
 			// FIXME provide non native alternative
 		}
@@ -121,7 +122,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeInts(int[] src, int offset, int elements) {
 		require(elements * Integer.BYTES);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.intsToBytes(buffer, src, offset, position, elements, swapEndianess);
+			NativeUtils.intsToBytes(buffer, src, offset, position, elements, bigEndian);
 		} else {
 
 		}
@@ -132,7 +133,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeLongs(long[] src, int offset, int elements) {
 		require(elements * Long.BYTES);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.longsToBytes(buffer, src, offset, position, elements, swapEndianess);
+			NativeUtils.longsToBytes(buffer, src, offset, position, elements, bigEndian);
 		} else {
 
 		}
@@ -143,7 +144,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeFloats(float[] src, int offset, int elements) {
 		require(elements * Float.BYTES);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.floatsToBytes(buffer, src, offset, position, elements, swapEndianess);
+			NativeUtils.floatsToBytes(buffer, src, offset, position, elements, bigEndian);
 		} else {
 			for (int i = 0; i < src.length; i++) {
 				writeFloat(src[i]);
@@ -156,7 +157,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeDoubles(double[] src, int offset, int elements) {
 		require(elements * Double.BYTES);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.doublesToBytes(buffer, src, offset, position, elements, swapEndianess);
+			NativeUtils.doublesToBytes(buffer, src, offset, position, elements, bigEndian);
 		} else {
 
 		}
@@ -167,7 +168,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeChars(char[] src, int offset, int elements) {
 		require(elements * Character.BYTES);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.charsToBytes(buffer, src, offset, position, elements, swapEndianess);
+			NativeUtils.charsToBytes(buffer, src, offset, position, elements, bigEndian);
 		} else {
 
 		}
@@ -178,7 +179,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeBooleans(boolean[] src, int offset, int elements) {
 		require(elements * 1);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.booleansToBytes(buffer, src, offset, position, elements, swapEndianess);
+			NativeUtils.booleansToBytes(buffer, src, offset, position, elements, bigEndian);
 			position += elements;
 		} else {
 

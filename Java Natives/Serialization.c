@@ -35,12 +35,12 @@ void putError(jlong pointer, jbyte code, jchar character, jint index) {
 
 JNIEXPORT jint JNICALL Java_com_troy_serialization_io_NativeFileOutput_fflush
 (JNIEnv * env, jclass class, jlong fd) {
-	fflush((FILE*)fd);
+	return fflush((FILE*)fd);
 }
 
 JNIEXPORT jint JNICALL Java_com_troy_serialization_io_NativeFileOutput_fputc
 (JNIEnv * env, jclass class, jbyte c, jlong fd) {
-	fputc(c, (FILE*)fd);
+	return fputc(c, (FILE*)fd);
 }
 
 JNIEXPORT jint JNICALL Java_com_troy_serialization_io_NativeFileOutput_fclose
@@ -65,7 +65,16 @@ JNIEXPORT jlong JNICALL Java_com_troy_serialization_io_NativeFileOutput_fopen
 
 
 inline jshort swapJshort(jshort value) {
-#ifdef VISUAL_CPP
+#if 1
+	return _byteswap_ushort(value);
+#else
+	return  ((value & 0x00FF) << 8) |
+		((value & 0xFF00) >> 8);
+#endif
+}
+
+inline jchar swapJchar(jchar value) {
+#if 1
 	return _byteswap_ushort(value);
 #else
 	return  ((value & 0x00FF) << 8) |
@@ -74,7 +83,18 @@ inline jshort swapJshort(jshort value) {
 }
 
 inline jint swapJint(jint value) {
-#ifdef VISUAL_CPP
+#if 1
+	return _byteswap_ulong(value);
+#else
+	return  ((value & 0x000000FF) << 24) |
+		((value & 0x0000FF00) << 8) |
+		((value & 0x00FF0000) >> 8) |
+		((value & 0xFF000000) >> 24);
+#endif
+}
+
+inline jfloat swapJfloat(jfloat value) {
+#if 1
 	return _byteswap_ulong(value);
 #else
 	return  ((value & 0x000000FF) << 24) |
@@ -85,7 +105,22 @@ inline jint swapJint(jint value) {
 }
 
 inline jlong swapJlong(jlong value) {
-#ifdef VISUAL_CPP
+#if 1
+	return _byteswap_uint64(value);
+#else
+	return  ((value & 0x00000000000000FF) << 56) |
+		((value & 0x000000000000FF00) << 40) |
+		((value & 0x0000000000FF0000) << 24) |
+		((value & 0x00000000FF000000) << 8) |
+		((value & 0x000000FF00000000) >> 8) |
+		((value & 0x0000FF0000000000) >> 24) |
+		((value & 0x00FF000000000000) >> 40) |
+		((value & 0xFF00000000000000) >> 56);
+#endif
+}
+
+inline jdouble swapJdouble(jdouble value) {
+#if 1
 	return _byteswap_uint64(value);
 #else
 	return  ((value & 0x00000000000000FF) << 56) |
@@ -125,9 +160,9 @@ xsToFWrite(boolean, )
 xsToFWrite(short, swapJshort)
 xsToFWrite(int, swapJint)
 xsToFWrite(long, swapJlong)
-xsToFWrite(float, swapJint)
-xsToFWrite(double, swapJlong)
-xsToFWrite(char, swapJshort)
+xsToFWrite(float, swapJfloat)
+xsToFWrite(double, swapJdouble)
+xsToFWrite(char, swapJchar)
 
 
 
@@ -149,9 +184,9 @@ xToFWrite(boolean, )
 xToFWrite(short, swapJshort)
 xToFWrite(int, swapJint)
 xToFWrite(long, swapJlong)
-xToFWrite(float, swapJint)
-xToFWrite(double, swapJlong)
-xToFWrite(char, swapJshort)
+xToFWrite(float, swapJfloat)
+xToFWrite(double, swapJdouble)
+xToFWrite(char, swapJchar)
 
 JNIEXPORT jbyteArray JNICALL Java_com_troy_serialization_io_NativeOutput_ngetBuffer
 (JNIEnv * env, jclass class, jlong addressJ, jint capacity)
@@ -272,8 +307,8 @@ JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_booleansToBy
 JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_##type##sToNative(JNIEnv * env, jclass class, jlong dest, j##type##Array src, jint offset, jint elements, jboolean swapEndianess) {\
 	if(src == 0 || dest == 0) return INVALID_ARGUMENT;\
 	(*env)->Get##capitalType##ArrayRegion(env, src, offset, elements, (j##type *)dest); \
-	if(swapEndianess) {\
-\
+	if(swapEndianess && sizeof(j##type) > 1) {\
+/*FIXME actually swap enginess if neccsary*/\
 	}\
 	return 0;\
 }

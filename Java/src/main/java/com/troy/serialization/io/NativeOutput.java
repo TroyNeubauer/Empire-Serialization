@@ -118,7 +118,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeBytes(byte[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Short.BYTES);
-			NativeUtils.bytesToNative(address + position, src, offset, elements, swapEndianess);
+			NativeUtils.bytesToNative(address + position, src, offset, elements, bigEndian);
 			addRequired();
 		} else {
 			super.writeBytes(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -129,7 +129,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeShorts(short[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Short.BYTES);
-			NativeUtils.shortsToNative(address + position, src, offset, elements, swapEndianess);
+			NativeUtils.shortsToNative(address + position, src, offset, elements, bigEndian);
 			addRequired();
 		} else {
 			super.writeShorts(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -140,7 +140,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeInts(int[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Integer.BYTES);
-			NativeUtils.intsToNative(address + position, src, offset, elements, swapEndianess);
+			NativeUtils.intsToNative(address + position, src, offset, elements, bigEndian);
 			addRequired();
 		} else {
 			super.writeInts(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -151,7 +151,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeLongs(long[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Long.BYTES);
-			NativeUtils.longsToNative(address + position, src, offset, elements, swapEndianess);
+			NativeUtils.longsToNative(address + position, src, offset, elements, bigEndian);
 			addRequired();
 		} else {
 			super.writeLongs(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -162,7 +162,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeFloats(float[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Float.BYTES);
-			NativeUtils.floatsToNative(address + position, src, offset, elements, swapEndianess);
+			NativeUtils.floatsToNative(address + position, src, offset, elements, bigEndian);
 			addRequired();
 		} else {
 			super.writeFloats(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -173,7 +173,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeDoubles(double[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Double.BYTES);
-			NativeUtils.doublesToNative(address + position, src, offset, elements, swapEndianess);
+			NativeUtils.doublesToNative(address + position, src, offset, elements, bigEndian);
 			addRequired();
 		} else {
 			super.writeDoubles(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -184,7 +184,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeChars(char[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Character.BYTES);
-			NativeUtils.charsToNative(address + position, src, offset, elements, swapEndianess);
+			NativeUtils.charsToNative(address + position, src, offset, elements, bigEndian);
 			addRequired();
 		} else {
 			super.writeChars(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -195,7 +195,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeBooleans(boolean[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Integer.BYTES);
-			NativeUtils.booleansToNative(address + position, src, offset, elements, swapEndianess);
+			NativeUtils.booleansToNative(address + position, src, offset, elements, bigEndian);
 			addRequired();
 		} else {
 			super.writeBooleans(src, offset, elements);// The superclass increments position so we're ok without addRequired();

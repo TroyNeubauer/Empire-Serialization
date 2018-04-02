@@ -1,21 +1,30 @@
 package com.troy.serialization.io;
 
-import java.nio.ByteOrder;
+import java.nio.*;
 
-import com.troy.serialization.exception.AlreadyMappedException;
-import com.troy.serialization.util.TroyStreamSettings;
+import com.troy.serialization.exception.*;
 
 public abstract class AbstractOutput implements Output {
-	protected TroyStreamSettings settings;
+
 	protected MappedIO mapped;
-	protected boolean swapEndianess = ByteOrder.nativeOrder() != ByteOrder.BIG_ENDIAN;
+	protected boolean bigEndian = false;
 
 	protected static final int NEXT_BYTE_VLE = 0b10000000, VLE_MASK = 0b01111111;
-	
+
 	public AbstractOutput() {
 	}
 
-	
+	//format:off
+	// System Big Endian 	| Writer BE 	| flip endianness in native code
+	// 		0 					1				1
+	// 		0 					0				0
+	// 		1 					1				0
+	// 		1 					0				1
+	//This is Xor!						format:on
+	protected boolean swapEndinessInNative() {
+		return bigEndian ^ (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN);
+	}
+
 	@Override
 	public void writeByte(int b) {
 		require(Byte.BYTES);
@@ -31,50 +40,75 @@ public abstract class AbstractOutput implements Output {
 	@Override
 	public void writeShort(short b) {
 		require(Short.BYTES);
-		writeByteImpl((byte) ((b >> 8) & 0xFF));
-		writeByteImpl((byte) ((b >> 0) & 0xFF));
+		if (bigEndian) {
+			writeByteImpl((byte) ((b >> 8) & 0xFF));
+			writeByteImpl((byte) ((b >> 0) & 0xFF));
+		} else {
+			writeByteImpl((byte) ((b >> 0) & 0xFF));
+			writeByteImpl((byte) ((b >> 8) & 0xFF));
+		}
 	}
 
 	@Override
 	public void writeInt(int b) {
 		require(Integer.BYTES);
-		writeByteImpl((byte) ((b >> 24) & 0xFF));
-		writeByteImpl((byte) ((b >> 16) & 0xFF));
-		writeByteImpl((byte) ((b >> 8) & 0xFF));
-		writeByteImpl((byte) ((b >> 0) & 0xFF));
+		if (bigEndian) {
+			writeByteImpl((byte) ((b >> 24) & 0xFF));
+			writeByteImpl((byte) ((b >> 16) & 0xFF));
+			writeByteImpl((byte) ((b >> 8) & 0xFF));
+			writeByteImpl((byte) ((b >> 0) & 0xFF));
+		} else {
+			writeByteImpl((byte) ((b >> 0) & 0xFF));
+			writeByteImpl((byte) ((b >> 8) & 0xFF));
+			writeByteImpl((byte) ((b >> 16) & 0xFF));
+			writeByteImpl((byte) ((b >> 24) & 0xFF));
+		}
 	}
 
 	@Override
 	public void writeLong(long b) {
 		require(Long.BYTES);
-		writeByteImpl((byte) ((b >> 56) & 0xFF));
-		writeByteImpl((byte) ((b >> 48) & 0xFF));
-		writeByteImpl((byte) ((b >> 40) & 0xFF));
-		writeByteImpl((byte) ((b >> 32) & 0xFF));
-		writeByteImpl((byte) ((b >> 24) & 0xFF));
-		writeByteImpl((byte) ((b >> 16) & 0xFF));
-		writeByteImpl((byte) ((b >> 8) & 0xFF));
-		writeByteImpl((byte) ((b >> 0) & 0xFF));
+		if (bigEndian) {
+			writeByteImpl((byte) ((b >> 56) & 0xFF));
+			writeByteImpl((byte) ((b >> 48) & 0xFF));
+			writeByteImpl((byte) ((b >> 40) & 0xFF));
+			writeByteImpl((byte) ((b >> 32) & 0xFF));
+			writeByteImpl((byte) ((b >> 24) & 0xFF));
+			writeByteImpl((byte) ((b >> 16) & 0xFF));
+			writeByteImpl((byte) ((b >> 8) & 0xFF));
+			writeByteImpl((byte) ((b >> 0) & 0xFF));
+		} else {
+			writeByteImpl((byte) ((b >> 0) & 0xFF));
+			writeByteImpl((byte) ((b >> 8) & 0xFF));
+			writeByteImpl((byte) ((b >> 16) & 0xFF));
+			writeByteImpl((byte) ((b >> 24) & 0xFF));
+			writeByteImpl((byte) ((b >> 32) & 0xFF));
+			writeByteImpl((byte) ((b >> 40) & 0xFF));
+			writeByteImpl((byte) ((b >> 48) & 0xFF));
+			writeByteImpl((byte) ((b >> 56) & 0xFF));
+		}
 	}
-	
+
 	@Override
 	public void writeUnsignedByte(short b) {
-		if(b > 0xFFL || b < 0) throw new IllegalArgumentException("The value " + b + " is out of range for an unsigned byte");
+		if (b > 0xFFL || b < 0)
+			throw new IllegalArgumentException("The value " + b + " is out of range for an unsigned byte");
 		writeByte(b);
 	}
 
 	@Override
 	public void writeUnsignedShort(int b) {
-		if(b > 0xFFFFL || b < 0) throw new IllegalArgumentException("The value " + b + " is out of range for an unsigned short");
+		if (b > 0xFFFF || b < 0)
+			throw new IllegalArgumentException("The value " + b + " is out of range for an unsigned short");
 		writeShort((short) b);
 	}
 
 	@Override
 	public void writeUnsignedInt(long b) {
-		if(b > 0xFFFFFFFFL || b < 0) throw new IllegalArgumentException("The value " + b + " is out of range for an unsigned int");
+		if (b > 0xFFFFFFFFL || b < 0)
+			throw new IllegalArgumentException("The value " + b + " is out of range for an unsigned int");
 		writeInt((int) b);
 	}
-
 
 	@Override
 	public void writeFloat(float b) {
@@ -89,8 +123,13 @@ public abstract class AbstractOutput implements Output {
 	@Override
 	public void writeChar(char b) {
 		require(Character.BYTES);
-		writeByteImpl((byte) ((b >> 8) & 0xFF));
-		writeByteImpl((byte) ((b >> 0) & 0xFF));
+		if (bigEndian) {
+			writeByteImpl((byte) ((b >> 0) & 0xFF));
+			writeByteImpl((byte) ((b >> 8) & 0xFF));
+		} else {
+			writeByteImpl((byte) ((b >> 8) & 0xFF));
+			writeByteImpl((byte) ((b >> 0) & 0xFF));
+		}
 	}
 
 	@Override
@@ -127,7 +166,7 @@ public abstract class AbstractOutput implements Output {
 			writeByteImpl((byte) (i & VLE_MASK));
 		} else if (i >>> 21 == 0) {
 			require(3);
-			writeByteImpl((byte) (i >>> 14| NEXT_BYTE_VLE));
+			writeByteImpl((byte) (i >>> 14 | NEXT_BYTE_VLE));
 			writeByteImpl((byte) (i >>> 7 | NEXT_BYTE_VLE));
 			writeByteImpl((byte) (i & VLE_MASK));
 		} else if (i >>> 28 == 0) {
@@ -157,7 +196,7 @@ public abstract class AbstractOutput implements Output {
 			writeByteImpl((byte) (l & VLE_MASK));
 		} else if (l >>> 21 == 0) {
 			require(3);
-			writeByteImpl((byte) (l >>> 14| NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 14 | NEXT_BYTE_VLE));
 			writeByteImpl((byte) (l >>> 7 | NEXT_BYTE_VLE));
 			writeByteImpl((byte) (l & VLE_MASK));
 		} else if (l >>> 28 == 0) {
@@ -230,88 +269,82 @@ public abstract class AbstractOutput implements Output {
 			writeByteImpl((byte) (c & VLE_MASK));
 		}
 	}
-	
+
 	@Override
 	public void writeBytes(byte[] src, int offset, int bytes) {
 		require(bytes);
-		for(int i = offset; i < offset + bytes; i++) {
+		for (int i = offset; i < offset + bytes; i++) {
 			writeByteImpl(src[i]);
 		}
 	}
 
 	@Override
 	public void writeShorts(short[] src, int offset, int elements) {
-		
-	}
 
+	}
 
 	@Override
 	public void writeInts(int[] src, int offset, int elements) {
-		
-	}
 
+	}
 
 	@Override
 	public void writeLongs(long[] src, int offset, int elements) {
-		
-	}
 
+	}
 
 	@Override
 	public void writeFloats(float[] src, int offset, int elements) {
-		
-	}
 
+	}
 
 	@Override
 	public void writeDoubles(double[] src, int offset, int elements) {
-		
-	}
 
+	}
 
 	@Override
 	public void writeChars(char[] src, int offset, int elements) {
-		
-	}
 
+	}
 
 	@Override
 	public void writeBooleans(boolean[] src, int offset, int elements) {
-		
-	}
 
+	}
 
 	@Override
 	public void writeBooleansCompact(boolean[] src, int offset, int elements) {
-		
-	}
 
-
-
-	public void setSettings(TroyStreamSettings settings) {
-		this.settings = settings;
 	}
 
 	/**
-	 * Resets a mapped output so that it can be used again. 
-	 * Also ensures that the native block of memory has at least minSize bytes remaining
+	 * Resets a mapped output so that it can be used again. Also ensures that the native block of memory has at least
+	 * minSize bytes remaining. Called by {@link #mapOutput(long)} on successive calls just before returning the mapped out 
 	 * 
-	 * @param out The mapped output to reset
-	 * @param minSize The number of bytes
+	 * @param out
+	 *            The mapped output to reset
+	 * @param minSize
+	 *            The number of bytes
 	 */
 	public abstract void resetMappedOutputImpl(MappedIO out, long minSize);
 
 	/**
 	 * Called once (the first time the user calls {@link #mapOutput(long)}) to create a mapped object to use
-	 * @param minSize The minimum number of bytes that the buffer must provide
+	 * 
+	 * @param minSize
+	 *            The minimum number of bytes that the buffer must provide
 	 * @return A new mapped IO to use in relation with this output
 	 */
 	public abstract MappedIO newMappedOutput(long minSize);
 
 	/**
 	 * Called when the user calls {@link #unmapOutput(MappedIO, long)} to commit all changes to the underlying output
-	 * @param out The output to unmap
-	 * @param numBytesWritten The number of bytes written to the mapped out since the caller received the mapped output object
+	 * 
+	 * @param out
+	 *            The output to unmap
+	 * @param numBytesWritten
+	 *            The number of bytes written to the mapped out since the caller received the mapped output object
 	 */
 	public abstract void unmapOutputImpl(MappedIO out, long numBytesWritten);
 
@@ -341,8 +374,14 @@ public abstract class AbstractOutput implements Output {
 		mappedOutput.offset = -1;
 	}
 
-	public TroyStreamSettings getSettings() {
-		return settings;
+	@Override
+	public void setByteOrder(ByteOrder byteOrder) {
+		bigEndian = byteOrder == ByteOrder.BIG_ENDIAN;
+	}
+
+	@Override
+	public ByteOrder getByteOrder() {
+		return bigEndian ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 	}
 
 }
