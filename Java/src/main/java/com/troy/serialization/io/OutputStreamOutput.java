@@ -79,7 +79,7 @@ public class OutputStreamOutput extends AbstractOutput {
 	}
 
 	@Override
-	public void resetMappedOutputImpl(AbstractMappedIO out, long minSize) {
+	public void resetMappedOutputImpl(MappedIO out, long minSize) {
 		out.offset = 0;
 		if (out.capacity < minSize) {
 			Unsafe unsafe = MiscUtil.getUnsafe();
@@ -91,13 +91,20 @@ public class OutputStreamOutput extends AbstractOutput {
 	}
 
 	@Override
-	public AbstractMappedIO newMappedOutput(long minSize) {
+	public MappedIO newMappedOutput(long minSize) {
 		long address = MiscUtil.getUnsafe().allocateMemory(minSize);
-		return new AbstractMappedIO(address, 0, minSize);
+		return new MappedIO(address, 0, minSize) {
+
+			@Override
+			public void require(long bytes) {
+				
+			}
+			
+		};
 	}
 
 	@Override
-	public void unmapOutputImpl(AbstractMappedIO out, long numBytesWritten) {
+	public void unmapOutputImpl(MappedIO out, long numBytesWritten) {
 	}
 
 	@Override

@@ -82,7 +82,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	@Override
 	public void require(long bytes) {
 		if (bytes + size > capacity) {
-			long newSize = (bytes / 2 + 1) / 2;// Round up to next power of two
+			long newSize = (bytes / 2 + 1) * 2;// Round up to next power of two
 			address = unsafe.reallocateMemory(address, newSize);
 			getDeallocator().addressToFree = this.address;
 			capacity = newSize;
@@ -96,19 +96,18 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	}
 
 	@Override
-	public void resetMappedOutputImpl(AbstractMappedIO out, long minSize) {
-
+	public void resetMappedOutputImpl(MappedIO out, long minSize) {
+		//Do nothing since
 	}
 	
-
 	@Override
-	public AbstractMappedIO newMappedOutput(long minSize) {
+	public MappedIO newMappedOutput(long minSize) {
 		require(minSize);
-		return new MappedOutput(address, size, capacity);
+		return new DefaultMappedIO(address, size, capacity);
 	}
 
 	@Override
-	public void unmapOutputImpl(AbstractMappedIO out, long numBytesWritten) {
+	public void unmapOutputImpl(MappedIO out, long numBytesWritten) {
 		require(numBytesWritten);
 		// FIXME actually copy bytes
 		// nmemcpy(address, position, out.address, out.offset, numBytesWritten);
@@ -116,20 +115,25 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	}
 
 	@Override
-	public void writeBytes(byte[] src, int offset, int bytes) {
-		require(bytes);
-		// FIXME switch to more efficient native approach later
-		final int end = offset + bytes;
-		for (int i = offset; i < end; i++) {
-			writeByteImpl(src[i]);
+	public void writeBytes(byte[] src, int offset, int elements) {
+		if (NativeUtils.NATIVES_ENABLED) {
+			require(elements * Short.BYTES);
+			NativeUtils.bytesToNative(address + position, src, offset, elements, swapEndianess);
+			addRequired();
+		} else {
+			super.writeBytes(src, offset, elements);// The superclass increments position so we're ok without addRequired();
 		}
-		addRequired();
 	}
 
 	@Override
 	public void writeShorts(short[] src, int offset, int elements) {
-		NativeUtils.shortsToNative(address + position, src, offset, elements, swapEndianess);
-		addRequired();
+		if (NativeUtils.NATIVES_ENABLED) {
+			require(elements * Short.BYTES);
+			NativeUtils.shortsToNative(address + position, src, offset, elements, swapEndianess);
+			addRequired();
+		} else {
+			super.writeShorts(src, offset, elements);// The superclass increments position so we're ok without addRequired();
+		}
 	}
 
 	@Override

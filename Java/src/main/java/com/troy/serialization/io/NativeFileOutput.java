@@ -94,16 +94,16 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 	}
 
 	@Override
-	public void resetMappedOutputImpl(AbstractMappedIO out, long minSize) {
+	public void resetMappedOutputImpl(MappedIO out, long minSize) {
 	}
 
 	@Override
-	public AbstractMappedIO newMappedOutput(long minSize) {
+	public MappedIO newMappedOutput(long minSize) {
 		return null;
 	}
 
 	@Override
-	public void unmapOutputImpl(AbstractMappedIO out, long numBytesWritten) {
+	public void unmapOutputImpl(MappedIO out, long numBytesWritten) {
 	}
 	
 	@Override

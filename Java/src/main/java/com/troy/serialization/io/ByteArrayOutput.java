@@ -5,9 +5,13 @@ import java.util.Arrays;
 import com.troy.serialization.exception.*;
 import com.troy.serialization.util.*;
 
+import sun.misc.Unsafe;
+
 public class ByteArrayOutput extends AbstractOutput {
+	private static final Unsafe unsafe = MiscUtil.getUnsafe();
 
 	private static final int NATIVE_ARRAY_COPY_THRESH_HOLD = 16;
+	private static final int DEFAULT_NATIVE_SIZE = 128;
 
 	private byte[] buffer;
 	private int position;
@@ -66,6 +70,8 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void close() {
 		buffer = null;// Help GC
 		position = -1;
+		if (mapped != null)
+			mapped.close();
 	}
 
 	@Override
@@ -74,7 +80,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	}
 
 	@Override
-	public void resetMappedOutputImpl(AbstractMappedIO out, long minSize) {
+	public void resetMappedOutputImpl(MappedIO out, long minSize) {
 		// We don't need to worry about minSize because require already ensured that we
 		// have enough space in the buffer
 
@@ -82,18 +88,15 @@ public class ByteArrayOutput extends AbstractOutput {
 	}
 
 	@Override
-	public AbstractMappedIO newMappedOutput(long minSize) {
-
-		return new AbstractMappedIO(0, 0, buffer.length);
+	public MappedIO newMappedOutput(long minSize) {
+		return new DefaultMappedIO(unsafe.allocateMemory(DEFAULT_NATIVE_SIZE), 0, DEFAULT_NATIVE_SIZE);
 	}
 
 	@Override
-	public void unmapOutputImpl(AbstractMappedIO out, long numBytesWritten) {
-		if (NATIVE_ARRAY_COPY_THRESH_HOLD > numBytesWritten) {
-
-		} else {
-
-		}
+	public void unmapOutputImpl(MappedIO out, long numBytesWritten) {
+		if (numBytesWritten > Integer.MAX_VALUE)
+			throw new IllegalStateException("Buffer capacity exceeded! " + ((long) position + numBytesWritten));
+		NativeUtils.nativeToBytes(buffer, out.address, position, (int) numBytesWritten, swapEndianess);
 	}
 
 	@Override
@@ -142,7 +145,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.floatsToBytes(buffer, src, offset, position, elements, swapEndianess);
 		} else {
-			for(int i = 0; i < src.length; i++) {
+			for (int i = 0; i < src.length; i++) {
 				writeFloat(src[i]);
 			}
 		}

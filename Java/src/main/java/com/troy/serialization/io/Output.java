@@ -155,9 +155,9 @@ public interface Output extends TroyIO, ArrayOutput {
 	 * @param bytes
 	 * @return
 	 */
-	public AbstractMappedIO mapOutput(long bytes);
+	public MappedIO mapOutput(long bytes);
 
-	public void unmapOutput(AbstractMappedIO mappedOutput, long numBytesWritten);
+	public void unmapOutput(MappedIO mappedOutput, long numBytesWritten);
 
 	/**
 	 * Flushes this output and forces any buffered output bytes to be written out.

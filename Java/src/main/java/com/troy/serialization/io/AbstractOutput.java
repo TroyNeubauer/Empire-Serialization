@@ -7,7 +7,7 @@ import com.troy.serialization.util.TroyStreamSettings;
 
 public abstract class AbstractOutput implements Output {
 	protected TroyStreamSettings settings;
-	protected AbstractMappedIO mapped;
+	protected MappedIO mapped;
 	protected boolean swapEndianess = ByteOrder.nativeOrder() != ByteOrder.BIG_ENDIAN;
 
 	protected static final int NEXT_BYTE_VLE = 0b10000000, VLE_MASK = 0b01111111;
@@ -293,18 +293,30 @@ public abstract class AbstractOutput implements Output {
 	}
 
 	/**
-	 * Resets a mapped output so that it can be used again
+	 * Resets a mapped output so that it can be used again. 
+	 * Also ensures that the native block of memory has at least minSize bytes remaining
 	 * 
-	 * @param out
+	 * @param out The mapped output to reset
+	 * @param minSize The number of bytes
 	 */
-	public abstract void resetMappedOutputImpl(AbstractMappedIO out, long minSize);
+	public abstract void resetMappedOutputImpl(MappedIO out, long minSize);
 
-	public abstract AbstractMappedIO newMappedOutput(long minSize);
+	/**
+	 * Called once (the first time the user calls {@link #mapOutput(long)}) to create a mapped object to use
+	 * @param minSize The minimum number of bytes that the buffer must provide
+	 * @return A new mapped IO to use in relation with this output
+	 */
+	public abstract MappedIO newMappedOutput(long minSize);
 
-	public abstract void unmapOutputImpl(AbstractMappedIO out, long numBytesWritten);
+	/**
+	 * Called when the user calls {@link #unmapOutput(MappedIO, long)} to commit all changes to the underlying output
+	 * @param out The output to unmap
+	 * @param numBytesWritten The number of bytes written to the mapped out since the caller received the mapped output object
+	 */
+	public abstract void unmapOutputImpl(MappedIO out, long numBytesWritten);
 
 	@Override
-	public AbstractMappedIO mapOutput(long bytes) {
+	public MappedIO mapOutput(long bytes) {
 		require(bytes);
 		if (mapped == null) {
 			mapped = newMappedOutput(bytes);
@@ -319,7 +331,7 @@ public abstract class AbstractOutput implements Output {
 	}
 
 	@Override
-	public void unmapOutput(AbstractMappedIO mappedOutput, long numBytesWritten) {
+	public void unmapOutput(MappedIO mappedOutput, long numBytesWritten) {
 		// No need to require more bytes here because the buffer is already sized to the number of bytes the user
 		// requested when un mapping and numBytesWritten *should* be less than that
 		if (mappedOutput != mapped)
