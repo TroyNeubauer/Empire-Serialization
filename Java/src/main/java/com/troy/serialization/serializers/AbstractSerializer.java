@@ -4,9 +4,11 @@ import com.troy.serialization.io.*;
 
 public abstract class AbstractSerializer<T> implements Serializer<T> {
 	protected Class<T> type;
+	protected ClassData<T> data;
 
 	public AbstractSerializer(Class<T> type) {
 		this.type = type;
+		this.data = new ClassData<T>(type);
 	}
 
 	@Override
@@ -16,8 +18,8 @@ public abstract class AbstractSerializer<T> implements Serializer<T> {
 	
 	@Override
 	public void writeTypeDefinition(Output out) {
-		// TODO Auto-generated method stub
-		
+		out.writeBytes(data.getTypeDefinition());
 	}
+
 
 }
