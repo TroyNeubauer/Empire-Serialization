@@ -21,6 +21,12 @@ public abstract class AbstractOutput implements Output {
 	// 		1 					1				0
 	// 		1 					0				1
 	//This is Xor!						format:on
+
+	/**
+	 * 
+	 * @return {@code true} if the endianness of the underlying system and the desired endianness are different, in which
+	 *         case values written in native code need to be swapped. {@code false} otherwise
+	 */
 	protected boolean swapEndinessInNative() {
 		return bigEndian ^ (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN);
 	}
@@ -271,26 +277,72 @@ public abstract class AbstractOutput implements Output {
 	}
 
 	@Override
-	public void writeBytes(byte[] src, int offset, int bytes) {
-		require(bytes);
-		for (int i = offset; i < offset + bytes; i++) {
+	public void writeBytes(byte[] src, int offset, int elements) {
+		require(elements * Byte.BYTES);
+		for (int i = offset; i < offset + elements; i++) {
 			writeByteImpl(src[i]);
 		}
 	}
 
 	@Override
 	public void writeShorts(short[] src, int offset, int elements) {
-
+		require(elements * Short.BYTES);
+		for (int i = offset; i < offset + elements; i++) {
+			short b = src[i];
+			if (bigEndian) {
+				writeByteImpl((byte) ((b >> 8) & 0xFF));
+				writeByteImpl((byte) ((b >> 0) & 0xFF));
+			} else {
+				writeByteImpl((byte) ((b >> 0) & 0xFF));
+				writeByteImpl((byte) ((b >> 8) & 0xFF));
+			}
+		}	
 	}
 
 	@Override
 	public void writeInts(int[] src, int offset, int elements) {
-
+		require(elements * Integer.BYTES);
+		for (int i = offset; i < offset + elements; i++) {
+			int b = src[i];
+			if (bigEndian) {
+				writeByteImpl((byte) ((b >> 24) & 0xFF));
+				writeByteImpl((byte) ((b >> 16) & 0xFF));
+				writeByteImpl((byte) ((b >> 8) & 0xFF));
+				writeByteImpl((byte) ((b >> 0) & 0xFF));
+			} else {
+				writeByteImpl((byte) ((b >> 0) & 0xFF));
+				writeByteImpl((byte) ((b >> 8) & 0xFF));
+				writeByteImpl((byte) ((b >> 16) & 0xFF));
+				writeByteImpl((byte) ((b >> 24) & 0xFF));
+			}
+		}
 	}
 
 	@Override
 	public void writeLongs(long[] src, int offset, int elements) {
-
+		require(elements * Long.BYTES);
+		for (int i = offset; i < offset + elements; i++) {
+			long b = src[i];
+			if (bigEndian) {
+				writeByteImpl((byte) ((b >> 56) & 0xFF));
+				writeByteImpl((byte) ((b >> 48) & 0xFF));
+				writeByteImpl((byte) ((b >> 40) & 0xFF));
+				writeByteImpl((byte) ((b >> 32) & 0xFF));
+				writeByteImpl((byte) ((b >> 24) & 0xFF));
+				writeByteImpl((byte) ((b >> 16) & 0xFF));
+				writeByteImpl((byte) ((b >> 8) & 0xFF));
+				writeByteImpl((byte) ((b >> 0) & 0xFF));
+			} else {
+				writeByteImpl((byte) ((b >> 0) & 0xFF));
+				writeByteImpl((byte) ((b >> 8) & 0xFF));
+				writeByteImpl((byte) ((b >> 16) & 0xFF));
+				writeByteImpl((byte) ((b >> 24) & 0xFF));
+				writeByteImpl((byte) ((b >> 32) & 0xFF));
+				writeByteImpl((byte) ((b >> 40) & 0xFF));
+				writeByteImpl((byte) ((b >> 48) & 0xFF));
+				writeByteImpl((byte) ((b >> 56) & 0xFF));
+			}
+		}
 	}
 
 	@Override
@@ -320,7 +372,8 @@ public abstract class AbstractOutput implements Output {
 
 	/**
 	 * Resets a mapped output so that it can be used again. Also ensures that the native block of memory has at least
-	 * minSize bytes remaining. Called by {@link #mapOutput(long)} on successive calls just before returning the mapped out 
+	 * minSize bytes remaining. Called by {@link #mapOutput(long)} on successive calls just before returning the mapped out.
+	 * This method should update the offset parameter because it will be -1 otherwise
 	 * 
 	 * @param out
 	 *            The mapped output to reset
@@ -365,11 +418,8 @@ public abstract class AbstractOutput implements Output {
 
 	@Override
 	public void unmapOutput(MappedIO mappedOutput, long numBytesWritten) {
-		// No need to require more bytes here because the buffer is already sized to the number of bytes the user
-		// requested when un mapping and numBytesWritten *should* be less than that
 		if (mappedOutput != mapped)
 			throw new IllegalArgumentException("Mapped output is not current the mapped output for this output!");
-		// Copy data
 		unmapOutputImpl(mappedOutput, numBytesWritten);
 		mappedOutput.offset = -1;
 	}
