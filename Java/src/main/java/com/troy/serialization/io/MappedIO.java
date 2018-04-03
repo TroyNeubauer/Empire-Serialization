@@ -22,8 +22,7 @@ public abstract class MappedIO implements Closeable {
 	protected long address;
 
 	/**
-	 * The index of the first byte that the receiver should write to. Always positive, zero or negative one. A value of negative one indicates that this mapped output object is
-	 * invalid, and not attached to any output.
+	 * The offset from address that the receiver should write to. Always positive or zero
 	 */
 	protected long offset;
 
@@ -76,8 +75,14 @@ public abstract class MappedIO implements Closeable {
 			address = 0;
 			capacity = -1;
 		}
-			
 	}
+
+	@Override
+	public String toString() {
+		return "MappedIO [address=0x" + StringFormatter.toHexString(address) + ", offset=" + offset + ", capacity=" + capacity + "]";
+	}
+	
+	
 	
 
 }

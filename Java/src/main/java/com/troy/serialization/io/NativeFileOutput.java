@@ -3,6 +3,7 @@ package com.troy.serialization.io;
 import java.io.File;
 import java.nio.file.Path;
 
+import com.troy.serialization.*;
 import com.troy.serialization.exception.NoBufferException;
 import com.troy.serialization.exception.TroySerializationIOException;
 import com.troy.serialization.util.NativeUtils;
@@ -92,19 +93,6 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 	public void addRequired() {
 		//Do nothing
 	}
-
-	@Override
-	public void resetMappedOutputImpl(MappedIO out, long minSize) {
-	}
-
-	@Override
-	public MappedIO newMappedOutput(long minSize) {
-		return null;
-	}
-
-	@Override
-	public void unmapOutputImpl(MappedIO out, long numBytesWritten) {
-	}
 	
 	@Override
 	public void writeBytes(byte[] src, int offset, int bytes) {
@@ -149,6 +137,16 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 
 	@Override
 	public void writeBooleansCompact(boolean[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public NativeMemoryBlock map(long bytes) {
+		return null;
+	}
+
+	@Override
+	public void unmap(NativeMemoryBlock block) {
+		
 	}
 
 }

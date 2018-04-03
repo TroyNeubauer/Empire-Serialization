@@ -1,12 +1,12 @@
 package com.troy.serialization.io;
 
-import java.nio.*;
-import java.util.Arrays;
+import java.util.*;
 
+import com.troy.serialization.*;
 import com.troy.serialization.exception.*;
 import com.troy.serialization.util.*;
 
-import sun.misc.Unsafe;
+import sun.misc.*;
 
 public class ByteArrayOutput extends AbstractOutput {
 	private static final Unsafe unsafe = MiscUtil.getUnsafe();
@@ -78,26 +78,6 @@ public class ByteArrayOutput extends AbstractOutput {
 	@Override
 	public void flush() {
 		// Nop nothing to flush
-	}
-
-	@Override
-	public void resetMappedOutputImpl(MappedIO out, long minSize) {
-		// We don't need to worry about minSize because require already ensured that we
-		// have enough space in the buffer
-
-		out.offset = position;
-	}
-
-	@Override
-	public MappedIO newMappedOutput(long minSize) {
-		return new DefaultMappedIO(unsafe.allocateMemory(DEFAULT_NATIVE_SIZE), 0, DEFAULT_NATIVE_SIZE);
-	}
-
-	@Override
-	public void unmapOutputImpl(MappedIO out, long numBytesWritten) {
-		if (numBytesWritten > Integer.MAX_VALUE)
-			throw new IllegalStateException("Buffer capacity exceeded! " + ((long) position + numBytesWritten));
-		NativeUtils.nativeToBytes(buffer, out.address, position, (int) numBytesWritten, bigEndian);
 	}
 
 	@Override
@@ -205,5 +185,17 @@ public class ByteArrayOutput extends AbstractOutput {
 
 	public void addRequired() {
 		position += requested;
+	}
+
+	@Override
+	public NativeMemoryBlock map(long bytes) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void unmap(NativeMemoryBlock block) {
+		// TODO Auto-generated method stub
+		
 	}
 }

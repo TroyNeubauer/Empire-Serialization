@@ -3,6 +3,7 @@ package com.troy.serialization.io;
 import java.io.Closeable;
 import java.nio.*;
 
+import com.troy.serialization.*;
 import com.troy.serialization.exception.*;
 
 public interface TroyIO extends Closeable {
@@ -76,5 +77,9 @@ public interface TroyIO extends Closeable {
 	 * @return The current byte order
 	 */
 	public ByteOrder getByteOrder();
+	
+	public NativeMemoryBlock map(long bytes);
+	
+	public void unmap(NativeMemoryBlock block);
 
 }

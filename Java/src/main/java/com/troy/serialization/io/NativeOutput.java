@@ -1,5 +1,6 @@
 package com.troy.serialization.io;
 
+import com.troy.serialization.*;
 import com.troy.serialization.exception.NoBufferException;
 import com.troy.serialization.util.MiscUtil;
 import com.troy.serialization.util.NativeUtils;
@@ -96,25 +97,6 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	}
 
 	@Override
-	public void resetMappedOutputImpl(MappedIO out, long minSize) {
-		//Do nothing since
-	}
-	
-	@Override
-	public MappedIO newMappedOutput(long minSize) {
-		require(minSize);
-		return new DefaultMappedIO(address, size, capacity);
-	}
-
-	@Override
-	public void unmapOutputImpl(MappedIO out, long numBytesWritten) {
-		require(numBytesWritten);
-		// FIXME actually copy bytes
-		// nmemcpy(address, position, out.address, out.offset, numBytesWritten);
-		size += numBytesWritten;
-	}
-
-	@Override
 	public void writeBytes(byte[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Short.BYTES);
@@ -204,6 +186,16 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 
 	@Override
 	public void writeBooleansCompact(boolean[] src, int offset, int elements) {
+	}
+
+	@Override
+	public NativeMemoryBlock map(long bytes) {
+		return null;
+	}
+
+	@Override
+	public void unmap(NativeMemoryBlock block) {
+		
 	}
 
 }

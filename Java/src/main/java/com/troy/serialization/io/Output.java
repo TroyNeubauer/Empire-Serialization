@@ -150,16 +150,6 @@ public interface Output extends TroyIO, ArrayOutput {
 	public void writeVLEChar(char b);
 
 	/**
-	 * Returns a MappedOutput object which contains a pointer to
-	 * 
-	 * @param bytes
-	 * @return
-	 */
-	public MappedIO mapOutput(long bytes);
-
-	public void unmapOutput(MappedIO mappedOutput, long numBytesWritten);
-
-	/**
 	 * Flushes this output and forces any buffered output bytes to be written out.
 	 * The general contract of <code>flush</code> is that calling it is an
 	 * indication that, if any bytes previously written have been buffered by the

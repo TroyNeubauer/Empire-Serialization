@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Objects;
 
+import com.troy.serialization.*;
 import com.troy.serialization.exception.AlreadyClosedException;
 import com.troy.serialization.exception.NoBufferException;
 import com.troy.serialization.exception.TroySerializationIOException;
@@ -79,35 +80,6 @@ public class OutputStreamOutput extends AbstractOutput {
 	}
 
 	@Override
-	public void resetMappedOutputImpl(MappedIO out, long minSize) {
-		out.offset = 0;
-		if (out.capacity < minSize) {
-			Unsafe unsafe = MiscUtil.getUnsafe();
-			if (out.address != 0)
-				unsafe.freeMemory(out.address);
-			out.address = unsafe.allocateMemory(minSize);
-			out.capacity = minSize;
-		}
-	}
-
-	@Override
-	public MappedIO newMappedOutput(long minSize) {
-		long address = MiscUtil.getUnsafe().allocateMemory(minSize);
-		return new MappedIO(address, 0, minSize) {
-
-			@Override
-			public void require(long bytes) {
-				
-			}
-			
-		};
-	}
-
-	@Override
-	public void unmapOutputImpl(MappedIO out, long numBytesWritten) {
-	}
-
-	@Override
 	public void writeBytes(byte[] src, int offset, int bytes) {
 		try {
 			out.write(src, offset, bytes);
@@ -148,6 +120,18 @@ public class OutputStreamOutput extends AbstractOutput {
 
 	@Override
 	public void writeBooleansCompact(boolean[] src, int offset, int bytes) {
+	}
+
+	@Override
+	public NativeMemoryBlock map(long bytes) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void unmap(NativeMemoryBlock block) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

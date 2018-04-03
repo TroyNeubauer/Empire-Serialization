@@ -8,6 +8,7 @@ public abstract class AbstractOutput implements Output {
 
 	protected MappedIO mapped;
 	protected boolean bigEndian = false;
+	private boolean alreadyMapped = false;
 
 	protected static final int NEXT_BYTE_VLE = 0b10000000, VLE_MASK = 0b01111111;
 
@@ -296,7 +297,7 @@ public abstract class AbstractOutput implements Output {
 				writeByteImpl((byte) ((b >> 0) & 0xFF));
 				writeByteImpl((byte) ((b >> 8) & 0xFF));
 			}
-		}	
+		}
 	}
 
 	@Override
@@ -368,60 +369,6 @@ public abstract class AbstractOutput implements Output {
 	@Override
 	public void writeBooleansCompact(boolean[] src, int offset, int elements) {
 
-	}
-
-	/**
-	 * Resets a mapped output so that it can be used again. Also ensures that the native block of memory has at least
-	 * minSize bytes remaining. Called by {@link #mapOutput(long)} on successive calls just before returning the mapped out.
-	 * This method should update the offset parameter because it will be -1 otherwise
-	 * 
-	 * @param out
-	 *            The mapped output to reset
-	 * @param minSize
-	 *            The number of bytes
-	 */
-	public abstract void resetMappedOutputImpl(MappedIO out, long minSize);
-
-	/**
-	 * Called once (the first time the user calls {@link #mapOutput(long)}) to create a mapped object to use
-	 * 
-	 * @param minSize
-	 *            The minimum number of bytes that the buffer must provide
-	 * @return A new mapped IO to use in relation with this output
-	 */
-	public abstract MappedIO newMappedOutput(long minSize);
-
-	/**
-	 * Called when the user calls {@link #unmapOutput(MappedIO, long)} to commit all changes to the underlying output
-	 * 
-	 * @param out
-	 *            The output to unmap
-	 * @param numBytesWritten
-	 *            The number of bytes written to the mapped out since the caller received the mapped output object
-	 */
-	public abstract void unmapOutputImpl(MappedIO out, long numBytesWritten);
-
-	@Override
-	public MappedIO mapOutput(long bytes) {
-		require(bytes);
-		if (mapped == null) {
-			mapped = newMappedOutput(bytes);
-			return mapped;
-		} else {
-			if (mapped.offset == -1) {
-				throw new AlreadyMappedException("Cannot map output " + this);
-			}
-			resetMappedOutputImpl(mapped, bytes);
-			return mapped;
-		}
-	}
-
-	@Override
-	public void unmapOutput(MappedIO mappedOutput, long numBytesWritten) {
-		if (mappedOutput != mapped)
-			throw new IllegalArgumentException("Mapped output is not current the mapped output for this output!");
-		unmapOutputImpl(mappedOutput, numBytesWritten);
-		mappedOutput.offset = -1;
 	}
 
 	@Override
