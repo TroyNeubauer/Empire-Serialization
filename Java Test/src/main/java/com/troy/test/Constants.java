@@ -1,6 +1,9 @@
 package com.troy.test;
 
 public class Constants {
+	
+	public static final String BIG_HARRY_POTTER = getBig();
+	
 	public static final String HARRY_POTTER = "Mr. and Mrs. Dursley, of number four, Privet Drive, were proud to say\n" + 
 			"that they were perfectly normal, thank you very much. They were the last\n" + 
 			"people you'd expect to be involved in anything strange or mysterious,\n" + 
@@ -427,4 +430,15 @@ public class Constants {
 			"moment, people meeting in secret all over the country were holding up\n" + 
 			"their glasses and saying in hushed voices: \"To Harry Potter -- the boy\n" + 
 			"who lived!\"";
+
+	private static String getBig() {
+		int minSize = 10_000_000, count = 0;
+		StringBuilder sb = new StringBuilder();
+		while(sb.length() < minSize) {
+			sb.append(HARRY_POTTER);
+			count++;
+		}
+		System.out.println("Count: " + count);
+		return sb.toString();
+	}
 }

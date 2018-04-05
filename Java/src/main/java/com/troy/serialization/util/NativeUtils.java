@@ -138,6 +138,8 @@ public class NativeUtils {
 
 	public static native int booleansToFWrite(long fd, boolean[] srcJ, int srcOffset, int elements, boolean swapEndianess);
 
+	public static native int nativeToFWrite(long fd, long src, long bytes);
+	
 	/**
 	 * Copies n bytes from the source address to the destination address<br>
 	 * Both {@code dest} and {@code src} pointers are <b>NOT</b> checked for

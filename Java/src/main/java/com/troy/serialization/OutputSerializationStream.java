@@ -38,11 +38,24 @@ public class OutputSerializationStream implements ObjectOut {
 
 	/**
 	 * Handles cases where the user passes a "primitive" into the write object method
-	 * @return {@code true} If the type passed in was a primitive and was written using the correct writeX() method 
-	 * {@code false} otherwise
+	 * 
+	 * @return {@code true} If the type passed in was a primitive and was written using the correct writeX() method
+	 *         {@code false} otherwise
 	 */
 	private boolean checkForPrimitive(Object obj, Class<?> clazz) {
-		if (clazz == Byte.class) {
+		if (clazz == String.class) {
+			writeString((String) obj);
+			return true;
+		} else if (clazz == List.class) {
+			writeList((List<?>) obj);
+			return true;
+		} else if (clazz == Set.class) {
+			writeSet((Set<?>) obj);
+			return true;
+		} else if (clazz == Map.class) {
+			writeMap((Map<?, ?>) obj);
+			return true;
+		} else if (clazz == Byte.class) {
 			writeByte(((Byte) obj).byteValue());
 			return true;
 		} else if (clazz == Short.class) {
@@ -65,18 +78,6 @@ public class OutputSerializationStream implements ObjectOut {
 			return true;
 		} else if (clazz == Boolean.class) {
 			writeBoolean(((Boolean) obj).booleanValue());
-			return true;
-		} else if (clazz == String.class) {
-			writeString((String) obj);
-			return true;
-		} else if (clazz == List.class) {
-			writeList((List<?>) obj);
-			return true;
-		} else if (clazz == Set.class) {
-			writeSet((Set<?>) obj);
-			return true;
-		} else if (clazz == Map.class) {
-			writeMap((Map<?, ?>) obj);
 			return true;
 		}
 		return false;

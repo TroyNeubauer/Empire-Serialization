@@ -8,23 +8,6 @@
 #define ERROR -1
 #define INVALID_ARGUMENT -10
 
-JNIEXPORT jint JNICALL
-JNI_OnLoad(JavaVM *vm, void *reserved)
-{
-	int* ptr = 0;
-	*ptr = 3;
-	printf("HELO WORLD!!!");
-	/*
-	void** envRaw = NULL;
-	(*vm)->GetEnv(vm, envRaw, JNI_VERSION_1_8);
-	JNIEnv* env = *(envRaw);
-	jclass cls = (*env)->FindClass(env, "com/troy/serialization/nativelibrary/LibraryProvider");
-	jfieldID id = (*env)->GetStaticFieldID(env, cls, "native_load", "Z");
-	(*env)->SetStaticBooleanField(env, cls, id, JNI_TRUE);
-	*/
-	return JNI_VERSION_1_8;
-}
-
 const jbyte FOUR_BIT_ENCODING_CACHE[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 2, -1, 11, 9, 0, 15, -1, 7, 4, -1, -1, 10, 13, 5, 3, -1, -1, 8, 6, 1, 12, -1, 14 };
 
 void putError(jlong pointer, jbyte code, jchar character, jint index) {

@@ -56,9 +56,22 @@ public interface NativeMemoryBlock {
 	 */
 	public default void require(long bytes) {
 		if (position() + bytes > capacity()) {
-			resize(bytes);
+			resize(capacity() * 2);
 		}
 	}
 
+	/**
+	 * Resizes this buffer to a new size so that it can hold at exactly x bytes after this method call
+	 * 
+	 * @param bytes
+	 *            The new capacity of this buffer
+	 */
 	void resize(long bytes);
+	
+	/**
+	 * Throws a runtime exception if the offset passed in is out of the range of this buffer
+	 * @param offset The offset to check
+	 * @throws RuntimeException If the offset is out of range
+	 */
+	public void checkOffset(long offset);
 }

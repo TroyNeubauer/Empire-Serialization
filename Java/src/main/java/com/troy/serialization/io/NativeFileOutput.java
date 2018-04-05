@@ -11,6 +11,8 @@ import com.troy.serialization.util.SerializationUtils;
 
 public class NativeFileOutput extends AbstractNativeOutput<com.troy.serialization.io.NativeFileOutput.Deallocator> {
 
+	private MasterMemoryBlock block;
+
 	static {
 		SerializationUtils.init();
 	}
@@ -27,6 +29,7 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 
 	class Deallocator implements Runnable {
 		private long fd;
+		private MasterMemoryBlock block;
 
 		public Deallocator(long fd) {
 			this.fd = fd;
@@ -38,6 +41,10 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 				fclose(fd);
 				fd = 0;
 			}
+			if (block != null) {
+				block.free();
+				block = null;
+			}
 		}
 	}
 
@@ -46,8 +53,7 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 		if (fd == 0)
 			throw new TroySerializationIOException("Unable to open file \"" + file + "\" for writing");
 		if (fd == SerializationUtils.OUT_OF_MEMORY)
-			throw new OutOfMemoryError(
-					"Unable to open file " + file + " because the creating the name in native code failed");
+			throw new OutOfMemoryError("Unable to open file " + file + " because the creating the name in native code failed");
 		setDeallocator(new Deallocator(fd));
 	}
 
@@ -86,14 +92,14 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 
 	@Override
 	public void require(long bytes) {
-		//fwrite does everything for us so we don't need to insure anything
+		// fwrite does everything for us so we don't need to insure anything
 	}
-	
+
 	@Override
 	public void addRequired() {
-		//Do nothing
+		// Do nothing
 	}
-	
+
 	@Override
 	public void writeBytes(byte[] src, int offset, int bytes) {
 		NativeUtils.bytesToFWrite(fd, src, offset, bytes, bigEndian);
@@ -141,12 +147,22 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 
 	@Override
 	public NativeMemoryBlock map(long bytes) {
-		return null;
+		if (block == null) {
+			block = MasterMemoryBlock.allocate(bytes);
+			getDeallocator().block = this.block;
+		} else {
+			//Reset it
+			block.setPosition(0);
+			block.require(bytes);
+		}
+		return block;
 	}
 
 	@Override
 	public void unmap(NativeMemoryBlock block) {
-		
+		System.out.println("unmappint: " + block);
+		System.out.println("fd " + fd);
+		NativeUtils.nativeToFWrite(fd, block.address(), block.position());
 	}
 
 }

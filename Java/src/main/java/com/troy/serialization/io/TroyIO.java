@@ -78,8 +78,20 @@ public interface TroyIO extends Closeable {
 	 */
 	public ByteOrder getByteOrder();
 	
+	/**
+	 * Returns a temporary buffer that can be used in native code. An IO can only be mapped at one instance in time.
+	 * Use {@link NativeMemoryBlock#position()} to indicate how many bytes 
+	 * Call {@link #unmap(NativeMemoryBlock)} 
+	 * once reading/writing to the buffer is finished to commit all changed back to the IO
+	 * @param bytes The number of bytes to require the buffer to have
+	 * @return A native block of memory that can be used to speed up operations
+	 */
 	public NativeMemoryBlock map(long bytes);
 	
+	/**
+	 * Commits all changes back to the IO after use is complete
+	 * @param block The block to unmap
+	 */
 	public void unmap(NativeMemoryBlock block);
 
 }

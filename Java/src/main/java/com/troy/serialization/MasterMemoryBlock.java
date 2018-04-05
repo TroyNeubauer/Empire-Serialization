@@ -8,6 +8,16 @@ public class MasterMemoryBlock implements NativeMemoryBlock {
 
 	protected long address, capacity, position;
 
+	public MasterMemoryBlock(long address, long capacity, long position) {
+		this.address = address;
+		this.capacity = capacity;
+		this.position = position;
+	}
+
+	public static MasterMemoryBlock allocate(long bytes) {
+		return new MasterMemoryBlock(unsafe.allocateMemory(bytes), bytes, 0);
+	}
+
 	@Override
 	public long address() {
 		return address;
@@ -30,7 +40,12 @@ public class MasterMemoryBlock implements NativeMemoryBlock {
 
 	@Override
 	public NativeMemoryBlock subset(long offset, long length) {
-		return null;
+		if (offset < 0 || length < 0)
+			throw new IllegalArgumentException();
+		if (offset + length > capacity)
+			throw new IllegalArgumentException("Attempting to create a subset from memory that is out of bounds capacity: " + capacity
+					+ " Requested offset: " + offset + " Requested length " + length);
+		return new SubMemoryBlock(this, offset, length);
 	}
 
 	@Override
@@ -42,7 +57,24 @@ public class MasterMemoryBlock implements NativeMemoryBlock {
 
 	@Override
 	public void resize(long bytes) {
-		
+		if (bytes > capacity) {
+			long newCapacity = capacity * 2;
+			address = unsafe.reallocateMemory(address, newCapacity);
+			capacity = newCapacity;
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "MasterMemoryBlock [address=" + address + ", capacity=" + capacity + ", position=" + position + "]";
+	}
+
+	@Override
+	public void checkOffset(long offset) {
+		if (offset < 0)
+			throw new RuntimeException("Negative offset not allowed! Offset " + offset);
+		if (offset > capacity)
+			throw new RuntimeException("Offset out of range! Buffer Capacity: " + capacity + " offset " + offset);
 	}
 
 }
