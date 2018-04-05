@@ -41,7 +41,7 @@ JNIEXPORT jlong JNICALL Java_com_troy_serialization_io_NativeFileOutput_fopen
 	if (result == NULL) return 0;
 	(*env)->ReleaseStringUTFChars(env, name, file);
 	(*env)->ReleaseStringUTFChars(env, accessJ, access);
-	return (jlong) result;
+	return (jlong)result;
 
 }
 
@@ -117,8 +117,16 @@ inline jdouble swapJdouble(jdouble value) {
 #endif
 }
 
+JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_nativeToFWrite(jlong fd, jlong srcJ, jlong bytes) {
+	jbyte* src = (void*)srcJ;
+	FILE* file = (FILE*)fd;
+	file->_Placeholder = 5;
+	//*src = 5;
+	//fwrite(src, bytes, 1, (FILE*)fd);
+}
+
 #define xsToFWrite(type, swapFunc) \
-JNIEXPORT j##type JNICALL Java_com_troy_serialization_util_NativeUtils_##type##sToFWrite(JNIEnv * env, jclass class, jlong fd, j##type##Array srcJ, jint srcOffset, jint elements, jboolean swapEndianess) {\
+JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_##type##sToFWrite(JNIEnv * env, jclass class, jlong fd, j##type##Array srcJ, jint srcOffset, jint elements, jboolean swapEndianess) {\
 	if (fd == 0 || srcJ == NULL) {											\
 		return INVALID_ARGUMENT;											\
 	}																		\
