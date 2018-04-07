@@ -5,8 +5,9 @@ import java.util.*;
 
 import com.esotericsoftware.kryo.*;
 import com.esotericsoftware.kryo.io.Output;
+import com.google.gson.*;
 import com.troy.serialization.*;
-import com.troy.serialization.io.*;
+import com.troy.serialization.io.out.*;
 import com.troy.serialization.util.*;
 
 public abstract class Library {
@@ -24,9 +25,9 @@ public abstract class Library {
 		}
 	}
 
-	public static void doTest(File file, Object obj) {
+	public static void doTest(Object obj) {
 		for (Library lib : libs) {
-			lib.test(new File(file.getParentFile(), lib.name + file.getName()), obj);
+			lib.test(new File("./" + lib.name + ".dat"), obj);
 		}
 	}
 
@@ -38,30 +39,20 @@ public abstract class Library {
 		long[] times = new long[samples];
 		long start, end, size = 0;
 		for (int i = 0; i < samples; i++) {
-			
+			file.delete();
+			System.gc();
 			start = System.nanoTime();
 			writeObjectToFile(file, obj);
-			size = file.length();
 			end = System.nanoTime();
-/*
-			if (lastBytes != null) {
-				if (lastBytes.length != bytes.length)
-					throw new RuntimeException();
-			} else {
-				try {
-					FileOutputStream stream = new FileOutputStream(new File("./" + getClass().getSimpleName() + ".dat"));
-					stream.write(bytes);
-					stream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			lastBytes = bytes;
-			*/
+			size = file.length();
+			/*
+			 * if (lastBytes != null) { if (lastBytes.length != bytes.length) throw new RuntimeException(); } else { try {
+			 * FileOutputStream stream = new FileOutputStream(new File("./" + getClass().getSimpleName() + ".dat"));
+			 * stream.write(bytes); stream.close(); } catch (IOException e) { e.printStackTrace(); } } lastBytes = bytes;
+			 */
 			times[i] = end - start;
-			System.gc();
 		}
-		
+
 		long average = Math.round(Arrays.stream(times).average().getAsDouble());
 		long min = Arrays.stream(times).min().getAsLong();
 		System.out.println("\tTook: " + StringFormatter.addCommas(average) + "ns on average.  Min:" + StringFormatter.addCommas(min) + " size: "
@@ -100,7 +91,7 @@ public abstract class Library {
 		}
 
 	}
-	
+
 	public static class MyLibraryJava extends Library {
 		public MyLibraryJava() {
 			SerializationUtils.init();
@@ -135,13 +126,22 @@ public abstract class Library {
 
 		@Override
 		public void writeObjectToFile(File file, Object obj) {
+			FileOutputStream stream = null;
+			ObjectOutputStream out = null;
 			try {
-				ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
+				stream = new FileOutputStream(file);
+				out = new ObjectOutputStream(stream);
 				out.writeObject(obj);
-				out.close();
 
 			} catch (IOException e) {
 				e.printStackTrace();
+			} finally {
+				try {
+					out.close();
+					stream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 
 		}
@@ -186,6 +186,32 @@ public abstract class Library {
 			Output out = new Output(4096, Integer.MAX_VALUE);
 			k.writeClassAndObject(out, obj);
 			return out.toBytes();
+		}
+
+	}
+
+	public static class GSON extends Library {
+		private Gson gson = new Gson();
+
+		@Override
+		public void writeObjectToFile(File file, Object obj) {
+			FileWriter writer = null;
+			try {
+				writer = new FileWriter(file);
+				writer.write(gson.toJson(obj));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		public byte[] writeObjectToBytes(Object obj) {
+			return gson.toJson(obj).getBytes();
 		}
 
 	}

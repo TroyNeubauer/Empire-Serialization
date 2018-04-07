@@ -1,7 +1,8 @@
 package com.troy.serialization.charset;
 
 import com.troy.serialization.*;
-import com.troy.serialization.io.*;
+import com.troy.serialization.io.in.*;
+import com.troy.serialization.io.out.*;
 import com.troy.serialization.util.*;
 
 public interface TroyCharset {
@@ -31,16 +32,16 @@ public interface TroyCharset {
 	 * @param chars
 	 *            The number of characters to encode
 	 */
-	public default void encode(final char[] src, Output dest, int srcOffset, final int chars) {
+	public default void encode(final char[] src, Output dest, int srcOffset, final int chars, int info) {
 		if (NativeUtils.NATIVES_ENABLED && chars > NativeUtils.MIN_NATIVE_THRESHOLD) {
 			long size = (long) (chars / getMinCharactersPerByte() + 1);
 			dest.require(size);
 			NativeMemoryBlock block = dest.map(size);
-			int bytesEncoded = nEncodeImpl(src, block.address(), srcOffset, chars);
+			int bytesEncoded = nEncodeImpl(src, block.address(), srcOffset, chars, info);
 			block.setPosition(bytesEncoded);
 			dest.unmap(block);
 		} else {
-			encodeImpl(src, dest, srcOffset, chars);
+			encodeImpl(src, dest, srcOffset, chars, info);
 		}
 	}
 	
@@ -48,13 +49,13 @@ public interface TroyCharset {
 	 * Encodes a subset of the given character array to the desired output
 	 * @see #encode(char[], Output, int, int)
 	 */
-	public void encodeImpl(final char[] src, Output dest, int srcOffset, final int chars);
+	public void encodeImpl(final char[] src, Output dest, int srcOffset, final int chars, int info);
 
 	/**
 	 * Encodes a subset of the given character array to the desired output using a native alternative
 	 * @see #encode(char[], Output, int, int)
 	 */
-	public abstract int nEncodeImpl(char[] src, long dest, int srcOffset, int chars);
+	public abstract int nEncodeImpl(char[] src, long dest, int srcOffset, int chars, int info);
 
 	public char[] getDecodingCache();
 

@@ -11,6 +11,11 @@
 const jbyte FOUR_BIT_ENCODING_CACHE[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 2, -1, 11, 9, 0, 15, -1, 7, 4, -1, -1, 10, 13, 5, 3, -1, -1, 8, 6, 1, 12, -1, 14 };
 const jbyte SIX_BIT_ENCODING_CACHE[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 2, 6, -1, -1, -1, -1, 5, -1, -1, -1, -1, 4, 10, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 8, 7, -1, -1, -1, 3, -1, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, -1, -1, -1, -1, 11, -1, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37 };
 
+#define VLE8_INFO_MASK 0b10000000
+#define VLE8_DATA_MASK 0b01111111
+#define VLE8_HAS_NEXT_BYTE 0b10000000
+#define VLE8_DOESNT_HAVE_NEXT_BYTE 0b00000000
+
 void putError(jlong pointer, jbyte code, jchar character, jint index) {
 	*((jbyte*)pointer) = code;
 	*((jchar*)(pointer + 1)) = character;
@@ -121,32 +126,6 @@ inline jdouble swapJdouble(jdouble value) {
 #endif
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_TroyCharsets_nIdentifyCharset
-(JNIEnv * env, jclass class, jcharArray array, jint offset, jint length) {
-	jchar* src = (*env)->GetPrimitiveArrayCritical(env, array, NULL);
-	int fourOK = 1;
-	int sixOK = 1;
-	for (int i = offset; i < offset + length; i++) {
-		jchar c = src[i];
-		if (fourOK && (c > sizeof(FOUR_BIT_ENCODING_CACHE) || FOUR_BIT_ENCODING_CACHE[c] == -1)) {
-			fourOK = 0;
-		}
-		if (sixOK && (c > sizeof(SIX_BIT_ENCODING_CACHE) || SIX_BIT_ENCODING_CACHE[c] == -1)) {
-			sixOK = 0;
-		}
-		if (!fourOK && !sixOK) {
-			break;
-		}
-		if (fourOK)
-			return 0b00;
-		if (sixOK)
-			return 0b01;
-
-		return 0b10;
-	}
-	(*env)->ReleasePrimitiveArrayCritical(env, array, src, JNI_ABORT);
-}
-
 JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_nativeToFWrite(JNIEnv * env, jclass class, jlong fd, jlong srcJ, jlong bytes) {
 	if (srcJ == 0 || fd == 0)
 		return INVALID_ARGUMENT;
@@ -217,13 +196,12 @@ JNIEXPORT jbyteArray JNICALL Java_com_troy_serialization_io_NativeOutput_ngetBuf
 }
 
 JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_FourBitCharset_nEncodeImpl
-(JNIEnv * env, jobject charset, jcharArray srcJ, jlong destJ, jint srcOffset, jint chars)
+(JNIEnv * env, jobject charset, jcharArray srcJ, jlong destJ, jint srcOffset, jint chars, jint info)
 {
 	jchar* src = (*env)->GetPrimitiveArrayCritical(env, srcJ, NULL);
 	jbyte* dest = (jbyte*)destJ;
-	if (src == NULL || dest == NULL) {
-		return OUT_OF_MEMORY;
-	}
+	if (src == NULL) return OUT_OF_MEMORY;
+	if (dest == NULL) return INVALID_ARGUMENT;
 	int bytesWritten = 0;
 	int i = 0;
 	const int end = (chars / 2) * 2;//round down to next mutiple of two
@@ -239,14 +217,13 @@ JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_FourBitCharset_nEncod
 }
 
 JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_SixBitCharset_nEncodeImpl
-(JNIEnv * env, jobject charset, jcharArray srcJ, jlong destJ, jint srcOffset, jint chars)
+(JNIEnv * env, jobject charset, jcharArray srcJ, jlong destJ, jint srcOffset, jint chars, jint info)
 {
 	jchar* src = (*env)->GetPrimitiveArrayCritical(env, srcJ, NULL);
 	jbyte* dest = (jbyte*)destJ;
 	const jbyte* inital = dest;
-	if (src == NULL || dest == NULL) {
-		return OUT_OF_MEMORY;
-	}
+	if (src == NULL) return OUT_OF_MEMORY;
+	if (dest == NULL) return INVALID_ARGUMENT;
 	int i = srcOffset;
 	int result;
 	const jint end = (chars / 4) * 4;// round down to next multiple of two
@@ -300,6 +277,75 @@ JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_SixBitCharset_nEncode
 		dest++;
 	}
 	return dest - inital;
+}
+
+JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_TroyCharsets_nIdentifyCharset
+(JNIEnv * env, jclass class, jcharArray array, jint offset, jint length) {
+	jchar* src = (*env)->GetPrimitiveArrayCritical(env, array, NULL);
+	unsigned int fourOK = 1;
+	unsigned int sixOK = 1;
+	unsigned int allASCII = 1;
+	for (int i = offset; i < offset + length; i++) {
+		jchar c = src[i];
+		if (allASCII && (c >> 7) != 0)
+			allASCII = 0;
+		if (fourOK && (c > sizeof(FOUR_BIT_ENCODING_CACHE) || FOUR_BIT_ENCODING_CACHE[c] == -1)) {
+			fourOK = 0;
+		}
+		if (sixOK && (c > sizeof(SIX_BIT_ENCODING_CACHE) || SIX_BIT_ENCODING_CACHE[c] == -1)) {
+			sixOK = 0;
+		}
+		if (!fourOK && !sixOK && !allASCII) {
+			break;
+		}
+	}
+	(*env)->ReleasePrimitiveArrayCritical(env, array, src, JNI_ABORT);
+	unsigned int result = (allASCII ? 0 : 1) << 2;
+	if (fourOK)
+		result |= 0b00;
+	else if (sixOK)
+		result |= 0b01;
+	else
+		result |= 0b10;
+	return result;
+}
+
+
+JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_VLE8Charset_nEncodeImpl
+(JNIEnv * env, jobject charset, jcharArray srcJ, jlong destJ, jint srcOffset, jint chars, jint info)
+{
+	jchar* src = (*env)->GetPrimitiveArrayCritical(env, srcJ, NULL);
+	jbyte* dest = (jbyte*)destJ;
+	if (src == NULL) return OUT_OF_MEMORY;
+	if (dest == NULL) return INVALID_ARGUMENT;
+	int bytesWritten = 0;
+	int i = srcOffset;
+	const int end = srcOffset + chars;//round down to next mutiple of two
+	if (info == 0) {
+		while (i < end) {
+			dest[bytesWritten++] = src[i++];
+		}
+	}
+	else {
+		while (i < end) {
+			jchar value = src[i++];
+			printf("char %c %i\n", value, value);
+			if (value >> 7 == 0) {
+				dest[bytesWritten++] = value;
+			}
+			else if (value >> 14 == 0) {
+				dest[bytesWritten++] = (value & VLE8_DATA_MASK) | VLE8_HAS_NEXT_BYTE;
+				dest[bytesWritten++] = value >> 7;
+			}
+			else if (value >> 21 == 0) {
+				dest[bytesWritten++] = (value & VLE8_DATA_MASK) | VLE8_HAS_NEXT_BYTE;
+				dest[bytesWritten++] = ((value >> 7) & VLE8_DATA_MASK) | VLE8_HAS_NEXT_BYTE;
+				dest[bytesWritten++] = value >> 14;
+			}
+		}
+	}
+	(*env)->ReleasePrimitiveArrayCritical(env, srcJ, src, 0);
+	return bytesWritten;
 }
 
 

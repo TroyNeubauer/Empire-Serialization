@@ -1,6 +1,6 @@
 package com.troy.serialization.serializers;
 
-import com.troy.serialization.io.*;
+import com.troy.serialization.io.out.*;
 
 public abstract class AbstractSerializer<T> implements Serializer<T> {
 	protected Class<T> type;

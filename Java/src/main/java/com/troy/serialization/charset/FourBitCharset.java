@@ -1,6 +1,7 @@
 package com.troy.serialization.charset;
 
-import com.troy.serialization.io.*;
+import com.troy.serialization.io.in.*;
+import com.troy.serialization.io.out.*;
 import com.troy.serialization.util.*;
 
 public final class FourBitCharset implements TroyCharset {
@@ -16,7 +17,7 @@ public final class FourBitCharset implements TroyCharset {
 	// maps a java char -> four bit code
 	public static final int[] ENCODING_CACHE = SerializationUtils.constructEncodingFromDecoding(DECODING_CACHE);
 
-	public native int nEncodeImpl(char[] src, long dest, int srcOffset, int chars);
+	public native int nEncodeImpl(char[] src, long dest, int srcOffset, int chars, int info);
 
 	@Override
 	public void decode(Input src, char[] dest, int destOffset, final int chars) {
@@ -35,7 +36,7 @@ public final class FourBitCharset implements TroyCharset {
 	}
 
 	@Override
-	public void encodeImpl(final char[] src, Output dest, final int srcOffset, final int chars) {
+	public void encodeImpl(final char[] src, Output dest, final int srcOffset, final int chars, int info) {
 		int i = srcOffset;
 		final int end = (chars / 2) * 2;// round down to next multiple of two
 

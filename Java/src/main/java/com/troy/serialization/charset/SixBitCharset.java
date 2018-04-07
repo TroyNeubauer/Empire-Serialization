@@ -1,6 +1,7 @@
 package com.troy.serialization.charset;
 
-import com.troy.serialization.io.*;
+import com.troy.serialization.io.in.*;
+import com.troy.serialization.io.out.*;
 import com.troy.serialization.util.*;
 
 public class SixBitCharset implements TroyCharset {
@@ -22,13 +23,13 @@ public class SixBitCharset implements TroyCharset {
 
 	@Override
 	public void decode(Input src, char[] dest, int destOffset, int chars) {
-
+		
 	}
 
-	public native int nEncodeImpl(char[] src, long dest, int srcOffset, int chars);
+	public native int nEncodeImpl(char[] src, long dest, int srcOffset, int chars, int info);
 
 	@Override
-	public void encodeImpl(char[] src, Output dest, int srcOffset, int chars) {
+	public void encodeImpl(char[] src, Output dest, int srcOffset, int chars, int info) {
 		int i = srcOffset;
 		int result;
 		final int end = (chars / 4) * 4;// round down to next multiple of two

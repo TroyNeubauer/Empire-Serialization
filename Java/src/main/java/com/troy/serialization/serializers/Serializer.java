@@ -1,6 +1,7 @@
 package com.troy.serialization.serializers;
 
-import com.troy.serialization.io.*;
+import com.troy.serialization.io.in.*;
+import com.troy.serialization.io.out.*;
 
 public interface Serializer<T> {
 

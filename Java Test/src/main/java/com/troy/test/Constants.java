@@ -430,6 +430,8 @@ public class Constants {
 			"moment, people meeting in secret all over the country were holding up\n" + 
 			"their glasses and saying in hushed voices: \"To Harry Potter -- the boy\n" + 
 			"who lived!\"";
+	
+	public static final String VLE8_TEST = "123456789 VLE8" + '\u1940';
 
 	private static String getBig() {
 		int minSize = 10000000, count = 0;

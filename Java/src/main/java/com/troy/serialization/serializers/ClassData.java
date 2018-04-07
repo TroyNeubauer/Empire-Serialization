@@ -3,7 +3,7 @@ package com.troy.serialization.serializers;
 import java.lang.reflect.*;
 import java.util.*;
 
-import com.troy.serialization.io.*;
+import com.troy.serialization.io.out.*;
 import com.troy.serialization.util.*;
 
 import sun.misc.*;
