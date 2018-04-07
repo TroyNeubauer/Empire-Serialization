@@ -1,5 +1,6 @@
 package com.troy.serialization;
 
+import com.troy.serialization.exception.*;
 import com.troy.serialization.util.*;
 import sun.misc.Unsafe;
 
@@ -20,6 +21,7 @@ public class MasterMemoryBlock implements NativeMemoryBlock {
 
 	@Override
 	public long address() {
+		if(address == 0) throw new AlreadyClosedException();
 		return address;
 	}
 
@@ -57,6 +59,7 @@ public class MasterMemoryBlock implements NativeMemoryBlock {
 
 	@Override
 	public void resize(long bytes) {
+		if(address == 0) throw new AlreadyClosedException();
 		if (bytes > capacity) {
 			address = unsafe.reallocateMemory(address, bytes);
 			capacity = bytes;

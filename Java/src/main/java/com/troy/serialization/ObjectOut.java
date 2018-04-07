@@ -7,6 +7,8 @@ public interface ObjectOut {
 
 	public void writeObject(Object obj);
 
+	//For writing "primitives"
+
 	public void writeByte(byte b);
 
 	public void writeShort(short s);

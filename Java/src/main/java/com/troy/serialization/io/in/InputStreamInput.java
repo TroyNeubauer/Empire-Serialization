@@ -45,8 +45,38 @@ public class InputStreamInput extends AbstractInput {
 
 	@Override
 	public NativeMemoryBlock map(long bytes) {
-		if(bytes > Integer.MAX_VALUE) NativeUtils.throwByteIndexOutOfBounds();
-		return null;
+		byte[] temp = ByteArrayPool.aquire((int) Math.min(bytes, 1048576));
+		MasterMemoryBlock block = null;
+		try {
+			try {
+				block = MasterMemoryBlock.allocate(bytes);
+				System.out.println("allocated " + bytes + " for the native buffer. Temp buffer " + temp.length + "bytes");
+				int read = 0;
+				long total = 0;
+				while (total < bytes) {
+					read = in.read(temp, 0, (int) Math.min(temp.length, bytes - total));
+					System.out.println("total: " + total + " just read " + read);
+					if (read == -1)
+						throw new EndOfInputException();
+					NativeUtils.bytesToNative(block.address + total, temp, 0, read, false);
+					System.out.println("Native copy was nominal. Just copied " + read + " bytes");
+					total += read;
+				}
+
+				return block;
+			} catch (NullPointerException e) {
+				if (block != null)
+					block.free();
+				throw new AlreadyClosedException();
+			} catch (IOException e) {
+				if (block != null)
+					block.free();
+				throw new TroySerializationIOException(e);
+			}
+		} finally {
+			ByteArrayPool.restore(temp);
+
+		}
 	}
 
 	@Override

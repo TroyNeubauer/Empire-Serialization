@@ -434,7 +434,7 @@ public class Constants {
 	public static final String VLE8_TEST = "123456789 VLE8" + '\u1940';
 
 	private static String getBig() {
-		int minSize = 10000000, count = 0;
+		int minSize = 10_000_000, count = 0;
 		StringBuilder sb = new StringBuilder();
 		while(sb.length() < minSize) {
 			sb.append(HARRY_POTTER);

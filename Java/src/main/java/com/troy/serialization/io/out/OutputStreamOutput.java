@@ -11,7 +11,6 @@ public class OutputStreamOutput extends AbstractOutput {
 
 	private OutputStream out;
 	private MasterMemoryBlock block;
-	private byte[] temp;
 
 	public OutputStreamOutput(OutputStream out) {
 		this.out = Objects.requireNonNull(out);
@@ -133,13 +132,7 @@ public class OutputStreamOutput extends AbstractOutput {
 	public void unmap(NativeMemoryBlock block) {
 		if(block.position() > Integer.MAX_VALUE) NativeUtils.throwByteIndexOutOfBounds();
 		int size = (int) block.position();
-		if(temp == null) {
-			temp = new byte[size];
-		} else {
-			if(size > temp.length) {
-				temp = new byte[size];
-			}
-		}
+		byte[] temp = ByteArrayPool.aquire(size);
 		NativeUtils.nativeToBytes(temp, block.address(), 0, size, false);
 		try {
 			out.write(temp, 0, size);
@@ -147,6 +140,8 @@ public class OutputStreamOutput extends AbstractOutput {
 			throw new AlreadyClosedException();
 		} catch (IOException e) {
 			throw new TroySerializationIOException(e);
+		} finally {
+			ByteArrayPool.restore(temp);
 		}
 		block.setPosition(0);
 	}

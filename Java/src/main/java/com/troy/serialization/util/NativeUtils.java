@@ -37,6 +37,7 @@ public class NativeUtils {
 		for (Method method : NativeUtils.class.getDeclaredMethods()) {
 			int mods = method.getModifiers();
 			if (Modifier.isStatic(mods) && Modifier.isNative(mods)) {
+				System.out.println(method);
 				MiscUtil.callMethod(method, null);
 				count++;
 			}
@@ -125,8 +126,7 @@ public class NativeUtils {
 	public static native int nativeToChars(char[] dest, long src, int offset, int elements, boolean swapEndianess);
 
 	// Writes primitive arrays to a C file
-	
-	
+
 	public static native long fopen(String file, String access);
 
 	public static native void fclose(long fd);
@@ -152,32 +152,31 @@ public class NativeUtils {
 	public static native int booleansToFWrite(long fd, boolean[] srcJ, int srcOffset, int elements, boolean swapEndianess);
 
 	public static native int nativeToFWrite(long fd, long src, long bytes);
-	
-	//For native output
 
-	public static native void byteToNative(long address, byte value);
-	
-	public static native void shortToNative(long address, short value);
-	
-	public static native void intToNative(long address, int value);
-	
-	public static native void longToNative(long address, long value);
-	
-	public static native void floatToNative(long address, float value);
-	
-	public static native void doubleToNative(long address, double value);
-	
-	public static native void charToNative(long address, char value);
-	
-	public static native void booleanToNative(long address, boolean value);
-	
-	//For VLE
+	// For native output
+	public static native void byteToNative(long address, byte value, boolean swapEndianness);
+
+	public static native void shortToNative(long address, short value, boolean swapEndianness);
+
+	public static native void intToNative(long address, int value, boolean swapEndianness);
+
+	public static native void longToNative(long address, long value, boolean swapEndianness);
+
+	public static native void floatToNative(long address, float value, boolean swapEndianness);
+
+	public static native void doubleToNative(long address, double value, boolean swapEndianness);
+
+	public static native void charToNative(long address, char value, boolean swapEndianness);
+
+	public static native void booleanToNative(long address, boolean value, boolean swapEndianness);
+
+	// For VLE
 	public static native void shortToVLENative(long address, short value);
-	
+
 	public static native void intToVLENative(long address, int value);
-	
+
 	public static native void longToVLENative(long address, long value);
-	
+
 	/**
 	 * Copies n bytes from the source address to the destination address<br>
 	 * Both {@code dest} and {@code src} pointers are <b>NOT</b> checked for validity! If they are null or point to memory

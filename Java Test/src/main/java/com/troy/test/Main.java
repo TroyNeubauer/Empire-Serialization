@@ -13,7 +13,7 @@ public class Main {
 	public static void main(String[] args) throws Throwable {
 		final Unsafe unsafe = MiscUtil.getUnsafe();
 
-		Library.doTest(Constants.VLE8_TEST);
+		Library.doTest(Constants.BIG_HARRY_POTTER);
 		System.exit(0);
 
 		
