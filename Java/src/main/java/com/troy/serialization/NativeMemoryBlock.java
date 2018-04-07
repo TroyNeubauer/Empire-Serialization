@@ -56,7 +56,11 @@ public interface NativeMemoryBlock {
 	 */
 	public default void require(long bytes) {
 		if (position() + bytes > capacity()) {
-			resize(capacity() * 2);
+			long newSize = capacity();
+			while(newSize < bytes + position()) {
+				newSize <<= 1;
+			}
+			resize(newSize);
 		}
 	}
 

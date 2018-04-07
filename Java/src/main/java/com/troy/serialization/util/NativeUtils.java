@@ -11,6 +11,8 @@ public class NativeUtils {
 	private static final int INVALID_CHARACTER_OFFSET = 1;// Invalid character is 2 bytes
 	private static final int INVALID_CHARACTER_INDEX_OFFSET = 3;// Represents what index the invalid character was at 4 bytes
 
+	public static final int DEFAULT_NATIVE_SIZE = 4096;
+
 	public static final boolean IS_64_BIT = System.getProperty("sun.arch.data.model").equals("64");
 
 	// Small structure used for returning string coding errors from native code
@@ -43,7 +45,9 @@ public class NativeUtils {
 		InternalLog.log("Called " + count + " methods in " + (end - start) / 1000000.0 + " milliseconds");
 	}
 
-	public static final boolean NATIVES_ENABLED = true;
+	public static boolean NATIVES_ENABLED = true;
+	// Always use native
+	public static final int MIN_NATIVE_THRESHOLD = 0;
 
 	public static byte getErrorCode() {
 		return NATIVE_RETURNS.get().get(ERROR_CODE_OFFSET);
@@ -121,6 +125,15 @@ public class NativeUtils {
 	public static native int nativeToChars(char[] dest, long src, int offset, int elements, boolean swapEndianess);
 
 	// Writes primitive arrays to a C file
+	
+	
+	public static native long fopen(String file, String access);
+
+	public static native void fclose(long fd);
+
+	public static native void fflush(long fd);
+
+	public static native int fputc(byte c, long fd);
 
 	public static native int bytesToFWrite(long fd, byte[] srcJ, int srcOffset, int elements, boolean swapEndianess);
 
@@ -139,12 +152,11 @@ public class NativeUtils {
 	public static native int booleansToFWrite(long fd, boolean[] srcJ, int srcOffset, int elements, boolean swapEndianess);
 
 	public static native int nativeToFWrite(long fd, long src, long bytes);
-	
+
 	/**
 	 * Copies n bytes from the source address to the destination address<br>
-	 * Both {@code dest} and {@code src} pointers are <b>NOT</b> checked for
-	 * validity! If they are null or point to memory that cannot be read, the Java
-	 * Virtual Machine will terminate with a memory access violation!!!
+	 * Both {@code dest} and {@code src} pointers are <b>NOT</b> checked for validity! If they are null or point to memory
+	 * that cannot be read, the Java Virtual Machine will terminate with a memory access violation!!!
 	 * 
 	 * @param dest
 	 *            A pointer to copy n bytes to
@@ -154,4 +166,8 @@ public class NativeUtils {
 	 *            The number of bytes to copy
 	 */
 	public static native void memcpy(long dest, long src, long bytes);
+
+	public static void throwByteIndexOutOfBounds() {
+		throw new RuntimeException("Java byte array cannot hold all of the elements! Switch to a native alternative!");
+	}
 }

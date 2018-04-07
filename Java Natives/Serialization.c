@@ -9,6 +9,7 @@
 #define INVALID_ARGUMENT -10
 
 const jbyte FOUR_BIT_ENCODING_CACHE[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 2, -1, 11, 9, 0, 15, -1, 7, 4, -1, -1, 10, 13, 5, 3, -1, -1, 8, 6, 1, 12, -1, 14 };
+const jbyte SIX_BIT_ENCODING_CACHE[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 2, 6, -1, -1, -1, -1, 5, -1, -1, -1, -1, 4, 10, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 8, 7, -1, -1, -1, 3, -1, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, -1, -1, -1, -1, 11, -1, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37 };
 
 void putError(jlong pointer, jbyte code, jchar character, jint index) {
 	*((jbyte*)pointer) = code;
@@ -16,23 +17,27 @@ void putError(jlong pointer, jbyte code, jchar character, jint index) {
 	*((jint*)(pointer + 3)) = index;
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_io_NativeFileOutput_fflush
+JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_fflush
 (JNIEnv * env, jclass class, jlong fd) {
+	if (fd == 0) return INVALID_ARGUMENT;
 	return fflush((FILE*)fd);
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_io_NativeFileOutput_fputc
+JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_fputc
 (JNIEnv * env, jclass class, jbyte c, jlong fd) {
+	if (fd == 0) return INVALID_ARGUMENT;
 	return fputc(c, (FILE*)fd);
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_io_NativeFileOutput_fclose
+JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_fclose
 (JNIEnv * env, jclass class, jlong fd) {
+	if (fd == 0) return INVALID_ARGUMENT;
 	return fclose((FILE*)fd);
 }
 
-JNIEXPORT jlong JNICALL Java_com_troy_serialization_io_NativeFileOutput_fopen
+JNIEXPORT jlong JNICALL Java_com_troy_serialization_util_NativeUtils_fopen
 (JNIEnv * env, jclass class, jstring name, jstring accessJ) {
+	if (name == 0 || accessJ == 0) return 0;
 	const char* file = (*env)->GetStringUTFChars(env, name, NULL);
 	const char* access = (*env)->GetStringUTFChars(env, accessJ, NULL);
 	if (file == NULL) return OUT_OF_MEMORY;
@@ -42,7 +47,6 @@ JNIEXPORT jlong JNICALL Java_com_troy_serialization_io_NativeFileOutput_fopen
 	(*env)->ReleaseStringUTFChars(env, name, file);
 	(*env)->ReleaseStringUTFChars(env, accessJ, access);
 	return (jlong)result;
-
 }
 
 
@@ -52,7 +56,7 @@ inline jshort swapJshort(jshort value) {
 	return _byteswap_ushort(value);
 #else
 	return  ((value & 0x00FF) << 8) |
-		((value & 0xFF00) >> 8);
+			((value & 0xFF00) >> 8);
 #endif
 }
 
@@ -61,7 +65,7 @@ inline jchar swapJchar(jchar value) {
 	return _byteswap_ushort(value);
 #else
 	return  ((value & 0x00FF) << 8) |
-		((value & 0xFF00) >> 8);
+			((value & 0xFF00) >> 8);
 #endif
 }
 
@@ -70,9 +74,9 @@ inline jint swapJint(jint value) {
 	return _byteswap_ulong(value);
 #else
 	return  ((value & 0x000000FF) << 24) |
-		((value & 0x0000FF00) << 8) |
-		((value & 0x00FF0000) >> 8) |
-		((value & 0xFF000000) >> 24);
+			((value & 0x0000FF00) << 8) |
+			((value & 0x00FF0000) >> 8) |
+			((value & 0xFF000000) >> 24);
 #endif
 }
 
@@ -81,9 +85,9 @@ inline jfloat swapJfloat(jfloat value) {
 	return _byteswap_ulong(value);
 #else
 	return  ((value & 0x000000FF) << 24) |
-		((value & 0x0000FF00) << 8) |
-		((value & 0x00FF0000) >> 8) |
-		((value & 0xFF000000) >> 24);
+			((value & 0x0000FF00) << 8) |
+			((value & 0x00FF0000) >> 8) |
+			((value & 0xFF000000) >> 24);
 #endif
 }
 
@@ -92,13 +96,13 @@ inline jlong swapJlong(jlong value) {
 	return _byteswap_uint64(value);
 #else
 	return  ((value & 0x00000000000000FF) << 56) |
-		((value & 0x000000000000FF00) << 40) |
-		((value & 0x0000000000FF0000) << 24) |
-		((value & 0x00000000FF000000) << 8) |
-		((value & 0x000000FF00000000) >> 8) |
-		((value & 0x0000FF0000000000) >> 24) |
-		((value & 0x00FF000000000000) >> 40) |
-		((value & 0xFF00000000000000) >> 56);
+			((value & 0x000000000000FF00) << 40) |
+			((value & 0x0000000000FF0000) << 24) |
+			((value & 0x00000000FF000000) <<  8) |
+			((value & 0x000000FF00000000) >>  8) |
+			((value & 0x0000FF0000000000) >> 24) |
+			((value & 0x00FF000000000000) >> 40) |
+			((value & 0xFF00000000000000) >> 56);
 #endif
 }
 
@@ -107,22 +111,47 @@ inline jdouble swapJdouble(jdouble value) {
 	return _byteswap_uint64(value);
 #else
 	return  ((value & 0x00000000000000FF) << 56) |
-		((value & 0x000000000000FF00) << 40) |
-		((value & 0x0000000000FF0000) << 24) |
-		((value & 0x00000000FF000000) << 8) |
-		((value & 0x000000FF00000000) >> 8) |
-		((value & 0x0000FF0000000000) >> 24) |
-		((value & 0x00FF000000000000) >> 40) |
-		((value & 0xFF00000000000000) >> 56);
+			((value & 0x000000000000FF00) << 40) |
+			((value & 0x0000000000FF0000) << 24) |
+			((value & 0x00000000FF000000) <<  8) |
+			((value & 0x000000FF00000000) >>  8) |
+			((value & 0x0000FF0000000000) >> 24) |
+			((value & 0x00FF000000000000) >> 40) |
+			((value & 0xFF00000000000000) >> 56);
 #endif
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_nativeToFWrite(jlong fd, jlong srcJ, jlong bytes) {
-	jbyte* src = (void*)srcJ;
-	FILE* file = (FILE*)fd;
-	file->_Placeholder = 5;
-	//*src = 5;
-	//fwrite(src, bytes, 1, (FILE*)fd);
+JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_TroyCharsets_nIdentifyCharset
+(JNIEnv * env, jclass class, jcharArray array, jint offset, jint length) {
+	jchar* src = (*env)->GetPrimitiveArrayCritical(env, array, NULL);
+	int fourOK = 1;
+	int sixOK = 1;
+	for (int i = offset; i < offset + length; i++) {
+		jchar c = src[i];
+		if (fourOK && (c > sizeof(FOUR_BIT_ENCODING_CACHE) || FOUR_BIT_ENCODING_CACHE[c] == -1)) {
+			fourOK = 0;
+		}
+		if (sixOK && (c > sizeof(SIX_BIT_ENCODING_CACHE) || SIX_BIT_ENCODING_CACHE[c] == -1)) {
+			sixOK = 0;
+		}
+		if (!fourOK && !sixOK) {
+			break;
+		}
+		if (fourOK)
+			return 0b00;
+		if (sixOK)
+			return 0b01;
+
+		return 0b10;
+	}
+	(*env)->ReleasePrimitiveArrayCritical(env, array, src, JNI_ABORT);
+}
+
+JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_nativeToFWrite(JNIEnv * env, jclass class, jlong fd, jlong srcJ, jlong bytes) {
+	if (srcJ == 0 || fd == 0)
+		return INVALID_ARGUMENT;
+	
+	fwrite((jbyte*)srcJ, 1, (size_t)bytes, (FILE*)fd);
 }
 
 #define xsToFWrite(type, swapFunc) \
@@ -155,9 +184,6 @@ xsToFWrite(float, swapJfloat)
 xsToFWrite(double, swapJdouble)
 xsToFWrite(char, swapJchar)
 
-
-
-
 #define xToFWrite(type, swapFunc) \
 JNIEXPORT j##type JNICALL Java_com_troy_serialization_util_NativeUtils_##type##ToFWrite(JNIEnv * env, jclass class, jlong fd, j##type value, jboolean swapEndianess) {\
 	if (fd == 0) {													\
@@ -182,6 +208,7 @@ xToFWrite(char, swapJchar)
 JNIEXPORT jbyteArray JNICALL Java_com_troy_serialization_io_NativeOutput_ngetBuffer
 (JNIEnv * env, jclass class, jlong addressJ, jint capacity)
 {
+	if (addressJ == 0) return NULL;
 	const jbyte* address = (jbyte*)addressJ;
 	jbyteArray result = (*env)->NewByteArray(env, capacity);
 	if (result == NULL) return NULL;
@@ -189,45 +216,91 @@ JNIEXPORT jbyteArray JNICALL Java_com_troy_serialization_io_NativeOutput_ngetBuf
 	return result;
 }
 
-/*
-* Class:     com_troy_serialization_FourBitEncodingCharset
-* Method:    nEncode
-* Signature: ([C[BIIIJZ)I
-*/
-JNIEXPORT jint JNICALL Java_com_troy_serialization_io_FourBitEncodingCharset_nEncode
-(JNIEnv * env, jobject charset, jcharArray srcJ, jbyteArray destJ, jint srcOffset, jint destOffset, jsize srcLength, jlong errorAddress, jboolean checkForErrors)
+JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_FourBitCharset_nEncodeImpl
+(JNIEnv * env, jobject charset, jcharArray srcJ, jlong destJ, jint srcOffset, jint chars)
 {
-	jboolean copy = 0;
-	jchar* src = (*env)->GetPrimitiveArrayCritical(env, srcJ, &copy);
-	jbyte* dest = (*env)->GetPrimitiveArrayCritical(env, destJ, &copy);
+	jchar* src = (*env)->GetPrimitiveArrayCritical(env, srcJ, NULL);
+	jbyte* dest = (jbyte*)destJ;
 	if (src == NULL || dest == NULL) {
-		putError(errorAddress, OUT_OF_MEMORY, 0, 0);
-		return ERROR;
-	}
-	if (checkForErrors) {
-		for (int i = srcOffset; i < srcLength; i++) {
-			if (src[i] >= sizeof(FOUR_BIT_ENCODING_CACHE) || FOUR_BIT_ENCODING_CACHE[src[i]] == -1) {
-				putError(errorAddress, UNSUPPORTED_CHARACTER, src[i], i);
-				return ERROR;
-			}
-		}
+		return OUT_OF_MEMORY;
 	}
 	int bytesWritten = 0;
-
 	int i = 0;
-	const int end = (srcLength / 2) * 2;//round down to next mutiple of two
+	const int end = (chars / 2) * 2;//round down to next mutiple of two
 	while (i < end) {
-		dest[bytesWritten++] = (FOUR_BIT_ENCODING_CACHE[src[i]] << 4) | FOUR_BIT_ENCODING_CACHE[src[i + 1]];
+		dest[bytesWritten++] = (FOUR_BIT_ENCODING_CACHE[src[srcOffset + i]] << 4) | FOUR_BIT_ENCODING_CACHE[src[srcOffset + i + 1]];
 		i += 2;
 	}
-	if (srcLength % 2 != 0) {
+	if (chars % 2 != 0) {
 		dest[bytesWritten++] = FOUR_BIT_ENCODING_CACHE[src[end]] << 4;
 	}
 	(*env)->ReleasePrimitiveArrayCritical(env, srcJ, src, 0);
-	(*env)->ReleasePrimitiveArrayCritical(env, destJ, dest, 0);
 	return bytesWritten;
 }
-#define VISUAL_CPP
+
+JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_SixBitCharset_nEncodeImpl
+(JNIEnv * env, jobject charset, jcharArray srcJ, jlong destJ, jint srcOffset, jint chars)
+{
+	jchar* src = (*env)->GetPrimitiveArrayCritical(env, srcJ, NULL);
+	jbyte* dest = (jbyte*)destJ;
+	const jbyte* inital = dest;
+	if (src == NULL || dest == NULL) {
+		return OUT_OF_MEMORY;
+	}
+	int i = srcOffset;
+	int result;
+	const jint end = (chars / 4) * 4;// round down to next multiple of two
+	while (i < end) {
+		int c0 = SIX_BIT_ENCODING_CACHE[src[i++]];
+		int c1 = SIX_BIT_ENCODING_CACHE[src[i++]];
+		int c2 = SIX_BIT_ENCODING_CACHE[src[i++]];
+		int c3 = SIX_BIT_ENCODING_CACHE[src[i++]];
+		result = c3;
+		result |= c2 << 6;
+		result |= c1 << 12;
+		result |= c0 << 18;
+
+		*dest = (result >> 16) & 0xFF;
+		dest++;
+		*dest = (result >>  8) & 0xFF;
+		dest++;
+		*dest = (result >>  0) & 0xFF;
+		dest++;
+	}
+	if (chars % 4 == 3) {// Write the remaining byte if there was an odd number
+		int c0 = SIX_BIT_ENCODING_CACHE[src[i++]];
+		int c1 = SIX_BIT_ENCODING_CACHE[src[i++]];
+		int c2 = SIX_BIT_ENCODING_CACHE[src[i++]];
+		result = 0;
+		result |= c2 << 0;
+		result |= c1 << 6;
+		result |= c0 << 12;
+
+		*dest = (result >> 16) & 0xFF;
+		dest++;
+		*dest  = (result >> 8) & 0xFF;
+		dest++;
+		*dest = (result >>  0) & 0xFF;
+		dest++;
+	}
+	else if (chars % 4 == 2) {// Write the remaining byte if there was an odd number
+		int c0 = SIX_BIT_ENCODING_CACHE[src[i++]];
+		int c1 = SIX_BIT_ENCODING_CACHE[src[i++]];
+		result = c1 << 0;
+		result |= c0 << 6;
+
+		*dest = (result >> 8) & 0xFF;
+		dest++;
+		*dest = (result >> 0) & 0xFF;
+		dest++;
+
+	}
+	else if (chars % 4 == 1) {// Write the remaining byte if there was an odd number
+		*dest = SIX_BIT_ENCODING_CACHE[src[end]];
+		dest++;
+	}
+	return dest - inital;
+}
 
 
 //public static native void shortsToBytes(byte[] dest, short[] src, int srcOffset, int destOffset, int elements);
@@ -334,5 +407,6 @@ nativeToX(char, Char)
 
 //wrapper for memcpy
 JNIEXPORT void JNICALL Java_com_troy_serialization_util_NativeUtils_memcpy(JNIEnv * env, jclass class, jlong dest, jlong src, jlong bytes) {
+	if (src == 0 || dest == 0) return;
 	memcpy((jbyte*)dest, (jbyte*)src, (size_t)bytes);
 }

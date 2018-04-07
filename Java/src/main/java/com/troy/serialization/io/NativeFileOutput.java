@@ -6,8 +6,7 @@ import java.nio.file.Path;
 import com.troy.serialization.*;
 import com.troy.serialization.exception.NoBufferException;
 import com.troy.serialization.exception.TroySerializationIOException;
-import com.troy.serialization.util.NativeUtils;
-import com.troy.serialization.util.SerializationUtils;
+import com.troy.serialization.util.*;
 
 public class NativeFileOutput extends AbstractNativeOutput<com.troy.serialization.io.NativeFileOutput.Deallocator> {
 
@@ -38,7 +37,7 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 		@Override
 		public void run() {
 			if (fd != 0) {
-				fclose(fd);
+				NativeUtils.fclose(fd);
 				fd = 0;
 			}
 			if (block != null) {
@@ -49,7 +48,7 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 	}
 
 	public NativeFileOutput(String file) {
-		fd = fopen(file, "wb");
+		fd = NativeUtils.fopen(file, "wb");
 		if (fd == 0)
 			throw new TroySerializationIOException("Unable to open file \"" + file + "\" for writing");
 		if (fd == SerializationUtils.OUT_OF_MEMORY)
@@ -57,22 +56,14 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 		setDeallocator(new Deallocator(fd));
 	}
 
-	private static native long fopen(String file, String access);
-
-	private static native void fclose(long fd);
-
-	private static native void fflush(long fd);
-
-	private static native int fputc(byte c, long fd);
-
 	@Override
 	public void writeByteImpl(byte b) {
-		fputc(b, fd);
+		NativeUtils.fputc(b, fd);
 	}
 
 	@Override
 	public void flush() {
-		fflush(fd);
+		NativeUtils.fflush(fd);
 	}
 
 	@Override
@@ -151,7 +142,7 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 			block = MasterMemoryBlock.allocate(bytes);
 			getDeallocator().block = this.block;
 		} else {
-			//Reset it
+			// Reset it
 			block.setPosition(0);
 			block.require(bytes);
 		}
@@ -160,8 +151,6 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 
 	@Override
 	public void unmap(NativeMemoryBlock block) {
-		System.out.println("unmappint: " + block);
-		System.out.println("fd " + fd);
 		NativeUtils.nativeToFWrite(fd, block.address(), block.position());
 	}
 

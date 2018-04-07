@@ -17,39 +17,37 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	private static final Unsafe unsafe = MiscUtil.getUnsafe();
 	private static final long DEFAULT_CAPACITY = 128;
 
-	private long address, position;
-	private long capacity, size, requested;
+	/**
+	 * Provides the native implemenentation for this output
+	 */
+	private MasterMemoryBlock impl;
+	private long requested;
 
 	public NativeOutput() {
 		this(DEFAULT_CAPACITY);
 	}
 
 	class Deallocator implements Runnable {
-		private long addressToFree;
 
-		public Deallocator(long address) {
-			this.addressToFree = address;
+		public Deallocator() {
 		}
 
 		@Override
 		public void run() {
-			if (addressToFree != 0) {
-				unsafe.freeMemory(addressToFree);
-				addressToFree = 0;
+			if (impl != null) {
+				impl.free();
 			}
 		}
 	}
 
 	public NativeOutput(long capacity) {
-		this.address = unsafe.allocateMemory(capacity);
-		this.capacity = capacity;
-		this.size = 0;
-		setDeallocator(new Deallocator(address));
+		this.impl = MasterMemoryBlock.allocate(capacity);
+		setDeallocator(new Deallocator());
 	}
 
 	@Override
 	public void writeByteImpl(byte b) {
-		unsafe.putByte(address + size++, b);
+		unsafe.putByte(impl.address + impl.position++, b);
 	}
 
 	@Override
@@ -59,48 +57,42 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 
 	@Override
 	public boolean hasBuffer() {
-		return false;
+		return impl.position < Integer.MAX_VALUE;
 	}
 
 	@Override
 	public int getBufferPosition() {
-		throw new NoBufferException();
+		if (impl.position >= Integer.MAX_VALUE)
+			throw new NoBufferException();
+		return (int) impl.position;
 	}
 
 	@Override
 	public byte[] getBuffer() {
-		throw new NoBufferException();
-	}
+		if (impl.position >= Integer.MAX_VALUE)
+			throw new NoBufferException();
+		return ngetBuffer(impl.address, (int) impl.position);
 
-	public byte[] toByteArray() {
-		if (capacity > Integer.MAX_VALUE)
-			throw new RuntimeException("Cannot represent this buffer as a byte array. The capacity is to big");
-		return ngetBuffer(address, (int) capacity);
 	}
 
 	public static native byte[] ngetBuffer(long address, int capacity);
 
 	@Override
 	public void require(long bytes) {
-		if (bytes + size > capacity) {
-			long newSize = (bytes / 2 + 1) * 2;// Round up to next power of two
-			address = unsafe.reallocateMemory(address, newSize);
-			getDeallocator().addressToFree = this.address;
-			capacity = newSize;
-		}
+		impl.require(bytes);
 		requested = bytes;
 	}
 
 	@Override
 	public void addRequired() {
-		position += requested;
+		impl.position += requested;
 	}
 
 	@Override
 	public void writeBytes(byte[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Short.BYTES);
-			NativeUtils.bytesToNative(address + position, src, offset, elements, bigEndian);
+			NativeUtils.bytesToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeBytes(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -111,7 +103,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeShorts(short[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Short.BYTES);
-			NativeUtils.shortsToNative(address + position, src, offset, elements, bigEndian);
+			NativeUtils.shortsToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeShorts(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -122,7 +114,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeInts(int[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Integer.BYTES);
-			NativeUtils.intsToNative(address + position, src, offset, elements, bigEndian);
+			NativeUtils.intsToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeInts(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -133,7 +125,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeLongs(long[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Long.BYTES);
-			NativeUtils.longsToNative(address + position, src, offset, elements, bigEndian);
+			NativeUtils.longsToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeLongs(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -144,7 +136,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeFloats(float[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Float.BYTES);
-			NativeUtils.floatsToNative(address + position, src, offset, elements, bigEndian);
+			NativeUtils.floatsToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeFloats(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -155,7 +147,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeDoubles(double[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Double.BYTES);
-			NativeUtils.doublesToNative(address + position, src, offset, elements, bigEndian);
+			NativeUtils.doublesToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeDoubles(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -166,7 +158,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeChars(char[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Character.BYTES);
-			NativeUtils.charsToNative(address + position, src, offset, elements, bigEndian);
+			NativeUtils.charsToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeChars(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -177,7 +169,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 	public void writeBooleans(boolean[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Integer.BYTES);
-			NativeUtils.booleansToNative(address + position, src, offset, elements, bigEndian);
+			NativeUtils.booleansToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeBooleans(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -186,16 +178,19 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.serialization.io
 
 	@Override
 	public void writeBooleansCompact(boolean[] src, int offset, int elements) {
+		super.writeBooleansCompact(src, offset, elements);// The superclass increments position so we're ok without addRequired();
 	}
 
 	@Override
 	public NativeMemoryBlock map(long bytes) {
-		return null;
+		return impl.subset(impl.position, bytes);
 	}
 
 	@Override
 	public void unmap(NativeMemoryBlock block) {
-		
+		// No copying needed since the block that we "mapped" was just a portion of the greater block.
+		// Only add to position
+		impl.position += block.position();
 	}
 
 }

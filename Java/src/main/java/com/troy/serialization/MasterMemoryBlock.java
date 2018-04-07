@@ -6,7 +6,7 @@ import sun.misc.Unsafe;
 public class MasterMemoryBlock implements NativeMemoryBlock {
 	private static final Unsafe unsafe = MiscUtil.getUnsafe();
 
-	protected long address, capacity, position;
+	public long address, capacity, position;
 
 	public MasterMemoryBlock(long address, long capacity, long position) {
 		this.address = address;
@@ -58,9 +58,8 @@ public class MasterMemoryBlock implements NativeMemoryBlock {
 	@Override
 	public void resize(long bytes) {
 		if (bytes > capacity) {
-			long newCapacity = capacity * 2;
-			address = unsafe.reallocateMemory(address, newCapacity);
-			capacity = newCapacity;
+			address = unsafe.reallocateMemory(address, bytes);
+			capacity = bytes;
 		}
 	}
 

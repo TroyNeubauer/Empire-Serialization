@@ -34,18 +34,16 @@ public abstract class Library {
 
 	public void test(File file, Object obj) {
 		System.out.println("Starting test for " + name);
-		int samples = 10;
+		int samples = 20;
 		long[] times = new long[samples];
-		long start, end;
-		byte[] bytes = null;
-		byte[] lastBytes = null;
+		long start, end, size = 0;
 		for (int i = 0; i < samples; i++) {
-
-			start = System.nanoTime();
-			bytes = writeObjectToBytes(obj);
-			end = System.nanoTime();
 			
-
+			start = System.nanoTime();
+			writeObjectToFile(file, obj);
+			size = file.length();
+			end = System.nanoTime();
+/*
 			if (lastBytes != null) {
 				if (lastBytes.length != bytes.length)
 					throw new RuntimeException();
@@ -58,37 +56,68 @@ public abstract class Library {
 					e.printStackTrace();
 				}
 			}
-			times[i] = end - start;
 			lastBytes = bytes;
+			*/
+			times[i] = end - start;
 			System.gc();
 		}
+		
 		long average = Math.round(Arrays.stream(times).average().getAsDouble());
 		long min = Arrays.stream(times).min().getAsLong();
 		System.out.println("\tTook: " + StringFormatter.addCommas(average) + "ns on average.  Min:" + StringFormatter.addCommas(min) + " size: "
-				+ StringFormatter.addCommas(bytes.length) + " bytes");
-		;
-
+				+ StringFormatter.addCommas(size) + " bytes");
+		System.out.println("\t" + StringFormatter.formatBytesLong((long) (size / (average / 1_000_000_000.0))) + " per second");
 	}
 
 	public abstract void writeObjectToFile(File file, Object obj);
 
 	public abstract byte[] writeObjectToBytes(Object obj);
 
-	public static class MyLibrary extends Library {
-		public MyLibrary() {
+	public static class MyLibraryNative extends Library {
+		public MyLibraryNative() {
+			SerializationUtils.init();
 		}
 
 		@Override
 		public void writeObjectToFile(File file, Object obj) {
+			NativeUtils.NATIVES_ENABLED = true;
 			OutputSerializationStream out = new OutputSerializationStream(new NativeFileOutput(file));
 			out.writeObject(obj);
-
 			out.close();
 		}
 
 		@Override
 		public byte[] writeObjectToBytes(Object obj) {
-			ByteArrayOutput out = new ByteArrayOutput(4096);
+			NativeUtils.NATIVES_ENABLED = true;
+			NativeOutput out = new NativeOutput(4096);
+			OutputSerializationStream stream = new OutputSerializationStream(out);
+			stream.writeObject(obj);
+			byte[] bytes = Arrays.copyOf(out.getBuffer(), out.getBufferPosition());
+
+			stream.close();
+
+			return bytes;
+		}
+
+	}
+	
+	public static class MyLibraryJava extends Library {
+		public MyLibraryJava() {
+			SerializationUtils.init();
+		}
+
+		@Override
+		public void writeObjectToFile(File file, Object obj) {
+			NativeUtils.NATIVES_ENABLED = false;
+			OutputSerializationStream out = new OutputSerializationStream(new NativeFileOutput(file));
+			out.writeObject(obj);
+			out.close();
+		}
+
+		@Override
+		public byte[] writeObjectToBytes(Object obj) {
+			NativeUtils.NATIVES_ENABLED = false;
+			NativeOutput out = new NativeOutput(4096);
 			OutputSerializationStream stream = new OutputSerializationStream(out);
 			stream.writeObject(obj);
 			byte[] bytes = Arrays.copyOf(out.getBuffer(), out.getBufferPosition());
@@ -102,7 +131,6 @@ public abstract class Library {
 
 	public static class JavaSerialization extends Library {
 		public JavaSerialization() {
-
 		}
 
 		@Override

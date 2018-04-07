@@ -40,6 +40,7 @@ public class SerializationUtils {
 		NativeUtils.init();
 		TroyCharsets.init();
 		Serializers.init();
+		MiscUtil.init();
 	}
 
 }

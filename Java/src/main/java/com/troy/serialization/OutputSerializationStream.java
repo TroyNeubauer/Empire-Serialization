@@ -178,7 +178,7 @@ public class OutputSerializationStream implements ObjectOut {
 			if (len == 0) {
 				out.writeByte(OpCodes.EMPTY_STRING_CONST);
 			} else {
-				TroyCharset charset = TroyCharsets.identifyCharset(str);
+				TroyCharset charset = TroyCharsets.identifyCharset(str, 0, str.length());
 				int opCode = OpCodes.STRING_TYPE_MAJOR_CODE;
 				opCode |= (charset.getCharsetCode() & 0b11) << 4;
 				boolean lengthFitsIntoOpCode = len < (1 << 4);
@@ -191,7 +191,7 @@ public class OutputSerializationStream implements ObjectOut {
 				if (!lengthFitsIntoOpCode) {
 					out.writeVLEInt(len);
 				}
-				charset.encode(str.toCharArray(), out, 0, len, false);
+				charset.encode(str.toCharArray(), out, 0, len);
 			}
 		}
 	}

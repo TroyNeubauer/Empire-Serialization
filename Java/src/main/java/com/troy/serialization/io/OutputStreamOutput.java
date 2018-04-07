@@ -1,20 +1,17 @@
 package com.troy.serialization.io;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Objects;
+import java.io.*;
+import java.util.*;
 
 import com.troy.serialization.*;
-import com.troy.serialization.exception.AlreadyClosedException;
-import com.troy.serialization.exception.NoBufferException;
-import com.troy.serialization.exception.TroySerializationIOException;
-import com.troy.serialization.util.MiscUtil;
-
-import sun.misc.Unsafe;
+import com.troy.serialization.exception.*;
+import com.troy.serialization.util.*;
 
 public class OutputStreamOutput extends AbstractOutput {
 
 	private OutputStream out;
+	private MasterMemoryBlock block;
+	private byte[] temp;
 
 	public OutputStreamOutput(OutputStream out) {
 		this.out = Objects.requireNonNull(out);
@@ -124,14 +121,34 @@ public class OutputStreamOutput extends AbstractOutput {
 
 	@Override
 	public NativeMemoryBlock map(long bytes) {
-		// TODO Auto-generated method stub
-		return null;
+		if (block == null)
+			block = MasterMemoryBlock.allocate(Math.max(bytes, NativeUtils.DEFAULT_NATIVE_SIZE));
+		else {
+			block.require(bytes);
+		}
+		return block;
 	}
 
 	@Override
 	public void unmap(NativeMemoryBlock block) {
-		// TODO Auto-generated method stub
-		
+		if(block.position() > Integer.MAX_VALUE) NativeUtils.throwByteIndexOutOfBounds();
+		int size = (int) block.position();
+		if(temp == null) {
+			temp = new byte[size];
+		} else {
+			if(size > temp.length) {
+				temp = new byte[size];
+			}
+		}
+		NativeUtils.nativeToBytes(temp, block.address(), 0, size, false);
+		try {
+			out.write(temp, 0, size);
+		} catch (NullPointerException e) {
+			throw new AlreadyClosedException();
+		} catch (IOException e) {
+			throw new TroySerializationIOException(e);
+		}
+		block.setPosition(0);
 	}
 
 

@@ -22,7 +22,22 @@ public class MiscUtil {
 	private static final String UNSAFE_CLASS = "sun.misc.Unsafe", DISABLE_UNSAFE_ARG = "DisableUnsafe";
 
 	private static final long NIO_BUFFER_ADDRESS_OFFSET = findBufferAddress();
+	
+	private static final Field STRING_VALUE;
 
+	static {
+		Field f = null;
+		for (Field field : String.class.getDeclaredFields()) {
+			if (field.getType() == char[].class) {
+				f = field;
+				break;
+			}
+		}
+		if(f == null) throw new Error("Unable to locate char[] inside the string class");
+		f.setAccessible(true);
+		STRING_VALUE = f;
+	}
+	
 	public static boolean isBigEndian() {
 		return ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
 	}
@@ -48,15 +63,13 @@ public class MiscUtil {
 	}
 
 	/**
-	 * Returns an Enum object representing the enum declared in class {@code class}
-	 * with the ordinal {@code ordinal}
+	 * Returns an Enum object representing the enum declared in class {@code class} with the ordinal {@code ordinal}
 	 * 
 	 * @param clazz
 	 *            The class to look in. Must be an enum class
 	 * @param ordinal
 	 *            The ordinal of the enum to look for
-	 * @return the enum declared in class {@code class} with the ordinal
-	 *         {@code ordinal} {@link Enum#ordinal()}<br>
+	 * @return the enum declared in class {@code class} with the ordinal {@code ordinal} {@link Enum#ordinal()}<br>
 	 *         {@link Enum}
 	 */
 	public static <T> T getEnum(Class<T> clazz, int ordinal) {
@@ -85,8 +98,7 @@ public class MiscUtil {
 	 *            The class's hierarchy to use
 	 * @param lookFor
 	 *            The class to compare to
-	 * @return {@code true} if the class a contains b in a superclass, otherwise
-	 *         false
+	 * @return {@code true} if the class a contains b in a superclass, otherwise false
 	 */
 	public static boolean classSharesSuperClassOrInterface(Class<?> baseClass, Class<?> lookFor) {
 		if (baseClass == lookFor)
@@ -174,8 +186,7 @@ public class MiscUtil {
 			throw new IllegalArgumentException("Signature cannot be empty!");
 		if (signature.charAt(0) == '[') {
 			if (signature.contains("L"))
-				return Array.newInstance(Class.forName(signature.substring(1, signature.length()).replace("/", ".")), 1)
-						.getClass();
+				return Array.newInstance(Class.forName(signature.substring(1, signature.length()).replace("/", ".")), 1).getClass();
 			int arrayDimensions = signature.lastIndexOf('[') + 1;
 			char type = signature.charAt(signature.length() - 1);
 			if (arrayDimensions == 1) {
@@ -230,8 +241,7 @@ public class MiscUtil {
 				if (type == 'Z')
 					return boolean[][][].class;
 			} else {
-				throw new ClassNotFoundException(
-						"MiscUtil cannot find primitive array classes with more that 3 dimensions");
+				throw new ClassNotFoundException("MiscUtil cannot find primitive array classes with more that 3 dimensions");
 			}
 
 		} else {
@@ -280,8 +290,7 @@ public class MiscUtil {
 				try {
 					field.setAccessible(true);
 					Unsafe cast = (Unsafe) field.get(null);
-					InternalLog
-							.log("Successfully retrived Unsafe instance. Avilable for use with MiscUtil.getUnsafe()");
+					InternalLog.log("Successfully retrived Unsafe instance. Avilable for use with MiscUtil.getUnsafe()");
 					return cast;
 				} catch (ClassCastException e) {
 					// Ignore, there might be other static fields
@@ -326,11 +335,9 @@ public class MiscUtil {
 	}
 
 	/**
-	 * Attempts to parse a string into an int using
-	 * {@link Integer#parseInt(String, int)}. If the string cannot be parsed, the
-	 * error message along with the unparsable string will be printed to
-	 * {@link System#err} and the default value will be returned. Otherwise string's
-	 * parsed int value will be returned
+	 * Attempts to parse a string into an int using {@link Integer#parseInt(String, int)}. If the string cannot be parsed,
+	 * the error message along with the unparsable string will be printed to {@link System#err} and the default value will
+	 * be returned. Otherwise string's parsed int value will be returned
 	 * 
 	 * @param str
 	 *            The string to parse
@@ -352,10 +359,9 @@ public class MiscUtil {
 	}
 
 	/**
-	 * Attempts to parse a string into an int using
-	 * {@link Integer#parseInt(String, int)}. If the string cannot be parsed, then
-	 * the runnable will be run and the default value will be returned. Otherwise
-	 * string's parsed integer value will be returned
+	 * Attempts to parse a string into an int using {@link Integer#parseInt(String, int)}. If the string cannot be parsed,
+	 * then the runnable will be run and the default value will be returned. Otherwise string's parsed integer value will be
+	 * returned
 	 * 
 	 * @param str
 	 *            The string to parse
@@ -377,13 +383,10 @@ public class MiscUtil {
 	}
 
 	/**
-	 * Attempts to parse a string into an int using
-	 * {@link Integer#parseInt(String)}. If the string cannot be parsed, the error
-	 * message along with the unparsable string will be printed to
-	 * {@link System#err} and the default value will be returned. Otherwise string's
-	 * parsed int value will be returned.<br>
-	 * This is equivalent to calling
-	 * {@code MiscUtil.getIntOrDefaultValue(str, 10, errorMessage, defaultValue)}
+	 * Attempts to parse a string into an int using {@link Integer#parseInt(String)}. If the string cannot be parsed, the
+	 * error message along with the unparsable string will be printed to {@link System#err} and the default value will be
+	 * returned. Otherwise string's parsed int value will be returned.<br>
+	 * This is equivalent to calling {@code MiscUtil.getIntOrDefaultValue(str, 10, errorMessage, defaultValue)}
 	 * 
 	 * @param str
 	 *            The string to parse
@@ -398,10 +401,9 @@ public class MiscUtil {
 	}
 
 	/**
-	 * Attempts to parse a string into an int using
-	 * {@link Integer#parseInt(String, int)}. If the string cannot be parsed, then
-	 * the runnable will be run and the default value will be returned. Otherwise
-	 * string's parsed integer value will be returned
+	 * Attempts to parse a string into an int using {@link Integer#parseInt(String, int)}. If the string cannot be parsed,
+	 * then the runnable will be run and the default value will be returned. Otherwise string's parsed integer value will be
+	 * returned
 	 * 
 	 * @param str
 	 *            The string to parse
@@ -415,8 +417,7 @@ public class MiscUtil {
 		return getIntOrRunnableAndDefValue(str, 10, runnable, defaultValue);
 	}
 
-	public static final java.lang.reflect.Field getDeclaredField(Class<?> root, String fieldName)
-			throws NoSuchFieldException {
+	public static final java.lang.reflect.Field getDeclaredField(Class<?> root, String fieldName) throws NoSuchFieldException {
 		Class<?> type = root;
 		do {
 			try {
@@ -429,14 +430,13 @@ public class MiscUtil {
 				type = type.getSuperclass();
 			}
 		} while (type != null);
-		throw new NoSuchFieldException(
-				fieldName + " does not exist in " + root.getName() + " or any of its superclasses.");
+		throw new NoSuchFieldException(fieldName + " does not exist in " + root.getName() + " or any of its superclasses.");
 	}
 
 	public static final long address(Buffer buffer) {
 		if (!buffer.isDirect() || unsafe == null) {
-			throw new UnsupportedOperationException("Unable to get Nio Buffer address! "
-					+ (unsafe == null ? "Unsafe is not supported" : "Buffer is not direct!"));
+			throw new UnsupportedOperationException(
+					"Unable to get Nio Buffer address! " + (unsafe == null ? "Unsafe is not supported" : "Buffer is not direct!"));
 		}
 		return unsafe.getLong(buffer, NIO_BUFFER_ADDRESS_OFFSET);
 	}
@@ -450,8 +450,7 @@ public class MiscUtil {
 	}
 
 	/**
-	 * Creates a new instance of the specified constructor by invoking a constructor
-	 * with garbage arguments
+	 * Creates a new instance of the specified constructor by invoking a constructor with garbage arguments
 	 * 
 	 * @param clazz
 	 *            The class to instantiate
@@ -599,7 +598,18 @@ public class MiscUtil {
 		// format:on
 	}
 
+	public static char[] getCharsFast(String str) {
+		if (str.length() > 1000) {
+			try {
+				return (char[]) STRING_VALUE.get(str);
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
+		return str.toCharArray();
+	}
+
 	public static void init() {
-		//Nothing. Forces static inatilizer to be called if it hasnt already
+		// Nothing. Forces static inatilizer to be called if it hasnt already
 	}
 }

@@ -432,13 +432,13 @@ public class Constants {
 			"who lived!\"";
 
 	private static String getBig() {
-		int minSize = 10_000_000, count = 0;
+		int minSize = 10000000, count = 0;
 		StringBuilder sb = new StringBuilder();
 		while(sb.length() < minSize) {
 			sb.append(HARRY_POTTER);
 			count++;
 		}
 		System.out.println("Count: " + count);
-		return sb.toString();
+		return sb.toString().substring(0, minSize);
 	}
 }

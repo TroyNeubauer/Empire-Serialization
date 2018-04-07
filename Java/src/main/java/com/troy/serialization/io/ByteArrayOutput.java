@@ -12,7 +12,8 @@ public class ByteArrayOutput extends AbstractOutput {
 	private static final Unsafe unsafe = MiscUtil.getUnsafe();
 
 	private static final int NATIVE_ARRAY_COPY_THRESH_HOLD = 16;
-	private static final int DEFAULT_NATIVE_SIZE = 128;
+
+	private MasterMemoryBlock mapped;
 
 	private byte[] buffer;
 	private int position;
@@ -72,7 +73,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		buffer = null;// Help GC
 		position = -1;
 		if (mapped != null)
-			mapped.close();
+			mapped.free();
 	}
 
 	@Override
@@ -93,7 +94,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.shortsToBytes(buffer, src, offset, position, elements, bigEndian);
 		} else {
-			// FIXME provide non native alternative
+			super.writeShorts(src, offset, elements);
 		}
 		addRequired();
 	}
@@ -104,7 +105,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.intsToBytes(buffer, src, offset, position, elements, bigEndian);
 		} else {
-
+			super.writeInts(src, offset, elements);
 		}
 		addRequired();
 	}
@@ -115,7 +116,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.longsToBytes(buffer, src, offset, position, elements, bigEndian);
 		} else {
-
+			super.writeLongs(src, offset, elements);
 		}
 		addRequired();
 	}
@@ -126,9 +127,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.floatsToBytes(buffer, src, offset, position, elements, bigEndian);
 		} else {
-			for (int i = 0; i < src.length; i++) {
-				writeFloat(src[i]);
-			}
+			super.writeFloats(src, offset, elements);
 		}
 		addRequired();
 	}
@@ -139,7 +138,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.doublesToBytes(buffer, src, offset, position, elements, bigEndian);
 		} else {
-
+			super.writeDoubles(src, offset, elements);
 		}
 		addRequired();
 	}
@@ -150,7 +149,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		if (NativeUtils.NATIVES_ENABLED) {
 			NativeUtils.charsToBytes(buffer, src, offset, position, elements, bigEndian);
 		} else {
-
+			super.writeChars(src, offset, elements);
 		}
 		addRequired();
 	}
@@ -162,7 +161,7 @@ public class ByteArrayOutput extends AbstractOutput {
 			NativeUtils.booleansToBytes(buffer, src, offset, position, elements, bigEndian);
 			position += elements;
 		} else {
-
+			super.writeBooleans(src, offset, elements);
 		}
 		addRequired();
 	}
@@ -178,7 +177,7 @@ public class ByteArrayOutput extends AbstractOutput {
 				position += result;// If result is positive, it holds the number of bytes written
 			}
 		} else {
-			addRequired();
+			super.writeBooleansCompact(src, offset, elements);
 		}
 
 	}
@@ -189,13 +188,19 @@ public class ByteArrayOutput extends AbstractOutput {
 
 	@Override
 	public NativeMemoryBlock map(long bytes) {
-		// TODO Auto-generated method stub
-		return null;
+		if (mapped == null)
+			mapped = MasterMemoryBlock.allocate(Math.max(bytes, NativeUtils.DEFAULT_NATIVE_SIZE));
+		else {
+			mapped.require(bytes);
+		}
+		return mapped;
 	}
 
 	@Override
 	public void unmap(NativeMemoryBlock block) {
-		// TODO Auto-generated method stub
-		
+		if(mapped.position + position > Integer.MAX_VALUE) NativeUtils.throwByteIndexOutOfBounds();
+		NativeUtils.nativeToBytes(buffer, mapped.address, position, (int) mapped.position, false);
+		position += block.position();
+		block.setPosition(0);
 	}
 }

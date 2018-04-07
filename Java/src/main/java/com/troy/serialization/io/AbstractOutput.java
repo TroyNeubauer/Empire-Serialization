@@ -6,8 +6,8 @@ import com.troy.serialization.exception.*;
 
 public abstract class AbstractOutput implements Output {
 
-	protected MappedIO mapped;
-	protected boolean bigEndian = false;
+	//Weather or not were writing in big endian
+	protected boolean bigEndian = true;
 	private boolean alreadyMapped = false;
 
 	protected static final int NEXT_BYTE_VLE = 0b10000000, VLE_MASK = 0b01111111;
