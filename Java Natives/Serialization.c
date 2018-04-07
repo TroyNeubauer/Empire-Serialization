@@ -184,6 +184,43 @@ xToFWrite(float, swapJfloat)
 xToFWrite(double, swapJdouble)
 xToFWrite(char, swapJchar)
 
+#define xToNative(type, swapFunc)														\
+JNIEXPORT void JNICALL Java_com_troy_serialization_util_NativeUtils_##type##ToNative	\
+(JNIEnv * env, jclass class, jlong addressJ, j##type value, jboolean swapEndianness) {	\
+	if (addressJ == NULL) return;														\
+	j##type* address = (j##type*) addressJ;												\
+	if (sizeof(j##type) > 1 && swapEndianness) {										\
+		value = swapFunc(value);														\
+	}																					\
+	*address = value;																	\
+}
+
+xToNative(byte, )
+xToNative(boolean, )
+xToNative(short, swapJshort)
+xToNative(int, swapJint)
+xToNative(long, swapJlong)
+xToNative(float, swapJfloat)
+xToNative(double, swapJdouble)
+xToNative(char, swapJchar)
+
+//For VLE
+
+JNIEXPORT void JNICALL Java_com_troy_serialization_util_NativeUtils_shortToVLENative
+(JNIEnv * env, jclass class, jlong addressJ, jshort value) {
+	if (addressJ == NULL) return;
+}
+
+JNIEXPORT void JNICALL Java_com_troy_serialization_util_NativeUtils_intToVLENative
+(JNIEnv * env, jclass class, jlong addressJ, jint value) {
+	if (addressJ == NULL) return;
+}
+
+JNIEXPORT void JNICALL Java_com_troy_serialization_util_NativeUtils_longToVLENative
+(JNIEnv * env, jclass class, jlong addressJ, jlong value) {
+	if (addressJ == NULL) return;
+}
+
 JNIEXPORT jbyteArray JNICALL Java_com_troy_serialization_io_NativeOutput_ngetBuffer
 (JNIEnv * env, jclass class, jlong addressJ, jint capacity)
 {
