@@ -10,8 +10,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.nio.Buffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import sun.misc.Unsafe;
 
@@ -22,8 +21,9 @@ public class MiscUtil {
 	private static final String UNSAFE_CLASS = "sun.misc.Unsafe", DISABLE_UNSAFE_ARG = "DisableUnsafe";
 
 	private static final long NIO_BUFFER_ADDRESS_OFFSET = findBufferAddress();
-	
+
 	private static final Field STRING_VALUE;
+	private static final Constructor<String> STRING_CHAR_CONSTRUCTOR;
 
 	static {
 		Field f = null;
@@ -33,11 +33,25 @@ public class MiscUtil {
 				break;
 			}
 		}
-		if(f == null) throw new Error("Unable to locate char[] inside the string class");
+		if (f == null)
+			throw new Error("Unable to locate char[] inside the string class");
 		f.setAccessible(true);
 		STRING_VALUE = f;
+
+		Constructor<String> c = null;
+		for (Constructor<?> constructor : String.class.getDeclaredConstructors()) {
+			if (constructor.getParameterCount() == 2 && constructor.getParameterTypes()[0] == char[].class) {
+				c = (Constructor<String>) constructor;
+				break;
+			}
+		}
+		if (c == null)
+			throw new Error("Unable to locate the String(char[]) constructor");
+		c.setAccessible(true);
+		STRING_CHAR_CONSTRUCTOR = c;
+
 	}
-	
+
 	public static boolean isBigEndian() {
 		return ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
 	}
@@ -607,6 +621,14 @@ public class MiscUtil {
 			}
 		}
 		return str.toCharArray();
+	}
+
+	public static String createString(char[] chars) {
+		try {
+			return STRING_CHAR_CONSTRUCTOR.newInstance(chars, true);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static void init() {

@@ -37,7 +37,6 @@ public class NativeUtils {
 		for (Method method : NativeUtils.class.getDeclaredMethods()) {
 			int mods = method.getModifiers();
 			if (Modifier.isStatic(mods) && Modifier.isNative(mods)) {
-				System.out.println(method);
 				MiscUtil.callMethod(method, null);
 				count++;
 			}
@@ -170,12 +169,12 @@ public class NativeUtils {
 
 	public static native void booleanToNative(long address, boolean value, boolean swapEndianness);
 
-	// For VLE
-	public static native void shortToVLENative(long address, short value);
+	// For VLE. Returns the number of bytes written to address
+	public static native int shortToVLENative(long address, short value);
 
-	public static native void intToVLENative(long address, int value);
+	public static native int intToVLENative(long address, int value);
 
-	public static native void longToVLENative(long address, long value);
+	public static native int longToVLENative(long address, long value);
 
 	/**
 	 * Copies n bytes from the source address to the destination address<br>

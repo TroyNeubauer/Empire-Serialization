@@ -22,13 +22,13 @@ public class InputStreamInput extends AbstractInput {
 		} catch (NullPointerException e) {
 			throw new AlreadyClosedException();
 		} catch (IOException e) {
-			throw new TroySerializationIOException(e);
+			throw new EmpireSerializationIOException(e);
 		}
 	}
 
 	@Override
 	public void addRequired() {
-		// Nothing because java.io.InputStream.read handles everything for us
+		// Nothing because InputStream.read handles everything for us
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class InputStreamInput extends AbstractInput {
 		} catch (NullPointerException e) {
 			throw new AlreadyClosedException();
 		} catch (IOException e) {
-			throw new TroySerializationIOException(e);
+			throw new EmpireSerializationIOException(e);
 		}
 		in = null;
 	}
@@ -71,7 +71,7 @@ public class InputStreamInput extends AbstractInput {
 			} catch (IOException e) {
 				if (block != null)
 					block.free();
-				throw new TroySerializationIOException(e);
+				throw new EmpireSerializationIOException(e);
 			}
 		} finally {
 			ByteArrayPool.restore(temp);
@@ -82,6 +82,7 @@ public class InputStreamInput extends AbstractInput {
 	@Override
 	public void unmap(NativeMemoryBlock block) {
 		block.setPosition(0);
+		
 	}
 
 	@Override

@@ -206,17 +206,17 @@ xToNative(char, swapJchar)
 
 //For VLE
 
-JNIEXPORT void JNICALL Java_com_troy_serialization_util_NativeUtils_shortToVLENative
+JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_shortToVLENative
 (JNIEnv * env, jclass class, jlong addressJ, jshort value) {
 	if (addressJ == NULL) return;
 }
 
-JNIEXPORT void JNICALL Java_com_troy_serialization_util_NativeUtils_intToVLENative
+JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_intToVLENative
 (JNIEnv * env, jclass class, jlong addressJ, jint value) {
 	if (addressJ == NULL) return;
 }
 
-JNIEXPORT void JNICALL Java_com_troy_serialization_util_NativeUtils_longToVLENative
+JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_longToVLENative
 (JNIEnv * env, jclass class, jlong addressJ, jlong value) {
 	if (addressJ == NULL) return;
 }
@@ -316,7 +316,7 @@ JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_SixBitCharset_nEncode
 	return dest - inital;
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_TroyCharsets_nIdentifyCharset
+JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_EmpireCharsets_nIdentifyCharset
 (JNIEnv * env, jclass class, jcharArray array, jint offset, jint length) {
 	jchar* src = (*env)->GetPrimitiveArrayCritical(env, array, NULL);
 	unsigned int fourOK = 1;

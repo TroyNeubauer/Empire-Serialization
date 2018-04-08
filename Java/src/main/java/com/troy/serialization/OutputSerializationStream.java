@@ -85,7 +85,7 @@ public class OutputSerializationStream implements ObjectOut {
 	private void writeObjectImpl(Object obj, Class<?> clazz) {
 		IntValue<Class<?>> classEntry = classCache.get(obj);
 		if (classEntry == null) {// We need to define the class and object
-			out.writeByte(OpCodes.TYPE_DEF_OBJ_DEF_TYPE);
+			out.writeByte(EmpireOpCodes.TYPE_DEF_OBJ_DEF_TYPE);
 		} else {
 			IntValue<Object> objEntry = objectCache.get(obj);
 			if (objEntry == null) {// We need to define the object but not the type
@@ -170,16 +170,16 @@ public class OutputSerializationStream implements ObjectOut {
 
 	@Override
 	public void writeString(String str) {
-		if (str.equals(TroyConstants.HELLO_WORLD_STRING)) {
-			out.writeByte(OpCodes.HELLO_WORLD_STRING_CONST);
+		if (str.equals(EmpireConstants.HELLO_WORLD_STRING)) {
+			out.writeByte(EmpireOpCodes.HELLO_WORLD_STRING_CONST);
 		} else {
 			int len = str.length();
 			if (len == 0) {
-				out.writeByte(OpCodes.EMPTY_STRING_CONST);
+				out.writeByte(EmpireOpCodes.EMPTY_STRING_CONST);
 			} else {
-				StringInfo info = TroyCharsets.identifyCharset(str, 0, str.length());
-				TroyCharset charset = info.charset;
-				int opCode = OpCodes.STRING_TYPE_MAJOR_CODE;
+				StringInfo info = EmpireCharsets.identifyCharset(str, 0, str.length());
+				EmpireCharset charset = info.charset;
+				int opCode = EmpireOpCodes.STRING_TYPE_MAJOR_CODE;
 				opCode |= (charset.getCharsetCode() & 0b11) << 4;
 				boolean lengthFitsIntoOpCode = len < (1 << 4);
 				if (lengthFitsIntoOpCode) {

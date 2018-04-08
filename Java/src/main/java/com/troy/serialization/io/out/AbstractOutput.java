@@ -2,7 +2,6 @@ package com.troy.serialization.io.out;
 
 import java.nio.*;
 
-import com.troy.serialization.charset.*;
 import com.troy.serialization.util.*;
 
 public abstract class AbstractOutput implements Output {
@@ -151,13 +150,13 @@ public abstract class AbstractOutput implements Output {
 			writeByteImpl((byte) s);
 		} else if (s >>> 14 == 0) {
 			require(2);
-			writeByteImpl((byte) (s >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (s & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (s >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (s & EmpireConstants.VLE_MASK));
 		} else {
 			require(3);
-			writeByteImpl((byte) (s >>> 14 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (s >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (s & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (s >>> 14 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (s >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (s & EmpireConstants.VLE_MASK));
 		}
 	}
 
@@ -168,26 +167,26 @@ public abstract class AbstractOutput implements Output {
 			writeByteImpl((byte) i);
 		} else if (i >>> 14 == 0) {
 			require(2);
-			writeByteImpl((byte) (i >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (i & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (i >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (i & EmpireConstants.VLE_MASK));
 		} else if (i >>> 21 == 0) {
 			require(3);
-			writeByteImpl((byte) (i >>> 14 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (i >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (i & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (i >>> 14 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (i >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (i & EmpireConstants.VLE_MASK));
 		} else if (i >>> 28 == 0) {
 			require(4);
-			writeByteImpl((byte) (i >>> 21 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (i >>> 14 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (i >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (i & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (i >>> 21 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (i >>> 14 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (i >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (i & EmpireConstants.VLE_MASK));
 		} else {
 			require(5);
-			writeByteImpl((byte) (i >>> 28 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (i >>> 21 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (i >>> 14 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (i >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (i & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (i >>> 28 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (i >>> 21 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (i >>> 14 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (i >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (i & EmpireConstants.VLE_MASK));
 		}
 	}
 
@@ -198,64 +197,64 @@ public abstract class AbstractOutput implements Output {
 			writeByteImpl((byte) l);
 		} else if (l >>> 14 == 0) {
 			require(2);
-			writeByteImpl((byte) (l >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (l >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l & EmpireConstants.VLE_MASK));
 		} else if (l >>> 21 == 0) {
 			require(3);
-			writeByteImpl((byte) (l >>> 14 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (l >>> 14 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l & EmpireConstants.VLE_MASK));
 		} else if (l >>> 28 == 0) {
 			require(4);
-			writeByteImpl((byte) (l >>> 21 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 14 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (l >>> 21 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 14 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l & EmpireConstants.VLE_MASK));
 		} else if (l >>> 35 == 0) {
 			require(5);
-			writeByteImpl((byte) (l >>> 28 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 21 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 14 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (l >>> 28 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 21 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 14 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l & EmpireConstants.VLE_MASK));
 		} else if (l >>> 42 == 0) {
 			require(6);
-			writeByteImpl((byte) (l >>> 35 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 28 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 21 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 14 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (l >>> 35 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 28 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 21 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 14 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l & EmpireConstants.VLE_MASK));
 		} else if (l >>> 49 == 0) {
 			require(7);
-			writeByteImpl((byte) (l >>> 42 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 35 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 28 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 21 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 14 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (l >>> 42 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 35 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 28 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 21 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 14 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l & EmpireConstants.VLE_MASK));
 		} else if (l >>> 56 == 0) {
 			require(8);
-			writeByteImpl((byte) (l >>> 49 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 42 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 35 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 28 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 21 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 14 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (l >>> 49 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 42 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 35 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 28 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 21 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 14 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l & EmpireConstants.VLE_MASK));
 		} else {
 			require(9);
-			writeByteImpl((byte) (l >>> 56 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 49 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 42 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 35 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 28 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 21 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 14 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (l & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (l >>> 56 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 49 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 42 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 35 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 28 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 21 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 14 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (l & EmpireConstants.VLE_MASK));
 		}
 	}
 
@@ -266,13 +265,13 @@ public abstract class AbstractOutput implements Output {
 			writeByteImpl((byte) c);
 		} else if (c >>> 14 == 0) {
 			require(2);
-			writeByteImpl((byte) (c >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (c & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (c >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (c & EmpireConstants.VLE_MASK));
 		} else {
 			require(3);
-			writeByteImpl((byte) (c >>> 14 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (c >>> 7 | TroyConstants.NEXT_BYTE_VLE));
-			writeByteImpl((byte) (c & TroyConstants.VLE_MASK));
+			writeByteImpl((byte) (c >>> 14 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (c >>> 7 | EmpireConstants.NEXT_BYTE_VLE));
+			writeByteImpl((byte) (c & EmpireConstants.VLE_MASK));
 		}
 	}
 

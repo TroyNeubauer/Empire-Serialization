@@ -9,7 +9,6 @@ public class ByteArrayPool {
 	static {
 		for (int i = 6; i < 16; i++) {
 			int size = (int) Math.pow(2, i);
-			System.out.println(size);
 			for (int j = 0; j < 3; j++) {
 				avilable.add(new byte[size]);
 			}
@@ -24,7 +23,7 @@ public class ByteArrayPool {
 		while (low <= high) {
 			int mid = (low + high) >>> 1;
 			byte[] midVal = avilable.get(mid);
-			if (midVal.length >= minLength)
+			if (midVal.length < minLength)
 				low = mid + 1;
 			else {
 				avilable.remove(mid);

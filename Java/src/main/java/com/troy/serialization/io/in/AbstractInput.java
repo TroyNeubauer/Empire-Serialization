@@ -90,13 +90,13 @@ public abstract class AbstractInput implements Input {
 	@Override
 	public short readVLEShort() {
 		int b = readByte();
-		int result = b & TroyConstants.VLE_MASK;
-		if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+		int result = b & EmpireConstants.VLE_MASK;
+		if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 			b = readByte();
-			result |= (b & TroyConstants.VLE_MASK) << 7;
-			if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+			result |= (b & EmpireConstants.VLE_MASK) << 7;
+			if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 				b = readByte();
-				result |= (b & TroyConstants.VLE_MASK) << 14;
+				result |= (b & EmpireConstants.VLE_MASK) << 14;
 			}
 		}
 		return (short) result;
@@ -105,19 +105,19 @@ public abstract class AbstractInput implements Input {
 	@Override
 	public int readVLEInt() {
 		int b = readByte();
-		int result = b & TroyConstants.VLE_MASK;
-		if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+		int result = b & EmpireConstants.VLE_MASK;
+		if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 			b = readByte();
-			result |= (b & TroyConstants.VLE_MASK) << 7;
-			if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+			result |= (b & EmpireConstants.VLE_MASK) << 7;
+			if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 				b = readByte();
-				result |= (b & TroyConstants.VLE_MASK) << 14;
-				if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+				result |= (b & EmpireConstants.VLE_MASK) << 14;
+				if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 					b = readByte();
-					result |= (b & TroyConstants.VLE_MASK) << 21;
-					if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+					result |= (b & EmpireConstants.VLE_MASK) << 21;
+					if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 						b = readByte();
-						result |= (b & TroyConstants.VLE_MASK) << 28;
+						result |= (b & EmpireConstants.VLE_MASK) << 28;
 					}
 				}
 			}
@@ -128,34 +128,34 @@ public abstract class AbstractInput implements Input {
 	@Override
 	public long readVLELong() {
 		long b = readByte();
-		long result = b & TroyConstants.VLE_MASK;
-		if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+		long result = b & EmpireConstants.VLE_MASK;
+		if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 			b = readByte();
-			result |= (b & TroyConstants.VLE_MASK) << 7;
-			if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+			result |= (b & EmpireConstants.VLE_MASK) << 7;
+			if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 				b = readByte();
-				result |= (b & TroyConstants.VLE_MASK) << 14;
-				if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+				result |= (b & EmpireConstants.VLE_MASK) << 14;
+				if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 					b = readByte();
-					result |= (b & TroyConstants.VLE_MASK) << 21;
-					if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+					result |= (b & EmpireConstants.VLE_MASK) << 21;
+					if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 						b = readByte();
-						result |= (b & TroyConstants.VLE_MASK) << 28;
-						if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+						result |= (b & EmpireConstants.VLE_MASK) << 28;
+						if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 							b = readByte();
-							result |= (b & TroyConstants.VLE_MASK) << 35;
-							if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+							result |= (b & EmpireConstants.VLE_MASK) << 35;
+							if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 								b = readByte();
-								result |= (b & TroyConstants.VLE_MASK) << 42;
-								if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+								result |= (b & EmpireConstants.VLE_MASK) << 42;
+								if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 									b = readByte();
-									result |= (b & TroyConstants.VLE_MASK) << 49;
-									if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+									result |= (b & EmpireConstants.VLE_MASK) << 49;
+									if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 										b = readByte();
-										result |= (b & TroyConstants.VLE_MASK) << 56;
-										if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+										result |= (b & EmpireConstants.VLE_MASK) << 56;
+										if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 											b = readByte();
-											result |= (b & TroyConstants.VLE_MASK) << 63;
+											result |= (b & EmpireConstants.VLE_MASK) << 63;
 										}
 									}
 								}
@@ -171,13 +171,13 @@ public abstract class AbstractInput implements Input {
 	@Override
 	public char readVLEChar() {
 		int b = readByte();
-		int result = b & TroyConstants.VLE_MASK;
-		if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+		int result = b & EmpireConstants.VLE_MASK;
+		if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 			b = readByte();
-			result |= (b & TroyConstants.VLE_MASK) << 7;
-			if ((b & TroyConstants.NEXT_BYTE_VLE) != 0) {
+			result |= (b & EmpireConstants.VLE_MASK) << 7;
+			if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
 				b = readByte();
-				result |= (b & TroyConstants.VLE_MASK) << 14;
+				result |= (b & EmpireConstants.VLE_MASK) << 14;
 			}
 		}
 		return (char) result;

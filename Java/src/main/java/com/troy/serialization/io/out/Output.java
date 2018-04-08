@@ -8,7 +8,7 @@ import com.troy.serialization.io.*;
  * @author Troy Neubauer
  *
  */
-public interface Output extends TroyIO, ArrayOutput {
+public interface Output extends EmpireIO, ArrayOutput {
 
 	/**
 	 * Writes a byte to the output without checking for overflow with require().

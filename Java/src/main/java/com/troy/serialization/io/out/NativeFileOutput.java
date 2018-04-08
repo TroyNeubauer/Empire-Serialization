@@ -5,7 +5,7 @@ import java.nio.file.Path;
 
 import com.troy.serialization.*;
 import com.troy.serialization.exception.NoBufferException;
-import com.troy.serialization.exception.TroySerializationIOException;
+import com.troy.serialization.exception.EmpireSerializationIOException;
 import com.troy.serialization.util.*;
 
 public class NativeFileOutput extends AbstractNativeOutput<com.troy.serialization.io.out.NativeFileOutput.Deallocator> {
@@ -50,7 +50,7 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 	public NativeFileOutput(String file) {
 		fd = NativeUtils.fopen(file, "wb");
 		if (fd == 0)
-			throw new TroySerializationIOException("Unable to open file \"" + file + "\" for writing");
+			throw new EmpireSerializationIOException("Unable to open file \"" + file + "\" for writing");
 		if (fd == SerializationUtils.OUT_OF_MEMORY)
 			throw new OutOfMemoryError("Unable to open file " + file + " because the creating the name in native code failed");
 		setDeallocator(new Deallocator(fd));
@@ -93,43 +93,42 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.serializatio
 
 	@Override
 	public void writeBytes(byte[] src, int offset, int bytes) {
-		NativeUtils.bytesToFWrite(fd, src, offset, bytes, bigEndian);
+		NativeUtils.bytesToFWrite(fd, src, offset, bytes, swapEndinessInNative());
 	}
 
 	@Override
 	public void writeShorts(short[] src, int offset, int bytes) {
-		NativeUtils.shortsToFWrite(fd, src, offset, bytes, bigEndian);
+		NativeUtils.shortsToFWrite(fd, src, offset, bytes, swapEndinessInNative());
 	}
 
 	@Override
 	public void writeInts(int[] src, int offset, int bytes) {
-		NativeUtils.intsToFWrite(fd, src, offset, bytes, bigEndian);
+		NativeUtils.intsToFWrite(fd, src, offset, bytes, swapEndinessInNative());
 	}
 
 	@Override
 	public void writeLongs(long[] src, int offset, int bytes) {
-		NativeUtils.longsToFWrite(fd, src, offset, bytes, bigEndian);
+		NativeUtils.longsToFWrite(fd, src, offset, bytes, swapEndinessInNative());
 	}
 
 	@Override
 	public void writeFloats(float[] src, int offset, int bytes) {
-		NativeUtils.floatsToFWrite(fd, src, offset, bytes, bigEndian);
+		NativeUtils.floatsToFWrite(fd, src, offset, bytes, swapEndinessInNative());
 	}
 
 	@Override
 	public void writeDoubles(double[] src, int offset, int bytes) {
-		NativeUtils.doublesToFWrite(fd, src, offset, bytes, bigEndian);
+		NativeUtils.doublesToFWrite(fd, src, offset, bytes, swapEndinessInNative());
 	}
 
 	@Override
 	public void writeChars(char[] src, int offset, int bytes) {
-		NativeUtils.charsToFWrite(fd, src, offset, bytes, bigEndian);
+		NativeUtils.charsToFWrite(fd, src, offset, bytes, swapEndinessInNative());
 	}
 
 	@Override
 	public void writeBooleans(boolean[] src, int offset, int bytes) {
-		NativeUtils.booleansToFWrite(fd, src, offset, bytes, bigEndian);
-
+		NativeUtils.booleansToFWrite(fd, src, offset, bytes, swapEndinessInNative());
 	}
 
 	@Override

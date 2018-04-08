@@ -4,7 +4,7 @@ import com.troy.serialization.io.in.*;
 import com.troy.serialization.io.out.*;
 import com.troy.serialization.util.*;
 
-public class VLE8Charset implements TroyCharset {
+public class VLE8Charset implements EmpireCharset {
 
 	public static final byte CODE = 0b10;
 	private static final int INFO_MASK = 0b10000000;

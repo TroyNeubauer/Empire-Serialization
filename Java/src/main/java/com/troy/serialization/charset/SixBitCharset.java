@@ -4,7 +4,7 @@ import com.troy.serialization.io.in.*;
 import com.troy.serialization.io.out.*;
 import com.troy.serialization.util.*;
 
-public class SixBitCharset implements TroyCharset {
+public class SixBitCharset implements EmpireCharset {
 	static {
 		NativeUtils.init();
 	}

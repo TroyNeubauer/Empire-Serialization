@@ -9,7 +9,7 @@ import com.troy.serialization.io.*;
  * @author Troy Neubauer
  *
  */
-public interface Input extends TroyIO {
+public interface Input extends EmpireIO {
 	/**
 	 * Reads the next byte in this input without checking for errors. This method should be used as the base method to implement reading primitives.
 	 * This method should be called any number of times to retrieve the required data for reading higher level primitives after checking for errors.

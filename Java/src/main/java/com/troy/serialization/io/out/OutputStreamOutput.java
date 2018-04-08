@@ -23,7 +23,7 @@ public class OutputStreamOutput extends AbstractOutput {
 		} catch (NullPointerException e) {
 			throw new AlreadyClosedException();
 		} catch (IOException e) {
-			throw new TroySerializationIOException(e);
+			throw new EmpireSerializationIOException(e);
 		}
 	}
 
@@ -60,7 +60,7 @@ public class OutputStreamOutput extends AbstractOutput {
 		} catch (NullPointerException e) {
 			throw new AlreadyClosedException();
 		} catch (IOException e) {
-			throw new TroySerializationIOException(e);
+			throw new EmpireSerializationIOException(e);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class OutputStreamOutput extends AbstractOutput {
 		} catch (NullPointerException e) {
 			throw new AlreadyClosedException();
 		} catch (IOException e) {
-			throw new TroySerializationIOException(e);
+			throw new EmpireSerializationIOException(e);
 		}
 	}
 
@@ -82,7 +82,7 @@ public class OutputStreamOutput extends AbstractOutput {
 		} catch (NullPointerException e) {
 			throw new AlreadyClosedException();
 		} catch (IOException e) {
-			throw new TroySerializationIOException(e);
+			throw new EmpireSerializationIOException(e);
 		}
 	}
 	
@@ -139,7 +139,7 @@ public class OutputStreamOutput extends AbstractOutput {
 		} catch (NullPointerException e) {
 			throw new AlreadyClosedException();
 		} catch (IOException e) {
-			throw new TroySerializationIOException(e);
+			throw new EmpireSerializationIOException(e);
 		} finally {
 			ByteArrayPool.restore(temp);
 		}

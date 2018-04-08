@@ -1,6 +1,6 @@
 package com.troy.serialization.util;
 
-import com.troy.serialization.charset.TroyCharsets;
+import com.troy.serialization.charset.EmpireCharsets;
 import com.troy.serialization.serializers.*;
 
 public class SerializationUtils {
@@ -38,7 +38,7 @@ public class SerializationUtils {
 
 	public static void init() {
 		NativeUtils.init();
-		TroyCharsets.init();
+		EmpireCharsets.init();
 		Serializers.init();
 		MiscUtil.init();
 	}
