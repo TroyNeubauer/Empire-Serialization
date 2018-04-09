@@ -16,6 +16,7 @@ public class EndiannessTest {
 				(byte) 0x88, (byte) 0xaa, (byte) 0xcc, (byte) 0xff, 0x01, 0x05, (byte) 0x81, 0x7f };
 
 		ByteArrayOutput out = new ByteArrayOutput(20);
+		
 		out.setByteOrder(ByteOrder.BIG_ENDIAN);
 
 		out.writeInt(5);// 0 - 4
