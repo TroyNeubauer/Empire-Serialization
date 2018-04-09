@@ -221,7 +221,7 @@ JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_longTo
 	if (addressJ == NULL) return;
 }
 
-JNIEXPORT jbyteArray JNICALL Java_com_troy_empireserialization_io_NativeOutput_ngetBuffer
+JNIEXPORT jbyteArray JNICALL Java_com_troy_empireserialization_util_NativeUtils_ngetBuffer
 (JNIEnv * env, jclass class, jlong addressJ, jint capacity)
 {
 	if (addressJ == 0) return NULL;
