@@ -22,25 +22,25 @@ void putError(jlong pointer, jbyte code, jchar character, jint index) {
 	*((jint*)(pointer + 3)) = index;
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_fflush
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_fflush
 (JNIEnv * env, jclass class, jlong fd) {
 	if (fd == 0) return INVALID_ARGUMENT;
 	return fflush((FILE*)fd);
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_fputc
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_fputc
 (JNIEnv * env, jclass class, jbyte c, jlong fd) {
 	if (fd == 0) return INVALID_ARGUMENT;
 	return fputc(c, (FILE*)fd);
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_fclose
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_fclose
 (JNIEnv * env, jclass class, jlong fd) {
 	if (fd == 0) return INVALID_ARGUMENT;
 	return fclose((FILE*)fd);
 }
 
-JNIEXPORT jlong JNICALL Java_com_troy_serialization_util_NativeUtils_fopen
+JNIEXPORT jlong JNICALL Java_com_troy_empireserialization_util_NativeUtils_fopen
 (JNIEnv * env, jclass class, jstring name, jstring accessJ) {
 	if (name == 0 || accessJ == 0) return 0;
 	const char* file = (*env)->GetStringUTFChars(env, name, NULL);
@@ -126,7 +126,7 @@ inline jdouble swapJdouble(jdouble value) {
 #endif
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_nativeToFWrite(JNIEnv * env, jclass class, jlong fd, jlong srcJ, jlong bytes) {
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_nativeToFWrite(JNIEnv * env, jclass class, jlong fd, jlong srcJ, jlong bytes) {
 	if (srcJ == 0 || fd == 0)
 		return INVALID_ARGUMENT;
 	
@@ -134,7 +134,7 @@ JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_nativeToFWri
 }
 
 #define xsToFWrite(type, swapFunc) \
-JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_##type##sToFWrite(JNIEnv * env, jclass class, jlong fd, j##type##Array srcJ, jint srcOffset, jint elements, jboolean swapEndianess) {\
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_##type##sToFWrite(JNIEnv * env, jclass class, jlong fd, j##type##Array srcJ, jint srcOffset, jint elements, jboolean swapEndianess) {\
 	if (fd == 0 || srcJ == NULL) {											\
 		return INVALID_ARGUMENT;											\
 	}																		\
@@ -164,7 +164,7 @@ xsToFWrite(double, swapJdouble)
 xsToFWrite(char, swapJchar)
 
 #define xToFWrite(type, swapFunc) \
-JNIEXPORT j##type JNICALL Java_com_troy_serialization_util_NativeUtils_##type##ToFWrite(JNIEnv * env, jclass class, jlong fd, j##type value, jboolean swapEndianess) {\
+JNIEXPORT j##type JNICALL Java_com_troy_empireserialization_util_NativeUtils_##type##ToFWrite(JNIEnv * env, jclass class, jlong fd, j##type value, jboolean swapEndianess) {\
 	if (fd == 0) {													\
 		return INVALID_ARGUMENT;									\
 	}																\
@@ -176,16 +176,16 @@ JNIEXPORT j##type JNICALL Java_com_troy_serialization_util_NativeUtils_##type##T
 }
 
 xToFWrite(byte, )
-xToFWrite(boolean, )
 xToFWrite(short, swapJshort)
 xToFWrite(int, swapJint)
 xToFWrite(long, swapJlong)
 xToFWrite(float, swapJfloat)
 xToFWrite(double, swapJdouble)
 xToFWrite(char, swapJchar)
+xToFWrite(boolean, )
 
 #define xToNative(type, swapFunc)														\
-JNIEXPORT void JNICALL Java_com_troy_serialization_util_NativeUtils_##type##ToNative	\
+JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_##type##ToNative	\
 (JNIEnv * env, jclass class, jlong addressJ, j##type value, jboolean swapEndianness) {	\
 	if (addressJ == NULL) return;														\
 	j##type* address = (j##type*) addressJ;												\
@@ -206,22 +206,22 @@ xToNative(char, swapJchar)
 
 //For VLE
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_shortToVLENative
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_shortToVLENative
 (JNIEnv * env, jclass class, jlong addressJ, jshort value) {
 	if (addressJ == NULL) return;
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_intToVLENative
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_intToVLENative
 (JNIEnv * env, jclass class, jlong addressJ, jint value) {
 	if (addressJ == NULL) return;
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_longToVLENative
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_longToVLENative
 (JNIEnv * env, jclass class, jlong addressJ, jlong value) {
 	if (addressJ == NULL) return;
 }
 
-JNIEXPORT jbyteArray JNICALL Java_com_troy_serialization_io_NativeOutput_ngetBuffer
+JNIEXPORT jbyteArray JNICALL Java_com_troy_empireserialization_io_NativeOutput_ngetBuffer
 (JNIEnv * env, jclass class, jlong addressJ, jint capacity)
 {
 	if (addressJ == 0) return NULL;
@@ -232,7 +232,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_troy_serialization_io_NativeOutput_ngetBuf
 	return result;
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_FourBitCharset_nEncodeImpl
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_charset_FourBitCharset_nEncodeImpl
 (JNIEnv * env, jobject charset, jcharArray srcJ, jlong destJ, jint srcOffset, jint chars, jint info)
 {
 	jchar* src = (*env)->GetPrimitiveArrayCritical(env, srcJ, NULL);
@@ -253,7 +253,7 @@ JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_FourBitCharset_nEncod
 	return bytesWritten;
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_SixBitCharset_nEncodeImpl
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_charset_SixBitCharset_nEncodeImpl
 (JNIEnv * env, jobject charset, jcharArray srcJ, jlong destJ, jint srcOffset, jint chars, jint info)
 {
 	jchar* src = (*env)->GetPrimitiveArrayCritical(env, srcJ, NULL);
@@ -316,7 +316,7 @@ JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_SixBitCharset_nEncode
 	return dest - inital;
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_EmpireCharsets_nIdentifyCharset
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_charset_EmpireCharsets_nIdentifyCharset
 (JNIEnv * env, jclass class, jcharArray array, jint offset, jint length) {
 	jchar* src = (*env)->GetPrimitiveArrayCritical(env, array, NULL);
 	unsigned int fourOK = 1;
@@ -348,7 +348,7 @@ JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_EmpireCharsets_nIdent
 }
 
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_VLE8Charset_nEncodeImpl
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_charset_VLE8Charset_nEncodeImpl
 (JNIEnv * env, jobject charset, jcharArray srcJ, jlong destJ, jint srcOffset, jint chars, jint info)
 {
 	jchar* src = (*env)->GetPrimitiveArrayCritical(env, srcJ, NULL);
@@ -389,7 +389,7 @@ JNIEXPORT jint JNICALL Java_com_troy_serialization_charset_VLE8Charset_nEncodeIm
 //public static native void shortsToBytes(byte[] dest, short[] src, int srcOffset, int destOffset, int elements);
 
 #define xToBytes(type, swapFunc) \
-JNIEXPORT j##type JNICALL Java_com_troy_serialization_util_NativeUtils_##type##sToBytes(JNIEnv * env, jclass class, jbyteArray destJ, j##type##Array srcJ, jint srcOffset, jint destOffset, jint elements, jboolean swapEndianess) {\
+JNIEXPORT j##type JNICALL Java_com_troy_empireserialization_util_NativeUtils_##type##sToBytes(JNIEnv * env, jclass class, jbyteArray destJ, j##type##Array srcJ, jint srcOffset, jint destOffset, jint elements, jboolean swapEndianess) {\
 	if (destJ == NULL || destJ == NULL) {									\
 		return INVALID_ARGUMENT;											\
 	}																		\
@@ -420,7 +420,7 @@ xToBytes(char, swapJshort)
 xToBytes(boolean, )
 
 
-JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_booleansToBytesCompact(JNIEnv * env, jclass class, jbyteArray destJ, jbooleanArray srcJ, jint srcOffset, jint destOffset, jint elements) {
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_booleansToBytesCompact(JNIEnv * env, jclass class, jbyteArray destJ, jbooleanArray srcJ, jint srcOffset, jint destOffset, jint elements) {
 	if (destJ == NULL || destJ == NULL) {
 		return INVALID_ARGUMENT;
 	}
@@ -451,7 +451,7 @@ JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_booleansToBy
 
 //Methods for manipulating java arrays
 #define xToNative(type, capitalType, swapFunc) \
-JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_##type##sToNative(JNIEnv * env, jclass class, jlong dest, j##type##Array src, jint offset, jint elements, jboolean swapEndianess) {\
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_##type##sToNative(JNIEnv * env, jclass class, jlong dest, j##type##Array src, jint offset, jint elements, jboolean swapEndianess) {\
 	if(src == 0 || dest == 0) return INVALID_ARGUMENT;\
 	(*env)->Get##capitalType##ArrayRegion(env, src, offset, elements, (j##type *)dest); \
 	if(swapEndianess && sizeof(j##type) > 1) {\
@@ -472,7 +472,7 @@ xToNative(boolean, Boolean, )
 
 //Theese methods copy bytes native memory to an array
 #define nativeToX(type, capitalType) \
-JNIEXPORT jint JNICALL Java_com_troy_serialization_util_NativeUtils_nativeTo##capitalType##s(JNIEnv * env, jclass class, j##type##Array dest, jlong src, jint offset, jint elements) {\
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_nativeTo##capitalType##s(JNIEnv * env, jclass class, j##type##Array dest, jlong src, jint offset, jint elements) {\
 	if(src == 0 || dest == 0) return INVALID_ARGUMENT;\
 	(*env)->Set##capitalType##ArrayRegion(env, dest, offset, elements, (jbyte*) src);\
 	return 0;\
@@ -489,7 +489,7 @@ nativeToX(char, Char)
 
 
 //wrapper for memcpy
-JNIEXPORT void JNICALL Java_com_troy_serialization_util_NativeUtils_memcpy(JNIEnv * env, jclass class, jlong dest, jlong src, jlong bytes) {
+JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_memcpy(JNIEnv * env, jclass class, jlong dest, jlong src, jlong bytes) {
 	if (src == 0 || dest == 0) return;
 	memcpy((jbyte*)dest, (jbyte*)src, (size_t)bytes);
 }
