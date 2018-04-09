@@ -6,9 +6,9 @@ import java.util.*;
 import com.esotericsoftware.kryo.*;
 import com.esotericsoftware.kryo.io.Output;
 import com.google.gson.*;
-import com.troy.serialization.*;
-import com.troy.serialization.io.out.*;
-import com.troy.serialization.util.*;
+import com.troy.empireserialization.*;
+import com.troy.empireserialization.io.out.*;
+import com.troy.empireserialization.util.*;
 
 public abstract class Library {
 	public static List<Library> libs = new ArrayList<Library>();

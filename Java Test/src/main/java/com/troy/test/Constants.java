@@ -2,7 +2,7 @@ package com.troy.test;
 
 import javax.xml.ws.handler.*;
 
-import com.troy.serialization.util.*;
+import com.troy.empireserialization.util.*;
 
 public class Constants {
 
@@ -336,7 +336,7 @@ public class Constants {
 			+ "moment, people meeting in secret all over the country were holding up\n"
 			+ "their glasses and saying in hushed voices: \"To Harry Potter -- the boy\n" + "who lived!\"";
 	
-	public static final String BIG_HARRY_POTTER = getBig(HARRY_POTTER, 100_000_000);
+	public static final String BIG_HARRY_POTTER = getBig(HARRY_POTTER, 10_000_000);
 
 	public static final String VLE8_TEST = "123456789 VLE8" + '\u1940';
 
