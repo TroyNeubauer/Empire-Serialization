@@ -65,7 +65,7 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.empireserial
 	@Override
 	public void writeByte(byte b) {
 		require(Byte.BYTES);
-		byteToFWrite(fd, b, false);
+		byteToFWrite(fd, b);
 		addRequired();
 	}
 
@@ -114,7 +114,7 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.empireserial
 	@Override
 	public void writeBoolean(boolean b) {
 		require(1);
-		booleanToFWrite(fd, b, false);
+		booleanToFWrite(fd, b);
 		addRequired();
 	}
 
@@ -150,7 +150,7 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.empireserial
 
 	@Override
 	public void writeBytes(byte[] src, int offset, int bytes) {
-		bytesToFWrite(fd, src, offset, bytes, swapEndinessInNative());
+		bytesToFWrite(fd, src, offset, bytes);
 	}
 
 	@Override
@@ -185,7 +185,7 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.empireserial
 
 	@Override
 	public void writeBooleans(boolean[] src, int offset, int bytes) {
-		booleansToFWrite(fd, src, offset, bytes, swapEndinessInNative());
+		booleansToFWrite(fd, src, offset, bytes);
 	}
 
 	@Override

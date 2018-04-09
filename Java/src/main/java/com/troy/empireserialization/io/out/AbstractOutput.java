@@ -129,11 +129,11 @@ public abstract class AbstractOutput implements Output {
 	public void writeChar(char b) {
 		require(Character.BYTES);
 		if (bigEndian) {
-			writeByteImpl((byte) ((b >> 0) & 0xFF));
 			writeByteImpl((byte) ((b >> 8) & 0xFF));
+			writeByteImpl((byte) ((b >> 0) & 0xFF));
 		} else {
-			writeByteImpl((byte) ((b >> 8) & 0xFF));
 			writeByteImpl((byte) ((b >> 0) & 0xFF));
+			writeByteImpl((byte) ((b >> 8) & 0xFF));
 		}
 	}
 

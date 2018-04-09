@@ -67,13 +67,8 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 
 	@Override
 	public byte[] getBuffer() {
-		if (impl.position >= Integer.MAX_VALUE)
-			throw new NoBufferException();
-		return ngetBuffer(impl.address, (int) impl.position);
-
+		throw new NoBufferException();
 	}
-
-	public static native byte[] ngetBuffer(long address, int capacity);
 
 	@Override
 	public void require(long bytes) {
@@ -90,7 +85,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 	public void writeBytes(byte[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Short.BYTES);
-			NativeUtils.bytesToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
+			NativeUtils.bytesToNative(impl.address + impl.position, src, offset, elements);
 			addRequired();
 		} else {
 			super.writeBytes(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -167,7 +162,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 	public void writeBooleans(boolean[] src, int offset, int elements) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			require(elements * Integer.BYTES);
-			NativeUtils.booleansToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
+			NativeUtils.booleansToNative(impl.address + impl.position, src, offset, elements);
 			addRequired();
 		} else {
 			super.writeBooleans(src, offset, elements);// The superclass increments position so we're ok without addRequired();
@@ -189,6 +184,13 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 		// No copying needed since the block that we "mapped" was just a portion of the greater block.
 		// Only add to position
 		impl.position += block.position();
+	}
+	
+	/**
+	 * Returns the address of the buffer used by this out
+	 */
+	public long address() {
+		return impl.address();
 	}
 
 }

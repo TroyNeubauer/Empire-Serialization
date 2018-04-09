@@ -36,7 +36,7 @@ public class NativeUtils {
 		// code so calls will be faster later
 		for (Method method : NativeUtils.class.getDeclaredMethods()) {
 			int mods = method.getModifiers();
-			if (Modifier.isStatic(mods) && Modifier.isNative(mods)) {
+			if (Modifier.isStatic(mods) && Modifier.isNative(mods) && Modifier.isPublic(mods)) {
 				MiscUtil.callMethod(method, null);
 				count++;
 			}
@@ -93,7 +93,11 @@ public class NativeUtils {
 	public static native int booleansToBytesCompact(byte[] dest, boolean[] src, int srcOffset, int destOffset, int elements);
 
 	// From array to native memory
-	public static native int bytesToNative(long dest, byte[] src, int offset, int elements, boolean swapEndianess);
+	public static int bytesToNative(long dest, byte[] src, int offset, int elements) {
+		return bytesToNative(dest, src, offset, elements, false);
+	}
+
+	private static native int bytesToNative(long dest, byte[] src, int offset, int elements, boolean swapEndianess);
 
 	public static native int shortsToNative(long dest, short[] src, int offset, int elements, boolean swapEndianess);
 
@@ -107,10 +111,18 @@ public class NativeUtils {
 
 	public static native int charsToNative(long dest, char[] src, int offset, int elements, boolean swapEndianess);
 
-	public static native int booleansToNative(long dest, boolean[] src, int offset, int elements, boolean swapEndianess);
+	public static int booleansToNative(long dest, boolean[] src, int offset, int elements) {
+		return booleansToNative(dest, src, offset, elements, false);
+	}
+
+	private static native int booleansToNative(long dest, boolean[] src, int offset, int elements, boolean swapEndianess);
 
 	// From native memory to array
-	public static native int nativeToBytes(byte[] dest, long src, int offset, int elements, boolean swapEndianess);
+	public static int nativeToBytes(byte[] dest, long src, int offset, int elements) {
+		return nativeToBytes(dest, src, offset, elements, false);
+	}
+
+	private static native int nativeToBytes(byte[] dest, long src, int offset, int elements, boolean swapEndianess);
 
 	public static native int nativeToShorts(short[] dest, long src, int offset, int elements, boolean swapEndianess);
 
@@ -133,10 +145,14 @@ public class NativeUtils {
 	public static native void fflush(long fd);
 
 	public static native int fputc(byte c, long fd);
-	
-	//Single primitive
 
-	public static native void byteToFWrite(long fd, byte value, boolean swapEndianess);
+	// Single primitive
+
+	public static void byteToFWrite(long fd, byte value) {
+		byteToFWrite(fd, value, false);
+	}
+
+	private static native void byteToFWrite(long fd, byte value, boolean swapEndianess);
 
 	public static native void shortToFWrite(long fd, short value, boolean swapEndianess);
 
@@ -150,11 +166,19 @@ public class NativeUtils {
 
 	public static native void charToFWrite(long fd, char value, boolean swapEndianess);
 
-	public static native void booleanToFWrite(long fd, boolean value, boolean swapEndianess);
-	
-	//Arrays
+	public static void booleanToFWrite(long fd, boolean value) {
+		booleanToFWrite(fd, value, false);
+	}
 
-	public static native int bytesToFWrite(long fd, byte[] srcJ, int srcOffset, int elements, boolean swapEndianess);
+	private static native void booleanToFWrite(long fd, boolean value, boolean swapEndianess);
+
+	// Arrays
+
+	public static int bytesToFWrite(long fd, byte[] srcJ, int srcOffset, int elements) {
+		return bytesToFWrite(fd, srcJ, srcOffset, elements, false);
+	}
+
+	private static native int bytesToFWrite(long fd, byte[] srcJ, int srcOffset, int elements, boolean swapEndianess);
 
 	public static native int shortsToFWrite(long fd, short[] srcJ, int srcOffset, int elements, boolean swapEndianess);
 
@@ -168,12 +192,21 @@ public class NativeUtils {
 
 	public static native int charsToFWrite(long fd, char[] srcJ, int srcOffset, int elements, boolean swapEndianess);
 
-	public static native int booleansToFWrite(long fd, boolean[] srcJ, int srcOffset, int elements, boolean swapEndianess);
+	public static int booleansToFWrite(long fd, boolean[] srcJ, int srcOffset, int elements) {
+		return booleansToFWrite(fd, srcJ, srcOffset, elements, false);
+	}
+
+	private static native int booleansToFWrite(long fd, boolean[] srcJ, int srcOffset, int elements, boolean swapEndianess);
 
 	public static native int nativeToFWrite(long fd, long src, long bytes);
 
 	// For native output
-	public static native void byteToNative(long address, byte value, boolean swapEndianness);
+
+	public static void byteToNative(long address, byte value) {
+		byteToNative(address, value, false);
+	}
+
+	private static native void byteToNative(long address, byte value, boolean swapEndianness);
 
 	public static native void shortToNative(long address, short value, boolean swapEndianness);
 
@@ -187,7 +220,11 @@ public class NativeUtils {
 
 	public static native void charToNative(long address, char value, boolean swapEndianness);
 
-	public static native void booleanToNative(long address, boolean value, boolean swapEndianness);
+	public static void booleanToNative(long address, boolean value) {
+		booleanToNative(address, value, false);
+	}
+
+	private static native void booleanToNative(long address, boolean value, boolean swapEndianness);
 
 	// For VLE. Returns the number of bytes written to address
 	public static native int shortToVLENative(long address, short value);
@@ -209,6 +246,8 @@ public class NativeUtils {
 	 *            The number of bytes to copy
 	 */
 	public static native void memcpy(long dest, long src, long bytes);
+
+	public static native byte[] ngetBuffer(long address, int capacity);
 
 	public static void throwByteIndexOutOfBounds() {
 		throw new RuntimeException("Java byte array cannot hold all of the elements! Switch to a native alternative!");

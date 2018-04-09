@@ -97,7 +97,7 @@ public class ByteArrayOutput extends AbstractOutput {
 		} else {
 			super.writeShorts(src, offset, elements);
 		}
-		
+
 	}
 
 	@Override
@@ -189,7 +189,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	@Override
 	public NativeMemoryBlock map(long bytes) {
 		if (mapped == null)
-			mapped = MasterMemoryBlock.allocate(Math.max(bytes, NativeUtils.DEFAULT_NATIVE_SIZE));
+			mapped = MasterMemoryBlock.allocate(bytes);
 		else {
 			mapped.require(bytes);
 		}
@@ -198,8 +198,11 @@ public class ByteArrayOutput extends AbstractOutput {
 
 	@Override
 	public void unmap(NativeMemoryBlock block) {
-		if(block.position() + position > Integer.MAX_VALUE) NativeUtils.throwByteIndexOutOfBounds();
-		NativeUtils.nativeToBytes(buffer, block.address(), position, (int) block.position(), false);
+		if (block != mapped)
+			throw new IllegalArgumentException("NativeMemoryBlock block " + block + " is not the block mapped by this buffer!");
+		if (block.position() + position > Integer.MAX_VALUE)
+			NativeUtils.throwByteIndexOutOfBounds();
+		NativeUtils.nativeToBytes(buffer, block.address(), position, (int) block.position());
 		position += block.position();
 		block.setPosition(0);
 	}

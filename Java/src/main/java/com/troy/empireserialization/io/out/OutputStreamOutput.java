@@ -133,7 +133,7 @@ public class OutputStreamOutput extends AbstractOutput {
 		if(block.position() > Integer.MAX_VALUE) NativeUtils.throwByteIndexOutOfBounds();
 		int size = (int) block.position();
 		byte[] temp = ByteArrayPool.aquire(size);
-		NativeUtils.nativeToBytes(temp, block.address(), 0, size, false);
+		NativeUtils.nativeToBytes(temp, block.address(), 0, size);
 		try {
 			out.write(temp, 0, size);
 		} catch (NullPointerException e) {

@@ -58,7 +58,7 @@ public class InputStreamInput extends AbstractInput {
 					System.out.println("total: " + total + " just read " + read);
 					if (read == -1)
 						throw new EndOfInputException();
-					NativeUtils.bytesToNative(block.address + total, temp, 0, read, false);
+					NativeUtils.bytesToNative(block.address + total, temp, 0, read);
 					System.out.println("Native copy was nominal. Just copied " + read + " bytes");
 					total += read;
 				}
