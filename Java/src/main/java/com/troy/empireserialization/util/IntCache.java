@@ -1,6 +1,6 @@
 package com.troy.empireserialization.util;
 
-public class IntCache<E> extends Cache<IntValue<E>> {
+public class IntCache<E> extends Cache<IntValue<E>, E> {
 
 	public IntCache() {
 		this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
@@ -26,18 +26,18 @@ public class IntCache<E> extends Cache<IntValue<E>> {
 		} else {
 			IntValue<E> entry = table[index];
 			while (entry.next != null) {
-				if (entry.equals(key))
+				if (entry.key.equals(key))
 					return;
 				entry = entry.next;
 			}
-			if (entry.equals(key))
+			if (entry.key.equals(key))
 				return;
 			entry.next = se;
 		}
 		size++;
 	}
 
-	public IntValue<E> get(Object key) {
+	public IntValue<E> get(E key) {
 		int index = key.hashCode() % table.length;
 		IntValue<E> entry = table[index];
 		if (entry != null) {
@@ -53,7 +53,6 @@ public class IntCache<E> extends Cache<IntValue<E>> {
 
 	protected void resize(int newSize) {
 		IntValue<E>[] oldStrings = table;
-		size = newSize;
 		this.table = new IntValue[newSize];
 		if (oldStrings != null) {
 			for (int i = 0; i < oldStrings.length; i++) {

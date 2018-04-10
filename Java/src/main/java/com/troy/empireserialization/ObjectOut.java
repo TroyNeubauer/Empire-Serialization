@@ -1,11 +1,12 @@
 package com.troy.empireserialization;
 
+import java.io.*;
 import java.math.*;
 import java.util.*;
 
-public interface ObjectOut {
+public interface ObjectOut extends Flushable, AutoCloseable {
 
-	public void writeObject(Object obj);
+	public<T> void writeObject(T obj);
 
 	//For writing "primitives"
 
@@ -46,6 +47,8 @@ public interface ObjectOut {
 	public void writeSet(Set<?> set);
 
 	public void writeMap(Map<?, ?> map);
+	
+	public void flush();
 	
 	public void close();
 

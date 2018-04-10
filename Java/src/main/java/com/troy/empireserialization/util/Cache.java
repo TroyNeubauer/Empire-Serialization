@@ -1,6 +1,6 @@
 package com.troy.empireserialization.util;
 
-public abstract class Cache<Entry> {
+public abstract class Cache<Entry, E> {
 	protected static final double DEFAULT_LOAD_FACTOR = 0.5;
 	protected static final int DEFAULT_CAPACITY = 16;
 
@@ -15,10 +15,14 @@ public abstract class Cache<Entry> {
 
 	protected abstract void resize(int newSize);
 	
-	public abstract Entry get(Object key);
+	public abstract Entry get(E key);
 
 	public int hash(Object key) {
 		return key.hashCode() % table.length;
+	}
+	
+	public int size() {
+		return size;
 	}
 
 }

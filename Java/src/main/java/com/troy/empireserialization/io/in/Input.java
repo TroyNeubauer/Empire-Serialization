@@ -11,8 +11,9 @@ import com.troy.empireserialization.io.*;
  */
 public interface Input extends EmpireIO {
 	/**
-	 * Reads the next byte in this input without checking for errors. This method should be used as the base method to implement reading primitives.
-	 * This method should be called any number of times to retrieve the required data for reading higher level primitives after checking for errors.
+	 * Reads the next byte in this input without checking for errors. This method should be used as the base method to
+	 * implement reading primitives. This method should be called any number of times to retrieve the required data for
+	 * reading higher level primitives after checking for errors.
 	 * 
 	 * This method will block until input is available if reading from a stream.
 	 * 
@@ -24,8 +25,10 @@ public interface Input extends EmpireIO {
 	 * Reads the next byte in this input. This method will block until input is available if reading from a stream.
 	 * 
 	 * @return The next byte
-	 * @throws EndOfInputException If the end of input was reached while attempting to read the next byte
-	 * @throws AlreadyClosedException If the underlying input was already closed
+	 * @throws EndOfInputException
+	 *             If the end of input was reached while attempting to read the next byte
+	 * @throws AlreadyClosedException
+	 *             If the underlying input was already closed
 	 */
 	public byte readByte();
 
@@ -34,8 +37,10 @@ public interface Input extends EmpireIO {
 	 * This method will block until input is available if reading from a stream.
 	 * 
 	 * @return The next two bytes as a short
-	 * @throws EndOfInputException If the end of input was reached while attempting to read the next bytes
-	 * @throws AlreadyClosedException If the underlying input was already closed
+	 * @throws EndOfInputException
+	 *             If the end of input was reached while attempting to read the next bytes
+	 * @throws AlreadyClosedException
+	 *             If the underlying input was already closed
 	 */
 	public short readShort();
 
@@ -44,8 +49,10 @@ public interface Input extends EmpireIO {
 	 * This method will block until input is available if reading from a stream.
 	 * 
 	 * @return The next four bytes as an int
-	 * @throws EndOfInputException If the end of input was reached while attempting to read the next bytes
-	 * @throws AlreadyClosedException If the underlying input was already closed
+	 * @throws EndOfInputException
+	 *             If the end of input was reached while attempting to read the next bytes
+	 * @throws AlreadyClosedException
+	 *             If the underlying input was already closed
 	 */
 	public int readInt();
 
@@ -54,8 +61,10 @@ public interface Input extends EmpireIO {
 	 * This method will block until input is available if reading from a stream.
 	 * 
 	 * @return The next eight bytes as a long
-	 * @throws EndOfInputException If the end of input was reached while attempting to read the next bytes
-	 * @throws AlreadyClosedException If the underlying input was already closed
+	 * @throws EndOfInputException
+	 *             If the end of input was reached while attempting to read the next bytes
+	 * @throws AlreadyClosedException
+	 *             If the underlying input was already closed
 	 */
 	public long readLong();
 
@@ -64,8 +73,10 @@ public interface Input extends EmpireIO {
 	 * This method will block until input is available if reading from a stream.
 	 * 
 	 * @return The next four bytes as a float
-	 * @throws EndOfInputException If the end of input was reached while attempting to read the next bytes
-	 * @throws AlreadyClosedException If the underlying input was already closed
+	 * @throws EndOfInputException
+	 *             If the end of input was reached while attempting to read the next bytes
+	 * @throws AlreadyClosedException
+	 *             If the underlying input was already closed
 	 */
 	public float readFloat();
 
@@ -74,8 +85,10 @@ public interface Input extends EmpireIO {
 	 * This method will block until input is available if reading from a stream.
 	 * 
 	 * @return The next eight bytes as a double
-	 * @throws EndOfInputException If the end of input was reached while attempting to read the next bytes
-	 * @throws AlreadyClosedException If the underlying input was already closed
+	 * @throws EndOfInputException
+	 *             If the end of input was reached while attempting to read the next bytes
+	 * @throws AlreadyClosedException
+	 *             If the underlying input was already closed
 	 */
 	public double readDouble();
 
@@ -84,17 +97,22 @@ public interface Input extends EmpireIO {
 	 * This method will block until input is available if reading from a stream.
 	 * 
 	 * @return The next two bytes as a char
-	 * @throws EndOfInputException If the end of input was reached while attempting to read the next bytes
-	 * @throws AlreadyClosedException If the underlying input was already closed
+	 * @throws EndOfInputException
+	 *             If the end of input was reached while attempting to read the next bytes
+	 * @throws AlreadyClosedException
+	 *             If the underlying input was already closed
 	 */
 	public char readChar();
 
 	/**
-	 * Reads a string using a charset and the character count This method will block until input is available if reading from a stream.
+	 * Reads a string using a charset and the character count This method will block until input is available if reading
+	 * from a stream.
 	 * 
 	 * @return A string based on the number of characters and the charset to use to decode
-	 * @throws EndOfInputException If the end of input was reached while attempting to read the next bytes
-	 * @throws AlreadyClosedException If the underlying input was already closed
+	 * @throws EndOfInputException
+	 *             If the end of input was reached while attempting to read the next bytes
+	 * @throws AlreadyClosedException
+	 *             If the underlying input was already closed
 	 */
 	public boolean readBoolean();
 
@@ -105,5 +123,20 @@ public interface Input extends EmpireIO {
 	public long readVLELong();
 
 	public char readVLEChar();
+
+	/**
+	 * Returns an estimate as to number of bytes that can be read (or skipped over) from this input without
+	 * blocking. A single read of this many bytes will not block, and neither will reading fewer bytes.
+	 *
+	 * <p>
+	 * Note that while some implementations of {@code Input} will return the total number of bytes in the stream,
+	 * many will not. Especially when dealing with web sockets, where the number of bytes remaining depends on the 
+	 * other side. It is never correct to use the return value of this method to allocate a buffer intended to hold
+	 * all data in this stream.
+	 * 
+	 * @return An estimate as to number of bytes that can be read (or skipped over) from this input without
+	 * blocking
+	 */
+	public long remaining();
 
 }

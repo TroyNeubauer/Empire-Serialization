@@ -46,6 +46,7 @@ public class NativeUtils {
 	}
 
 	public static boolean NATIVES_ENABLED = true;
+	
 	// Always use native
 	public static final int MIN_NATIVE_THRESHOLD = 0;
 

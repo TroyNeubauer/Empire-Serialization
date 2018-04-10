@@ -9,25 +9,27 @@ import java.util.Set;
 
 import com.troy.empireserialization.charset.*;
 import com.troy.empireserialization.io.out.*;
+import com.troy.empireserialization.serializers.Serializer;
+import com.troy.empireserialization.serializers.Serializers;
 import com.troy.empireserialization.util.*;
 
-public class OutputSerializationStream implements ObjectOut {
+public class EmpireOutput implements ObjectOut {
 
 	private Output out;
 	private IntCache<String> stringCache;
 	private IntCache<Class<?>> classCache;
 	private IntCache<Object> objectCache;
 
-	public OutputSerializationStream(Output out) {
+	public EmpireOutput(Output out) {
 		this.out = out;
 	}
 
-	public OutputSerializationStream(File file) {
+	public EmpireOutput(File file) {
 		this.out = new NativeFileOutput(file);
 	}
 
-	public void writeObject(Object obj) {
-		Class<?> clazz = obj.getClass();
+	public <T> void writeObject(T obj) {
+		Class<T> clazz = (Class<T>) obj.getClass();
 		if (checkForPrimitive(obj, clazz))
 			return;
 		else
@@ -82,90 +84,98 @@ public class OutputSerializationStream implements ObjectOut {
 		return false;
 	}
 
-	private void writeObjectImpl(Object obj, Class<?> clazz) {
-		IntValue<Class<?>> classEntry = classCache.get(obj);
+	private <T> void writeObjectImpl(T obj, Class<T> type) {
+		IntValue<Class<?>> classEntry = classCache.get(type);
 		if (classEntry == null) {// We need to define the class and object
+			classCache.add(type, classCache.size());
+
 			out.writeByte(EmpireOpCodes.TYPE_DEF_OBJ_DEF_TYPE);
+			writeTypeDefinition(type);
+			writeObjectDefinition(obj, type);
 		} else {
 			IntValue<Object> objEntry = objectCache.get(obj);
 			if (objEntry == null) {// We need to define the object but not the type
+				objectCache.add(obj, objectCache.size());
 
+				out.writeByte(EmpireOpCodes.TYPE_REF_OBJ_DEF_TYPE);
+				// Write the type's id
+				out.writeVLEInt(classEntry.value);
+				writeObjectDefinition(obj, type);
 			} else {// The object already exists so just reference it
-
+				out.writeByte(EmpireOpCodes.OBJ_REF_TYPE);
+				// Write only the object's id
+				out.writeVLEInt(objEntry.value);
 			}
 		}
 	}
 
+	private <T> void writeObjectDefinition(T obj, Class<T> type) {
+		Serializer<T> serializer = Serializers.getSerializer(type);
+		serializer.writeFields(obj, out);
+	}
+
+	private void writeTypeDefinition(Class<?> type) {
+
+	}
+
 	@Override
 	public void writeByte(byte b) {
-		// TODO Auto-generated method stub
-
+		out.writeByte(b);
 	}
 
 	@Override
 	public void writeShort(short s) {
-		// TODO Auto-generated method stub
-
+		out.writeShort(s);
 	}
 
 	@Override
 	public void writeInt(int i) {
-		// TODO Auto-generated method stub
-
+		out.writeInt(i);
 	}
 
 	@Override
 	public void writeLong(long l) {
-		// TODO Auto-generated method stub
-
+		out.writeLong(l);
 	}
 
 	@Override
 	public void writeUnsignedByte(byte b) {
-		// TODO Auto-generated method stub
-
+		out.writeByte(b);
 	}
 
 	@Override
 	public void writeUnsignedShort(short s) {
-		// TODO Auto-generated method stub
-
+		out.writeUnsignedShort(s);
 	}
 
 	@Override
 	public void writeUnsignedInt(int i) {
-		// TODO Auto-generated method stub
-
+		out.writeInt(i);
 	}
 
 	@Override
 	public void writeUnsignedLong(long l) {
-		// TODO Auto-generated method stub
-
+		out.writeLong(l);
 	}
 
 	@Override
 	public void writeFloat(float f) {
-		// TODO Auto-generated method stub
-
+		out.writeFloat(f);
 	}
 
 	@Override
 	public void writeDouble(double d) {
-		// TODO Auto-generated method stub
-
+		out.writeDouble(d);
 	}
 
 	@Override
 	public void writeChar(char c) {
-		// TODO Auto-generated method stub
-
+		out.writeChar(c);
 	}
 
 	@Override
 	public void writeBoolean(boolean b) {
-		// TODO Auto-generated method stub
-
+		out.writeBoolean(b);
 	}
 
 	@Override
@@ -235,6 +245,11 @@ public class OutputSerializationStream implements ObjectOut {
 	@Override
 	public void close() {
 		out.close();
+	}
+
+	@Override
+	public void flush() {
+		out.flush();
 	}
 
 }

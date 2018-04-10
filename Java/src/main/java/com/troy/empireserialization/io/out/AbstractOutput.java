@@ -13,23 +13,6 @@ public abstract class AbstractOutput implements Output {
 	public AbstractOutput() {
 	}
 
-	//format:off
-	// System Big Endian 	| Writer BE 	| flip endianness in native code
-	// 		0 					1				1
-	// 		0 					0				0
-	// 		1 					1				0
-	// 		1 					0				1
-	//This is Xor!						format:on
-
-	/**
-	 * 
-	 * @return {@code true} if the endianness of the underlying system and the desired endianness are different, in which
-	 *         case values written in native code need to be swapped. {@code false} otherwise
-	 */
-	protected boolean swapEndinessInNative() {
-		return bigEndian ^ (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN);
-	}
-
 	@Override
 	public void writeByte(int b) {
 		require(Byte.BYTES);

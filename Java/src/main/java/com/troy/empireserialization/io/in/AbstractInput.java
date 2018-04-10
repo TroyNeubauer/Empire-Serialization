@@ -18,7 +18,7 @@ public abstract class AbstractInput implements Input {
 
 	@Override
 	public void setByteOrder(ByteOrder byteOrder) {
-
+		bigEndian = (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN) ^ (byteOrder == ByteOrder.BIG_ENDIAN);
 	}
 
 	@Override
@@ -50,18 +50,17 @@ public abstract class AbstractInput implements Input {
 		} else {
 			return (int) (readByteImpl() | readByteImpl() << 8 | readByteImpl() << 16 | readByteImpl() << 24);
 		}
-
 	}
 
 	@Override
 	public long readLong() {
 		require(Long.BYTES);
 		if (bigEndian) {
-			return (long) (readByteImpl() << 56 | readByteImpl() << 48 | readByteImpl() << 40 | readByteImpl() << 32 | readByteImpl() << 24
-					| readByteImpl() << 16 | readByteImpl() << 8 | readByteImpl());
+			return (long) (readByteImpl() << 56 | readByteImpl() << 48 | readByteImpl() << 40 | readByteImpl() << 32
+					| readByteImpl() << 24 | readByteImpl() << 16 | readByteImpl() << 8 | readByteImpl());
 		} else {
-			return (long) (readByteImpl() | readByteImpl() << 8 | readByteImpl() << 16 | readByteImpl() << 24 | readByteImpl() << 32
-					| readByteImpl() << 40 | readByteImpl() << 48 | readByteImpl() << 56);
+			return (long) (readByteImpl() | readByteImpl() << 8 | readByteImpl() << 16 | readByteImpl() << 24
+					| readByteImpl() << 32 | readByteImpl() << 40 | readByteImpl() << 48 | readByteImpl() << 56);
 		}
 	}
 
@@ -86,7 +85,7 @@ public abstract class AbstractInput implements Input {
 			return (char) (readByteImpl() | readByteImpl() << 8);
 		}
 	}
-	
+
 	@Override
 	public short readVLEShort() {
 		int b = readByte();

@@ -45,11 +45,6 @@ public abstract class Library {
 			writeObjectToFile(file, obj);
 			end = System.nanoTime();
 			size = file.length();
-			/*
-			 * if (lastBytes != null) { if (lastBytes.length != bytes.length) throw new RuntimeException(); } else { try {
-			 * FileOutputStream stream = new FileOutputStream(new File("./" + getClass().getSimpleName() + ".dat"));
-			 * stream.write(bytes); stream.close(); } catch (IOException e) { e.printStackTrace(); } } lastBytes = bytes;
-			 */
 			times[i] = end - start;
 		}
 
@@ -72,7 +67,7 @@ public abstract class Library {
 		@Override
 		public void writeObjectToFile(File file, Object obj) {
 			NativeUtils.NATIVES_ENABLED = true;
-			OutputSerializationStream out = new OutputSerializationStream(new NativeFileOutput(file));
+			EmpireOutput out = new EmpireOutput(new NativeFileOutput(file));
 			out.writeObject(obj);
 			out.close();
 		}
@@ -81,7 +76,7 @@ public abstract class Library {
 		public byte[] writeObjectToBytes(Object obj) {
 			NativeUtils.NATIVES_ENABLED = true;
 			NativeOutput out = new NativeOutput(4096);
-			OutputSerializationStream stream = new OutputSerializationStream(out);
+			EmpireOutput stream = new EmpireOutput(out);
 			stream.writeObject(obj);
 			byte[] bytes = Arrays.copyOf(out.getBuffer(), out.getBufferPosition());
 
@@ -100,7 +95,7 @@ public abstract class Library {
 		@Override
 		public void writeObjectToFile(File file, Object obj) {
 			NativeUtils.NATIVES_ENABLED = false;
-			OutputSerializationStream out = new OutputSerializationStream(new NativeFileOutput(file));
+			EmpireOutput out = new EmpireOutput(new NativeFileOutput(file));
 			out.writeObject(obj);
 			out.close();
 		}
@@ -109,7 +104,7 @@ public abstract class Library {
 		public byte[] writeObjectToBytes(Object obj) {
 			NativeUtils.NATIVES_ENABLED = false;
 			NativeOutput out = new NativeOutput(4096);
-			OutputSerializationStream stream = new OutputSerializationStream(out);
+			EmpireOutput stream = new EmpireOutput(out);
 			stream.writeObject(obj);
 			byte[] bytes = Arrays.copyOf(out.getBuffer(), out.getBufferPosition());
 

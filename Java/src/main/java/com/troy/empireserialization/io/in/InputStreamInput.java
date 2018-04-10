@@ -105,4 +105,15 @@ public class InputStreamInput extends AbstractInput {
 		// Nothing because java.io.InputStream.read handles everything for us
 	}
 
+	@Override
+	public long remaining() {
+		try {
+			return in.available();
+		} catch (NullPointerException e) {
+			throw new AlreadyClosedException();
+		} catch (IOException e) {
+			throw new EmpireSerializationIOException(e);
+		}
+	}
+
 }
