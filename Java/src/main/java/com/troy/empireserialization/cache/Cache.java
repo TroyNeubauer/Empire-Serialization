@@ -1,4 +1,4 @@
-package com.troy.empireserialization.util;
+package com.troy.empireserialization.cache;
 
 public abstract class Cache<Entry, E> {
 	protected static final double DEFAULT_LOAD_FACTOR = 0.5;

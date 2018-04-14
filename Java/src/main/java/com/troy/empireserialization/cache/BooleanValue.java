@@ -1,4 +1,4 @@
-package com.troy.empireserialization.util;
+package com.troy.empireserialization.cache;
 
 public class BooleanValue<E> {
 	public E key;

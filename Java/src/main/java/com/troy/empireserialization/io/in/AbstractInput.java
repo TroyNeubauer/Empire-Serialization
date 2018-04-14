@@ -2,6 +2,7 @@ package com.troy.empireserialization.io.in;
 
 import java.nio.*;
 
+import com.troy.empireserialization.EmpireConstants;
 import com.troy.empireserialization.util.*;
 
 public abstract class AbstractInput implements Input {

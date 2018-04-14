@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.troy.empireserialization.cache.IntCache;
+import com.troy.empireserialization.cache.IntValue;
 import com.troy.empireserialization.charset.*;
 import com.troy.empireserialization.io.out.*;
 import com.troy.empireserialization.serializers.Serializer;
