@@ -9,6 +9,7 @@ import org.junit.*;
 
 import com.troy.empireserialization.*;
 import com.troy.empireserialization.io.out.*;
+import com.troy.empireserialization.memory.NativeMemoryBlock;
 import com.troy.empireserialization.util.*;
 
 import static com.troy.junit.JUnitConstants.*;

@@ -1,4 +1,4 @@
-package com.troy.empireserialization;
+package com.troy.empireserialization.memory;
 
 public interface NativeMemoryBlock {
 	/**

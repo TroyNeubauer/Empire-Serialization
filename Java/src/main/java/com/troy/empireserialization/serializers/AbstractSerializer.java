@@ -24,6 +24,8 @@ public abstract class AbstractSerializer<T> implements Serializer<T> {
 	public void writeTypeDefinition(Output out) {
 		out.writeBytes(data.getTypeDefinition());
 	}
+	
+	
 
 
 }

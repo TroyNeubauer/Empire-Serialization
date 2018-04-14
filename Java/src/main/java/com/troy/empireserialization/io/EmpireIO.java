@@ -5,6 +5,7 @@ import java.nio.*;
 
 import com.troy.empireserialization.*;
 import com.troy.empireserialization.exception.*;
+import com.troy.empireserialization.memory.NativeMemoryBlock;
 
 /**
  * The super interface for all streams that read or write primitives. This class provides an abstraction for

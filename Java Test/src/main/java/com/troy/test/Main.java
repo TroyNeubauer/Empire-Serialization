@@ -1,13 +1,24 @@
 package com.troy.test;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.Map.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
+import com.troy.empireserialization.serializers.ClassData;
 
 public class Main {
 
 	public static void main(String[] args) throws Throwable {
+
+		List<String> list = new ArrayList<String>();
+		new ClassData<>(list.getClass());
 
 		/*
 		 * File f = new File("./MyLibraryNative.dat"); InputStreamInput in = new InputStreamInput(new
@@ -19,7 +30,12 @@ public class Main {
 		 */
 
 		// Library.doTest(Constants.BIG_HARRY_POTTER);
-		wordTest(new File("C:\\Users\\Troy Neubauer\\Desktop\\scan").listFiles());
+
+		/*
+		 * ArrayList<File> files = new ArrayList<File>(); for (File file : new
+		 * File("C:\\Users\\Troy Neubauer\\Desktop\\scan").listFiles()) files.add(file); files.add(new
+		 * File("D:\\Minecraft\\1.2billion.txt")); wordTest(files.toArray(new File[files.size()]));
+		 */
 
 	}
 
@@ -27,7 +43,7 @@ public class Main {
 		HashMap<Character, Integer> map = new HashMap<Character, Integer>();
 		int counter = 0;
 		for (File file : files) {
-			System.out.println(file);
+			long start = System.nanoTime();
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String line;
 			while ((line = reader.readLine()) != null) {
@@ -43,48 +59,27 @@ public class Main {
 					counter++;
 				}
 			}
+			double seconds = (System.nanoTime() - start) / 1000000000.0;
 			reader.close();
-		}
-		System.out.println("Scanned " + counter + " characters. ");
-		System.out.println(map.size() +" different characters");
-		System.out.println("Results:");
-		Map<Character, Integer> r = new TreeMap<Character, Integer>(new Comparator<Character>() {
+			System.out.println("Scanned " + counter + " characters. ");
+			System.out.println(map.size() + " different characters");
+			System.out.println("Results for file " + file + ":");
+			Map<Character, Integer> r = new TreeMap<Character, Integer>(new Comparator<Character>() {
 
-			@Override
-			public int compare(Character o1, Character o2) {
-				return Integer.compare(map.get(o2).intValue(), map.get(o1).intValue());
+				@Override
+				public int compare(Character o1, Character o2) {
+					return Integer.compare(map.get(o2).intValue(), map.get(o1).intValue());
+				}
+			});
+			r.putAll(map);
+			for (Entry<Character, Integer> entry : r.entrySet()) {
+				char key = entry.getKey().charValue();
+				int value = entry.getValue().intValue();
+				System.out.println(key + " (" + ((int) key) + ") count " + value + " = "
+						+ ((double) value / counter * 100.0) + "%");
 			}
-		});
-		r.putAll(map);
-		for (Entry<Character, Integer> entry : r.entrySet()) {
-			char key = entry.getKey().charValue();
-			int value = entry.getValue().intValue();
-			System.out.println(
-					key + " (" + ((int) key) + ") count " + value + " = " + ((double) value / counter * 100.0) + "%");
+			map.clear();
 		}
 
 	}
-
-	private static int[] sort(int[] chars) {
-		int[] result = new int[chars.length];
-		for (int i = 0; i < result.length; i++) {
-			result[i] = i;
-		}
-		int n = result.length;
-		for (int i = 1; i < n; ++i) {
-			int key = result[i];
-			int j = i - 1;
-
-			/*
-			 * Move elements of arr[0..i-1], that are greater than key, to one position ahead of their current position
-			 */
-			while (j >= 0 && chars[j] > key) {
-				result[j + 1] = result[j];
-				j = j - 1;
-			}
-			result[j + 1] = key;
-		}
-		return result;
-	}
-
 }

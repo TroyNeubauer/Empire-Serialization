@@ -1,5 +1,6 @@
 package com.troy.empireserialization.charset;
 
+import com.troy.empireserialization.io.out.Output;
 import com.troy.empireserialization.util.*;
 
 public class EmpireCharsets {
@@ -9,7 +10,7 @@ public class EmpireCharsets {
 
 	public static void init() {
 	}
-
+	
 	/**
 	 * Returns a charset capable of encoding the specified string
 	 * 
@@ -19,6 +20,11 @@ public class EmpireCharsets {
 	 */
 	public static StringInfo identifyCharset(String str, int offset, int length) {
 		char[] chars = MiscUtil.getCharsFast(str);
+		return identifyCharset(chars, offset, length);
+	}
+
+
+	public static StringInfo identifyCharset(char[] chars, int offset, int length) {
 		if (NativeUtils.NATIVES_ENABLED) {
 			int result = nIdentifyCharset(chars, offset, length);
 			int value = result & 0b11;
@@ -69,4 +75,11 @@ public class EmpireCharsets {
 	}
 
 	private static native int nIdentifyCharset(char[] chars, int offset, int length);
+
+	public static void write(String str, Output out) {
+		char[] chars = MiscUtil.getCharsFast(str);
+		int len = chars.length;
+		StringInfo charset = identifyCharset(chars, 0, len);
+		charset.charset.encode(chars, out, 0, len, charset.info);
+	}
 }

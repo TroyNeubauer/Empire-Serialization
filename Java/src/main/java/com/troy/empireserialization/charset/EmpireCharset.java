@@ -3,6 +3,7 @@ package com.troy.empireserialization.charset;
 import com.troy.empireserialization.*;
 import com.troy.empireserialization.io.in.*;
 import com.troy.empireserialization.io.out.*;
+import com.troy.empireserialization.memory.NativeMemoryBlock;
 import com.troy.empireserialization.util.*;
 
 public interface EmpireCharset {

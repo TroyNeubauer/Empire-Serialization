@@ -5,6 +5,8 @@ import java.nio.file.Path;
 
 import com.troy.empireserialization.*;
 import com.troy.empireserialization.exception.*;
+import com.troy.empireserialization.memory.MasterMemoryBlock;
+import com.troy.empireserialization.memory.NativeMemoryBlock;
 import com.troy.empireserialization.util.*;
 
 import static com.troy.empireserialization.util.NativeUtils.*;

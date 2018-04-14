@@ -114,8 +114,8 @@ public class EmpireOutput implements ObjectOut {
 		serializer.writeFields(obj, out);
 	}
 
-	private void writeTypeDefinition(Class<?> type) {
-
+	private <T> void writeTypeDefinition(Class<T> type) {
+		Serializers.getSerializer(type).writeTypeDefinition(out);
 	}
 
 	@Override
