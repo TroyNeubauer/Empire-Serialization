@@ -1,4 +1,4 @@
-package com.troy.empireserialization.serializers;
+package com.troy.empireserialization.clazz;
 
 import java.lang.reflect.*;
 import java.util.*;

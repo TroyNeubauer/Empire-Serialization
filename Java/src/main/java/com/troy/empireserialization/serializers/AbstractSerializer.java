@@ -1,5 +1,6 @@
 package com.troy.empireserialization.serializers;
 
+import com.troy.empireserialization.clazz.ClassData;
 import com.troy.empireserialization.io.out.*;
 
 public abstract class AbstractSerializer<T> implements Serializer<T> {

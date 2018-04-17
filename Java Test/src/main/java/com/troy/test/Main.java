@@ -9,14 +9,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
-import com.troy.empireserialization.serializers.ClassData;
+import com.troy.empireserialization.clazz.ClassData;
+
+import java.util.TreeMap;
 
 public class Main {
 
 	public static void main(String[] args) throws Throwable {
 
+		System.out.println(Object.class.isAssignableFrom(String.class));
+		
 		List<String> list = new ArrayList<String>();
 		new ClassData<>(list.getClass());
 
