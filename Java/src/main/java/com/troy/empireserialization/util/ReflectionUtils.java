@@ -1,8 +1,10 @@
 package com.troy.empireserialization.util;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -34,6 +36,30 @@ public class ReflectionUtils {
 		BIG_DOUBLE_INFLATED = inflated;
 		ARRAY_LIST_DATA = data;
 		ARRAY_LIST_SIZE = size;
+		Method accessibleObjMethod;
+		try {
+			accessibleObjMethod = AccessibleObject.class.getDeclaredMethod("setAccessible", boolean.class);
+		} catch (NoSuchMethodException | SecurityException e1) {
+			throw new RuntimeException(e1);
+		}
+
+		// Reflection code that ensures all reflection related final static fields can be accessed without worry
+		// Works by calling the setAccessible method on each static field
+		for (Field reflectionThing : ReflectionUtils.class.getDeclaredFields()) {
+			try {
+				int mods = reflectionThing.getModifiers();
+				Object field = reflectionThing.get(null);
+				if (Modifier.isStatic(mods) && Modifier.isFinal(mods) && field instanceof AccessibleObject) {
+					// Lets us call the method
+					accessibleObjMethod.setAccessible(true);
+					// Sets the calls the method's of field's setAccessible method so that we can access them
+					accessibleObjMethod.invoke(field, true);
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+
+			}
+		}
 
 	}
 
@@ -50,8 +76,7 @@ public class ReflectionUtils {
 			ARRAY_LIST_DATA.set(list, data);
 			ARRAY_LIST_SIZE.setInt(list, data.length);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 }

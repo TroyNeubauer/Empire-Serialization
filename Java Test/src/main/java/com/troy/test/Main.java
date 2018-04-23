@@ -11,12 +11,19 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import com.troy.empireserialization.clazz.ClassData;
+import com.troy.empireserialization.util.ReflectionUtils;
 
 public class Main {
 
 	public static void main(String[] args) throws Throwable {
 
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<Object> list = new ArrayList<Object>();
+		
+		Object[] objects = new Object[] {5, "test", "test2", "test3"};
+		ReflectionUtils.setData(list, objects);
+		System.out.println(list);
+		
+		System.exit(0);
 		ClassData data = new ClassData<>(list.getClass());
 
 		/*
