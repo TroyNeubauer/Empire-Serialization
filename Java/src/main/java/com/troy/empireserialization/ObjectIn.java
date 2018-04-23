@@ -20,14 +20,6 @@ public interface ObjectIn extends AutoCloseable {
 
 	public long readLong();
 
-	public byte readUnsignedByte();
-
-	public short readUnsignedShort();
-
-	public int readUnsignedInt();
-
-	public long readUnsignedLong();
-
 	public float readFloat();
 
 	public double readDouble();
@@ -42,7 +34,7 @@ public interface ObjectIn extends AutoCloseable {
 
 	public BigDecimal readBigDecimal();
 
-	public Object readArray();
+	public Object[] readArray();
 
 	public List<?> readList();
 

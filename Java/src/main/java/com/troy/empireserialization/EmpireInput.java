@@ -24,78 +24,46 @@ public class EmpireInput implements ObjectIn {
 
 	@Override
 	public byte readByte() {
-		return 0;
+		return in.readByte();
 	}
 
 	@Override
 	public short readShort() {
-		// TODO Auto-generated method stub
-		return 0;
+		return in.readShort();
 	}
 
 	@Override
 	public int readInt() {
-		// TODO Auto-generated method stub
-		return 0;
+		return in.readInt();
 	}
 
 	@Override
 	public long readLong() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public byte readUnsignedByte() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public short readUnsignedShort() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int readUnsignedInt() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public long readUnsignedLong() {
-		// TODO Auto-generated method stub
-		return 0;
+		return in.readLong();
 	}
 
 	@Override
 	public float readFloat() {
-		// TODO Auto-generated method stub
-		return 0;
+		return in.readFloat();
 	}
 
 	@Override
 	public double readDouble() {
-		// TODO Auto-generated method stub
-		return 0;
+		return in.readDouble();
 	}
 
 	@Override
 	public char readChar() {
-		// TODO Auto-generated method stub
-		return 0;
+		return in.readChar();
 	}
 
 	@Override
 	public boolean readBoolean() {
-		// TODO Auto-generated method stub
-		return false;
+		return in.readBoolean();
 	}
 
 	@Override
 	public String readString() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -112,9 +80,13 @@ public class EmpireInput implements ObjectIn {
 	}
 
 	@Override
-	public Object readArray() {
+	public Object[] readArray() {
 		int length = in.readVLEInt();
-		return null;
+		Object[] array = new Object[length];
+		for(int i = 0; i < length; i++) {
+			array[i] = readObject();
+		}
+		return array;
 	}
 
 	@Override

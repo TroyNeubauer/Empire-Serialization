@@ -141,26 +141,6 @@ public class EmpireOutput implements ObjectOut {
 	}
 
 	@Override
-	public void writeUnsignedByte(byte b) {
-		out.writeByte(b);
-	}
-
-	@Override
-	public void writeUnsignedShort(short s) {
-		out.writeUnsignedShort(s);
-	}
-
-	@Override
-	public void writeUnsignedInt(int i) {
-		out.writeInt(i);
-	}
-
-	@Override
-	public void writeUnsignedLong(long l) {
-		out.writeLong(l);
-	}
-
-	@Override
 	public void writeFloat(float f) {
 		out.writeFloat(f);
 	}

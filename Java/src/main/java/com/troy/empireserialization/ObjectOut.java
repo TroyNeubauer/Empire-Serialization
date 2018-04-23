@@ -18,14 +18,6 @@ public interface ObjectOut extends Flushable, AutoCloseable {
 
 	public void writeLong(long l);
 
-	public void writeUnsignedByte(byte b);
-
-	public void writeUnsignedShort(short s);
-
-	public void writeUnsignedInt(int i);
-
-	public void writeUnsignedLong(long l);
-
 	public void writeFloat(float f);
 
 	public void writeDouble(double d);
