@@ -80,4 +80,10 @@ public class ByteArrayInput extends AbstractInput {
 		return buffer.length - position;
 	}
 
+	@Override
+	public void readBytes(byte[] dest, int offset, int count) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -10,9 +10,13 @@ public class ClassInfo<T> {
 
 	protected boolean ignoreTransient;
 	protected Field[] ignoreTransientFields;
+	
+	private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
 
 	public ClassInfo(Class<T> type, boolean ignoreTransient) {
-
+		this.type = type;
+		this.ignoreTransient = ignoreTransient;
+		this.ignoreTransientFields = EMPTY_FIELD_ARRAY;
 	}
 
 	public ClassInfo(Class<T> type, boolean ignoreTransient, Field[] ignoreTransientFields) {

@@ -125,18 +125,25 @@ public interface Input extends EmpireIO {
 	public char readVLEChar();
 
 	/**
-	 * Returns an estimate as to number of bytes that can be read (or skipped over) from this input without
-	 * blocking. A single read of this many bytes will not block, and neither will reading fewer bytes.
+	 * Returns an estimate as to number of bytes that can be read (or skipped over) from this input without blocking. A
+	 * single read of this many bytes will not block, and neither will reading fewer bytes.
 	 *
 	 * <p>
-	 * Note that while some implementations of {@code Input} will return the total number of bytes in the stream,
-	 * many will not. Especially when dealing with web sockets, where the number of bytes remaining depends on the 
-	 * other side. It is never correct to use the return value of this method to allocate a buffer intended to hold
-	 * all data in this stream.
+	 * Note that while some implementations of {@code Input} will return the total number of bytes in the stream, many
+	 * will not. Especially when dealing with web sockets, where the number of bytes remaining depends on the other
+	 * side. It is never correct to use the return value of this method to allocate a buffer intended to hold all data
+	 * in this stream.
 	 * 
-	 * @return An estimate as to number of bytes that can be read (or skipped over) from this input without
-	 * blocking
+	 * @return An estimate as to number of bytes that can be read (or skipped over) from this input without blocking
 	 */
 	public long remaining();
+
+	public void readBytes(byte[] dest, int offset, int count);
+
+	public default byte[] readBytes(int length) {
+		byte[] dest = new byte[length];
+		readBytes(dest, 0, length);
+		return dest;
+	}
 
 }

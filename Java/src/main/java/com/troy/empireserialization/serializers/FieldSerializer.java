@@ -1,13 +1,17 @@
 package com.troy.empireserialization.serializers;
 
-import com.troy.empireserialization.io.in.*;
-import com.troy.empireserialization.io.out.*;
-import com.troy.empireserialization.util.*;
+import java.lang.reflect.Field;
 
-import sun.misc.*;
+import com.troy.empireserialization.ObjectIn;
+import com.troy.empireserialization.ObjectOut;
+import com.troy.empireserialization.io.in.Input;
+import com.troy.empireserialization.io.out.Output;
+import com.troy.empireserialization.util.MiscUtil;
+
+import sun.misc.Unsafe;
 
 public class FieldSerializer<T> extends AbstractSerializer<T> {
-	
+
 	public FieldSerializer(Class<T> type) {
 		super(type);
 	}
@@ -15,16 +19,21 @@ public class FieldSerializer<T> extends AbstractSerializer<T> {
 	private static final Unsafe unsafe = MiscUtil.getUnsafe();
 
 	@Override
-	public void writeFields(Object obj, Output out) {
-		if(unsafe != null) {
-			
-		} else {
-			
+	public void writeFields(ObjectOut objectOut, Object obj, Output out) {
+		int size = data.getFields().length;
+		for (int i = 0; i < size; i++) {
+			Field field = data.getFields()[i];
+			Class<?> type = field.getType();
+			if (unsafe != null) {
+				long offset = FieldType.sizeof(type);
+			} else {
+
+			}
 		}
 	}
 
 	@Override
-	public T readFields(Object obj, Input in) {
+	public T readFields(ObjectIn out, Object obj, Input in) {
 		return null;
 	}
 }

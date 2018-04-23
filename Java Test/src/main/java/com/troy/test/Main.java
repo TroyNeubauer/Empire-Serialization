@@ -6,22 +6,18 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import com.troy.empireserialization.clazz.ClassData;
-
-import java.util.TreeMap;
 
 public class Main {
 
 	public static void main(String[] args) throws Throwable {
 
-		System.out.println(Object.class.isAssignableFrom(String.class));
-		
-		List<String> list = new ArrayList<String>();
-		new ClassData<>(list.getClass());
+		ArrayList<String> list = new ArrayList<String>();
+		ClassData data = new ClassData<>(list.getClass());
 
 		/*
 		 * File f = new File("./MyLibraryNative.dat"); InputStreamInput in = new InputStreamInput(new

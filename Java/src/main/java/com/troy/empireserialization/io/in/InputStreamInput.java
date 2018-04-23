@@ -118,4 +118,10 @@ public class InputStreamInput extends AbstractInput {
 		}
 	}
 
+	@Override
+	public void readBytes(byte[] dest, int offset, int count) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

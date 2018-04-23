@@ -113,7 +113,7 @@ public class EmpireOutput implements ObjectOut {
 
 	private <T> void writeObjectDefinition(T obj, Class<T> type) {
 		Serializer<T> serializer = Serializers.getSerializer(type);
-		serializer.writeFields(obj, out);
+		serializer.writeFields(this, obj, out);
 	}
 
 	private <T> void writeTypeDefinition(Class<T> type) {
@@ -210,20 +210,24 @@ public class EmpireOutput implements ObjectOut {
 
 	@Override
 	public void writeBigInteger(BigInteger integer) {
-		// TODO Auto-generated method stub
-
+		byte[] bytes = integer.toByteArray();
+		out.writeVLEInt(bytes.length);
+		out.writeBytes(bytes);
 	}
 
 	@Override
 	public void writeBigDecimal(BigDecimal decimal) {
-		// TODO Auto-generated method stub
-
+		writeBigInteger(ReflectionUtils.getBigInteger(decimal));
+		out.writeVLEInt(decimal.scale());
 	}
 
 	@Override
-	public void writeArray(Object array) {
-		// TODO Auto-generated method stub
-
+	public void writeArray(Object[] array) {
+		int length = array.length;
+		out.writeVLEInt(length);
+		for (int i = 0; i < length; i++) {
+			writeObject(array[i]);
+		}
 	}
 
 	@Override

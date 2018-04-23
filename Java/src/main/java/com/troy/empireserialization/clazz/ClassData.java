@@ -3,8 +3,10 @@ package com.troy.empireserialization.clazz;
 import java.lang.reflect.*;
 import java.util.*;
 
+import com.troy.empireserialization.EmpireSerializationSettings;
 import com.troy.empireserialization.charset.EmpireCharsets;
 import com.troy.empireserialization.io.out.*;
+import com.troy.empireserialization.serializers.FieldType;
 import com.troy.empireserialization.util.*;
 
 import sun.misc.*;
@@ -22,11 +24,15 @@ public class ClassData<T> {
 	private byte[] typeDefinition;
 
 	public ClassData(Class<T> type) {
-		this.type = type;
-		init();
+		this(type, EmpireSerializationSettings.defaultSettings);
 	}
 
-	private void init() {
+	public ClassData(Class<T> type, EmpireSerializationSettings settings) {
+		this.type = type;
+		init(settings);
+	}
+
+	private void init(EmpireSerializationSettings settings) {
 		Class<?> superType = type.getSuperclass();
 		if (type == null) {
 		} else {
@@ -78,7 +84,7 @@ public class ClassData<T> {
 				}
 			}
 		}
-		writeTypeDefinition();
+		writeTypeDefinition(settings);
 	}
 
 	private boolean isValidField(Field field) {
@@ -86,13 +92,15 @@ public class ClassData<T> {
 		return !Modifier.isStatic(mods) && !Modifier.isTransient(mods);
 	}
 
-	private void writeTypeDefinition() {
+	private void writeTypeDefinition(EmpireSerializationSettings settings) {
 		ByteArrayOutput out = new ByteArrayOutput();
 		int length = rawFields.length;
 		int bitFieldBytes = (length + 3) / 4;
 		byte[] bitfield = ByteArrayPool.aquire(bitFieldBytes);
 		for (int i = 0; i < length; i++) {
+			Field field = rawFields[i];
 			int shift = 6 - (i % 4) * 2;
+			FieldType type = FieldType.identifyFieldType(field, settings);
 		}
 
 		EmpireCharsets.write(type.getName(), out);
@@ -113,5 +121,9 @@ public class ClassData<T> {
 
 	public byte[] getTypeDefinition() {
 		return typeDefinition;
+	}
+
+	public Field[] getFields() {
+		return rawFields;
 	}
 }

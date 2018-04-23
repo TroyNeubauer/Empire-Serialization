@@ -6,7 +6,7 @@ import java.util.*;
 
 public interface ObjectOut extends Flushable, AutoCloseable {
 
-	public<T> void writeObject(T obj);
+	public <T> void writeObject(T obj);
 
 	//For writing "primitives"
 
@@ -40,7 +40,7 @@ public interface ObjectOut extends Flushable, AutoCloseable {
 
 	public void writeBigDecimal(BigDecimal decimal);
 
-	public void writeArray(Object array);
+	public void writeArray(Object[] array);
 
 	public void writeList(List<?> list);
 

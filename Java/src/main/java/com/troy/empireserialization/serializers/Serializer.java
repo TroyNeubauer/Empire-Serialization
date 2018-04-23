@@ -1,7 +1,9 @@
 package com.troy.empireserialization.serializers;
 
-import com.troy.empireserialization.io.in.*;
-import com.troy.empireserialization.io.out.*;
+import com.troy.empireserialization.ObjectIn;
+import com.troy.empireserialization.ObjectOut;
+import com.troy.empireserialization.io.in.Input;
+import com.troy.empireserialization.io.out.Output;
 
 public interface Serializer<T> {
 
@@ -16,7 +18,7 @@ public interface Serializer<T> {
 	 * @param out
 	 *            The output to write to
 	 */
-	public void writeFields(T obj, Output out);
+	public void writeFields(ObjectOut objectOut, T obj, Output out);
 
 	/**
 	 * 
@@ -27,7 +29,7 @@ public interface Serializer<T> {
 	 * @param in
 	 *            The input to read from
 	 */
-	public T readFields(Object obj, Input in);
+	public T readFields(ObjectIn objIn, Object obj, Input in);
 
 	/**
 	 * Returns a new instance of the type represented by this serializer. If an instance cannot be created by this

@@ -6,6 +6,6 @@ repositories {
 
 dependencies {
 	compile group: 'org.apache.commons', name: 'commons-pool2', version: '2.5.0'
-	
+	compile group: 'io.github.lukehutch', name: 'fast-classpath-scanner', version: '2.18.2'
 }
 
