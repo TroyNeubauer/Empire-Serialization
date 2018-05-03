@@ -87,7 +87,6 @@ public class EmpireOutput implements ObjectOut {
 	}
 
 	private <T> void writeObjectImpl(T obj, Class<T> type) {
-		IntValue<Object> objectEntry = objectCache.get(obj);
 		IntValue<Class<?>> classEntry = classCache.get(type);
 		if (classEntry == null) {// Determine if the class hasn't been written before
 			// We need to define the class and object
