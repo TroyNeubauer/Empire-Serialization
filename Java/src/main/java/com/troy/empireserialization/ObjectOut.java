@@ -8,7 +8,7 @@ public interface ObjectOut extends Flushable, AutoCloseable {
 
 	public <T> void writeObject(T obj);
 
-	//For writing "primitives"
+	// For writing "primitives"
 
 	public void writeByte(byte b);
 
@@ -25,7 +25,7 @@ public interface ObjectOut extends Flushable, AutoCloseable {
 	public void writeChar(char c);
 
 	public void writeBoolean(boolean b);
-	
+
 	public void writeString(String str);
 
 	public void writeBigInteger(BigInteger integer);
@@ -34,14 +34,14 @@ public interface ObjectOut extends Flushable, AutoCloseable {
 
 	public void writeArray(Object[] array);
 
-	public void writeList(List<?> list);
+	public <T> void writeList(List<T> list, Class<List<?>> type);
 
-	public void writeSet(Set<?> set);
+	public <T> void writeSet(Set<T> set, Class<Set<?>> type);
 
-	public void writeMap(Map<?, ?> map);
-	
+	public <K, V> void writeMap(Map<K, V> map, Class<Map<?, ?>> type);
+
 	public void flush();
-	
+
 	public void close();
 
 }

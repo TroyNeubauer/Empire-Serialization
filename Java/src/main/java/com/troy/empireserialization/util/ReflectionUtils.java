@@ -71,10 +71,18 @@ public class ReflectionUtils {
 		}
 	}
 
-	public static void setData(ArrayList list, Object[] data) {
+	public static void setData(ArrayList<?> list, Object[] data) {
 		try {
 			ARRAY_LIST_DATA.set(list, data);
 			ARRAY_LIST_SIZE.setInt(list, data.length);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static Object[] getData(ArrayList<?> list) {
+		try {
+			return (Object[]) ARRAY_LIST_DATA.get(list);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}

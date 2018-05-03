@@ -3,6 +3,8 @@ package com.troy.empireserialization;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,18 +47,18 @@ public class EmpireOutput implements ObjectOut {
 	 * @return {@code true} If the type passed in was a primitive and was written using the correct writeX() method
 	 *         {@code false} otherwise
 	 */
-	private boolean checkForPrimitive(Object obj, Class<?> clazz) {
+	private <T> boolean checkForPrimitive(T obj, Class<T> clazz) {
 		if (clazz == String.class) {
 			writeString((String) obj);
 			return true;
-		} else if (clazz == List.class) {
-			writeList((List<?>) obj);
+		} else if (List.class.isAssignableFrom(clazz)) {
+			writeList((List<T>) obj, (Class<List<?>>) clazz);
 			return true;
-		} else if (clazz == Set.class) {
-			writeSet((Set<?>) obj);
+		} else if (Set.class.isAssignableFrom(clazz)) {
+			writeSet((Set<?>) obj, (Class<Set<?>>) clazz);
 			return true;
-		} else if (clazz == Map.class) {
-			writeMap((Map<?, ?>) obj);
+		} else if (Map.class.isAssignableFrom(clazz)) {
+			writeMap((Map<?, ?>) obj, (Class<Map<?, ?>>) clazz);
 			return true;
 		} else if (clazz == Byte.class) {
 			writeByte(((Byte) obj).byteValue());
@@ -219,19 +221,30 @@ public class EmpireOutput implements ObjectOut {
 	}
 
 	@Override
-	public void writeList(List<?> list) {
+	public <T> void writeList(List<T> list, Class<List<?>> type) {
+		if (list instanceof LinkedList) {
+			for (Object element : list) {
+
+			}
+		} else if (list instanceof ArrayList) {
+			int size = list.size();
+			Object[] listData;
+			if (list instanceof ArrayList) {
+				listData = ReflectionUtils.getData((ArrayList<?>) list);
+			}
+		} else {
+			writeObjectImpl(list, type);
+		}
+	}
+
+	@Override
+	public <T> void writeSet(Set<T> set, Class<Set<?>> type) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void writeSet(Set<?> set) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void writeMap(Map<?, ?> map) {
+	public <K, V> void writeMap(Map<K, V> map, Class<Map<?, ?>> type) {
 		// TODO Auto-generated method stub
 
 	}
