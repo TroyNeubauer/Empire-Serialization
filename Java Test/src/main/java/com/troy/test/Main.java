@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,15 @@ public class Main {
 		ByteArrayOutput bOut = new ByteArrayOutput();
 		EmpireOutput out = new EmpireOutput(bOut);
 
+		out.writeObject(list);
+		
+		ArrayList<String> list2 = new ArrayList<>();
+		list2.add("test1");
+		list2.add("test2");
+		list2.add("test3");
+		list2.add("test4");
+		out.writeObject(list2);
+		
 		out.writeObject(list);
 
 		System.out.println(StringFormatter.toHexString(bOut.getBuffer()));
