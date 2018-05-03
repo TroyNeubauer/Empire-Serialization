@@ -96,11 +96,13 @@ public class ClassData<T> {
 		ByteArrayOutput out = new ByteArrayOutput();
 		int length = rawFields.length;
 		int bitFieldBytes = (length + 3) / 4;
-		byte[] bitfield = ByteArrayPool.aquire(bitFieldBytes);
+		byte[] bitfield = out.getBuffer();
 		for (int i = 0; i < length; i++) {
 			Field field = rawFields[i];
 			int shift = 6 - (i % 4) * 2;
 			FieldType type = FieldType.identifyFieldType(field, settings);
+			bitfield[i / 4] |= (type.getCode() << shift);
+			System.out.println(StringFormatter.toBinaryString(bitfield[i / 4]));
 		}
 
 		EmpireCharsets.write(type.getName(), out);
@@ -112,6 +114,7 @@ public class ClassData<T> {
 	}
 
 	private void addField(Field field, int index) {
+		rawFields[index] = field;
 		fieldNames[index] = field.getName();
 		fieldTypes[index] = field.getType();
 		System.out.println(field);

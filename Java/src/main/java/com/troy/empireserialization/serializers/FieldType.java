@@ -20,36 +20,6 @@ public enum FieldType {
 		return identifyFieldType(field, EmpireSerializationSettings.defaultSettings);
 	}
 
-	public static int sizeof(Class<?> clazz) {
-		if (clazz.isPrimitive()) {
-			if (clazz == byte.class) {
-				return 1;
-			}
-			if (clazz == short.class) {
-				return 2;
-			}
-			if (clazz == int.class) {
-				return 4;
-			}
-			if (clazz == long.class) {
-				return 8;
-			}
-			if (clazz == float.class) {
-				return 4;
-			}
-			if (clazz == double.class) {
-				return 8;
-			}
-			if (clazz == char.class) {
-				return 2;
-			} else {
-				throw new Error();
-			}
-		} else {
-			return sun.misc.Unsafe.ADDRESS_SIZE;
-		}
-	}
-
 	public static FieldType identifyFieldType(Field field, EmpireSerializationSettings settings) {
 		Class<?> type = field.getDeclaringClass();
 		if (type.isPrimitive())
@@ -65,5 +35,9 @@ public enum FieldType {
 				return FieldType.USER_DEFINED;
 		}
 		return FieldType.WILDCARD;
+	}
+
+	public int getCode() {
+		return code;
 	}
 }

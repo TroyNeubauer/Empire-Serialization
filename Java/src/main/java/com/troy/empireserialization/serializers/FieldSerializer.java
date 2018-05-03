@@ -24,10 +24,14 @@ public class FieldSerializer<T> extends AbstractSerializer<T> {
 		for (int i = 0; i < size; i++) {
 			Field field = data.getFields()[i];
 			Class<?> type = field.getType();
-			if (unsafe != null) {
-				long offset = FieldType.sizeof(type);
-			} else {
+			if (type.isPrimitive()) {
+				if (unsafe != null) {
+					long offset = MiscUtil.sizeof(type);
+				} else {
 
+				}
+			} else {
+				
 			}
 		}
 	}

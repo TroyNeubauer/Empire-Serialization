@@ -10,21 +10,29 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import com.troy.empireserialization.clazz.ClassData;
+import com.troy.empireserialization.EmpireOutput;
+import com.troy.empireserialization.io.out.ByteArrayOutput;
+import com.troy.empireserialization.serializers.FieldSerializer;
 import com.troy.empireserialization.util.ReflectionUtils;
+import com.troy.empireserialization.util.StringFormatter;
 
 public class Main {
-
+	// C:\Empire Serialization\Java Natives\bin\x64\Release
 	public static void main(String[] args) throws Throwable {
+		init();
 
 		ArrayList<Object> list = new ArrayList<Object>();
-		
-		Object[] objects = new Object[] {5, "test", "test2", "test3"};
+
+		Object[] objects = new Object[] { 5, "test", "test2", "test3" };
 		ReflectionUtils.setData(list, objects);
 		System.out.println(list);
-		
-		System.exit(0);
-		ClassData data = new ClassData<>(list.getClass());
+		ByteArrayOutput bOut = new ByteArrayOutput();
+		EmpireOutput out = new EmpireOutput(bOut);
+
+		out.writeObject(list);
+
+		System.out.println(StringFormatter.toHexString(bOut.getBuffer()));
+		out.close();
 
 		/*
 		 * File f = new File("./MyLibraryNative.dat"); InputStreamInput in = new InputStreamInput(new
@@ -43,6 +51,18 @@ public class Main {
 		 * File("D:\\Minecraft\\1.2billion.txt")); wordTest(files.toArray(new File[files.size()]));
 		 */
 
+	}
+
+	private static void init() {
+		ArrayList<Object> list = new ArrayList<Object>();
+
+		Object[] objects = new Object[] { 5, "test", "test2", "test3" };
+		ReflectionUtils.setData(list, objects);
+		System.out.println(list);
+
+		FieldSerializer data = new FieldSerializer(list.getClass());
+		ByteArrayOutput bOut = new ByteArrayOutput();
+		EmpireOutput out = new EmpireOutput(bOut);
 	}
 
 	public static void wordTest(File... files) throws Exception {

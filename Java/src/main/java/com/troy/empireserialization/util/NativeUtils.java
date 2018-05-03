@@ -9,7 +9,8 @@ public class NativeUtils {
 
 	private static final int ERROR_CODE_OFFSET = 0;// The error code is one byte
 	private static final int INVALID_CHARACTER_OFFSET = 1;// Invalid character is 2 bytes
-	private static final int INVALID_CHARACTER_INDEX_OFFSET = 3;// Represents what index the invalid character was at 4 bytes
+	private static final int INVALID_CHARACTER_INDEX_OFFSET = 3;// Represents what index the invalid character was at 4
+																// bytes
 
 	public static final int DEFAULT_NATIVE_SIZE = 4096;
 
@@ -46,7 +47,7 @@ public class NativeUtils {
 	}
 
 	public static boolean NATIVES_ENABLED = true;
-	
+
 	// Always use native
 	public static final int MIN_NATIVE_THRESHOLD = 0;
 
@@ -74,24 +75,31 @@ public class NativeUtils {
 
 	public static void init() {
 	}
-
 	// Copies data from a primitive array to a byte array. The byte array must be at
 	// least bytes long
-	public static native int shortsToBytes(byte[] dest, short[] src, int srcOffset, int destOffset, int elements, boolean swapEndianess);
+	public static native int shortsToBytes(byte[] dest, short[] src, int srcOffset, int destOffset, int elements,
+			boolean swapEndianess);
 
-	public static native int intsToBytes(byte[] dest, int[] src, int srcOffset, int destOffset, int elements, boolean swapEndianess);
+	public static native int intsToBytes(byte[] dest, int[] src, int srcOffset, int destOffset, int elements,
+			boolean swapEndianess);
 
-	public static native int longsToBytes(byte[] dest, long[] src, int srcOffset, int destOffset, int elements, boolean swapEndianess);
+	public static native int longsToBytes(byte[] dest, long[] src, int srcOffset, int destOffset, int elements,
+			boolean swapEndianess);
 
-	public static native int floatsToBytes(byte[] dest, float[] src, int srcOffset, int destOffset, int elements, boolean swapEndianess);
+	public static native int floatsToBytes(byte[] dest, float[] src, int srcOffset, int destOffset, int elements,
+			boolean swapEndianess);
 
-	public static native int doublesToBytes(byte[] dest, double[] src, int srcOffset, int destOffset, int elements, boolean swapEndianess);
+	public static native int doublesToBytes(byte[] dest, double[] src, int srcOffset, int destOffset, int elements,
+			boolean swapEndianess);
 
-	public static native int charsToBytes(byte[] dest, char[] src, int srcOffset, int destOffset, int elements, boolean swapEndianess);
+	public static native int charsToBytes(byte[] dest, char[] src, int srcOffset, int destOffset, int elements,
+			boolean swapEndianess);
 
-	public static native int booleansToBytes(byte[] dest, boolean[] src, int srcOffset, int destOffset, int elements, boolean swapEndianess);
+	public static native int booleansToBytes(byte[] dest, boolean[] src, int srcOffset, int destOffset, int elements,
+			boolean swapEndianess);
 
-	public static native int booleansToBytesCompact(byte[] dest, boolean[] src, int srcOffset, int destOffset, int elements);
+	public static native int booleansToBytesCompact(byte[] dest, boolean[] src, int srcOffset, int destOffset,
+			int elements);
 
 	// From array to native memory
 	public static int bytesToNative(long dest, byte[] src, int offset, int elements) {
@@ -116,7 +124,8 @@ public class NativeUtils {
 		return booleansToNative(dest, src, offset, elements, false);
 	}
 
-	private static native int booleansToNative(long dest, boolean[] src, int offset, int elements, boolean swapEndianess);
+	private static native int booleansToNative(long dest, boolean[] src, int offset, int elements,
+			boolean swapEndianess);
 
 	// From native memory to array
 	public static int nativeToBytes(byte[] dest, long src, int offset, int elements) {
@@ -189,7 +198,8 @@ public class NativeUtils {
 
 	public static native int floatsToFWrite(long fd, float[] srcJ, int srcOffset, int elements, boolean swapEndianess);
 
-	public static native int doublesToFWrite(long fd, double[] srcJ, int srcOffset, int elements, boolean swapEndianess);
+	public static native int doublesToFWrite(long fd, double[] srcJ, int srcOffset, int elements,
+			boolean swapEndianess);
 
 	public static native int charsToFWrite(long fd, char[] srcJ, int srcOffset, int elements, boolean swapEndianess);
 
@@ -197,7 +207,8 @@ public class NativeUtils {
 		return booleansToFWrite(fd, srcJ, srcOffset, elements, false);
 	}
 
-	private static native int booleansToFWrite(long fd, boolean[] srcJ, int srcOffset, int elements, boolean swapEndianess);
+	private static native int booleansToFWrite(long fd, boolean[] srcJ, int srcOffset, int elements,
+			boolean swapEndianess);
 
 	public static native int nativeToFWrite(long fd, long src, long bytes);
 
@@ -236,8 +247,8 @@ public class NativeUtils {
 
 	/**
 	 * Copies n bytes from the source address to the destination address<br>
-	 * Both {@code dest} and {@code src} pointers are <b>NOT</b> checked for validity! If they are null or point to memory
-	 * that cannot be read, the Java Virtual Machine will terminate with a memory access violation!!!
+	 * Both {@code dest} and {@code src} pointers are <b>NOT</b> checked for validity! If they are null or point to
+	 * memory that cannot be read, the Java Virtual Machine will terminate with a memory access violation!!!
 	 * 
 	 * @param dest
 	 *            A pointer to copy n bytes to

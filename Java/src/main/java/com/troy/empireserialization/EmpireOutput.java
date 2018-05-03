@@ -18,9 +18,9 @@ import com.troy.empireserialization.util.*;
 public class EmpireOutput implements ObjectOut {
 
 	private Output out;
-	private IntCache<String> stringCache;
-	private IntCache<Class<?>> classCache;
-	private IntCache<Object> objectCache;
+	private IntCache<String> stringCache = new IntCache<String>();
+	private IntCache<Class<?>> classCache = new IntCache<Class<?>>();
+	private IntCache<Object> objectCache = new IntCache<Object>();
 
 	public EmpireOutput(Output out) {
 		this.out = out;
@@ -87,14 +87,17 @@ public class EmpireOutput implements ObjectOut {
 	}
 
 	private <T> void writeObjectImpl(T obj, Class<T> type) {
+		IntValue<Object> objectEntry = objectCache.get(obj);
 		IntValue<Class<?>> classEntry = classCache.get(type);
-		if (classEntry == null) {// We need to define the class and object
+		if (classEntry == null) {// Determine if the class hasn't been written before
+			// We need to define the class and object
 			classCache.add(type, classCache.size());
 
 			out.writeByte(EmpireOpCodes.TYPE_DEF_OBJ_DEF_TYPE);
 			writeTypeDefinition(type);
 			writeObjectDefinition(obj, type);
-		} else {
+		} else {// The class has been written before - we either need to define the fields, or reference the previously
+				// written object
 			IntValue<Object> objEntry = objectCache.get(obj);
 			if (objEntry == null) {// We need to define the object but not the type
 				objectCache.add(obj, objectCache.size());
@@ -169,21 +172,27 @@ public class EmpireOutput implements ObjectOut {
 			if (len == 0) {
 				out.writeByte(EmpireOpCodes.EMPTY_STRING_CONST);
 			} else {
-				StringInfo info = EmpireCharsets.identifyCharset(str, 0, str.length());
-				EmpireCharset charset = info.charset;
-				int opCode = EmpireOpCodes.STRING_TYPE_MAJOR_CODE;
-				opCode |= (charset.getCharsetCode() & 0b11) << 4;
-				boolean lengthFitsIntoOpCode = len < (1 << 4);
-				if (lengthFitsIntoOpCode) {
-					opCode |= len;
+				IntValue<String> cached = stringCache.get(str);
+				if (cached != null) {
+					out.writeByte(EmpireOpCodes.STRING_REF_TYPE);
+					out.writeVLEInt(cached.value);
 				} else {
-					opCode |= 0b0000;
+					StringInfo info = EmpireCharsets.identifyCharset(str, 0, str.length());
+					EmpireCharset charset = info.charset;
+					int opCode = EmpireOpCodes.STRING_TYPE_MAJOR_CODE;
+					opCode |= (charset.getCharsetCode() & 0b11) << 4;
+					boolean lengthFitsIntoOpCode = len < (1 << 4);
+					if (lengthFitsIntoOpCode) {
+						opCode |= len;
+					} else {
+						opCode |= 0b0000;
+					}
+					out.writeByte(opCode);
+					if (!lengthFitsIntoOpCode) {
+						out.writeVLEInt(len);
+					}
+					charset.encode(MiscUtil.getCharsFast(str), out, 0, len, info.info);
 				}
-				out.writeByte(opCode);
-				if (!lengthFitsIntoOpCode) {
-					out.writeVLEInt(len);
-				}
-				charset.encode(MiscUtil.getCharsFast(str), out, 0, len, info.info);
 			}
 		}
 	}

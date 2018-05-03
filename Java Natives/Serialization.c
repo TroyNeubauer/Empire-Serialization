@@ -204,12 +204,11 @@ xToNative(float, swapJfloat)
 xToNative(double, swapJdouble)
 xToNative(char, swapJchar)
 
-//For VLE
-
 JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_shortToVLENative
 (JNIEnv * env, jclass class, jlong addressJ, jshort value) {
 	if (addressJ == NULL) return;
 }
+
 
 JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_intToVLENative
 (JNIEnv * env, jclass class, jlong addressJ, jint value) {
