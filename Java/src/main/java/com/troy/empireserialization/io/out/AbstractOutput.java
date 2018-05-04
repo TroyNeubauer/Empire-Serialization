@@ -330,27 +330,35 @@ public abstract class AbstractOutput implements Output {
 
 	@Override
 	public void writeFloats(float[] src, int offset, int elements) {
-
+		for(int i = offset; i < offset + elements; i++) {
+			writeFloat(src[i]);
+		}
 	}
 
 	@Override
 	public void writeDoubles(double[] src, int offset, int elements) {
-
+		for(int i = offset; i < offset + elements; i++) {
+			writeDouble(src[i]);
+		}
 	}
 
 	@Override
 	public void writeChars(char[] src, int offset, int elements) {
-
+		for(int i = offset; i < offset + elements; i++) {
+			writeChar(src[i]);
+		}
 	}
 
 	@Override
 	public void writeBooleans(boolean[] src, int offset, int elements) {
-
+		for(int i = offset; i < offset + elements; i++) {
+			writeBoolean(src[i]);
+		}
 	}
 
 	@Override
 	public void writeBooleansCompact(boolean[] src, int offset, int elements) {
-
+		//TODO
 	}
 
 	@Override

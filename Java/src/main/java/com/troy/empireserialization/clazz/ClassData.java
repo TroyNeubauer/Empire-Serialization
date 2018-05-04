@@ -3,7 +3,7 @@ package com.troy.empireserialization.clazz;
 import java.lang.reflect.*;
 import java.util.*;
 
-import com.troy.empireserialization.EmpireSerializationSettings;
+import com.troy.empireserialization.SerializationSettings;
 import com.troy.empireserialization.charset.EmpireCharsets;
 import com.troy.empireserialization.io.out.*;
 import com.troy.empireserialization.serializers.FieldType;
@@ -24,15 +24,15 @@ public class ClassData<T> {
 	private byte[] typeDefinition;
 
 	public ClassData(Class<T> type) {
-		this(type, EmpireSerializationSettings.defaultSettings);
+		this(type, SerializationSettings.defaultSettings);
 	}
 
-	public ClassData(Class<T> type, EmpireSerializationSettings settings) {
+	public ClassData(Class<T> type, SerializationSettings settings) {
 		this.type = type;
 		init(settings);
 	}
 
-	private void init(EmpireSerializationSettings settings) {
+	private void init(SerializationSettings settings) {
 		Class<?> superType = type.getSuperclass();
 		if (type == null) {
 		} else {
@@ -92,7 +92,7 @@ public class ClassData<T> {
 		return !Modifier.isStatic(mods) && !Modifier.isTransient(mods);
 	}
 
-	private void writeTypeDefinition(EmpireSerializationSettings settings) {
+	private void writeTypeDefinition(SerializationSettings settings) {
 		ByteArrayOutput out = new ByteArrayOutput();
 		int length = rawFields.length;
 		int bitFieldBytes = (length + 3) / 4;

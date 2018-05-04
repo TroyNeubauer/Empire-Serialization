@@ -3,7 +3,7 @@ package com.troy.empireserialization.serializers;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import com.troy.empireserialization.EmpireSerializationSettings;
+import com.troy.empireserialization.SerializationSettings;
 import com.troy.empireserialization.util.ClassHelper;
 
 public enum FieldType {
@@ -17,10 +17,10 @@ public enum FieldType {
 	}
 
 	public static FieldType identifyFieldType(Field field) {
-		return identifyFieldType(field, EmpireSerializationSettings.defaultSettings);
+		return identifyFieldType(field, SerializationSettings.defaultSettings);
 	}
 
-	public static FieldType identifyFieldType(Field field, EmpireSerializationSettings settings) {
+	public static FieldType identifyFieldType(Field field, SerializationSettings settings) {
 		Class<?> type = field.getDeclaringClass();
 		if (type.isPrimitive())
 			return FieldType.PRIMITIVE;

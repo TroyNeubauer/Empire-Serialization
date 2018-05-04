@@ -1,13 +1,17 @@
 package com.troy.empireserialization;
 
+import java.util.HashMap;
+import java.util.Map.Entry;
+
 /**
  * 
- * See <a href="https://docs.google.com/document/d/1hk4uM8_i8ZAb3smQFcM6dKP8REH3ivORBcV8yDvftxo/edit?usp=sharing">https://docs.google.com</a>
+ * See <a href=
+ * "https://docs.google.com/document/d/1hk4uM8_i8ZAb3smQFcM6dKP8REH3ivORBcV8yDvftxo/edit?usp=sharing">https://docs.google.com</a>
  * 
  * @author Troy Neubauer
  */
-public interface EmpireOpCodes {
-	
+public class EmpireOpCodes {
+
 	//format:off
 	public static final int MAJOR_CODE_MASK 	= 0b11_000000;
 	public static final int MINIOR_CODE_MASK 	= 0b00_111111;
@@ -67,11 +71,53 @@ public interface EmpireOpCodes {
 	public static final int VLE_SIGNED_INT_TYPE 		= 0x28 | GENERAL_OPCODE_MAJOR_CODE;
 	public static final int VLE_SIGNED_LONG_TYPE 		= 0x29 | GENERAL_OPCODE_MAJOR_CODE;
 	
+	public static final int PRIMITIVE_ARRAY_TYPE 		= 0x2A | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int USER_DEFINED_ARRAY_TYPE 	= 0x2B | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int WILD_CARD_ARRAY_TYPE 		= 0x2C | GENERAL_OPCODE_MAJOR_CODE;
+	
 	public static final int HELLO_WORLD_STRING_CONST 	= 0x30 | GENERAL_OPCODE_MAJOR_CODE;
 	public static final int EMPTY_STRING_CONST		 	= 0x31 | GENERAL_OPCODE_MAJOR_CODE;
 	
+	public static final int ARRAY_LIST_TYPE		 		= 0x34 | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int LINKED_LIST_TYPE		 	= 0x34 | GENERAL_OPCODE_MAJOR_CODE;
+	
+	public static final int STACK_TYPE			 		= 0x34 | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int QUEUE_TYPE		 			= 0x34 | GENERAL_OPCODE_MAJOR_CODE;
+	
 	//format:on
-	
-	
-	
+
+	public static final HashMap<Class<?>, Integer> PRIMITIVE_TYPE_MAPPING;;
+	public static final HashMap<Class<?>, Integer> PRIMITIVE_TYPE_VLE_MAPPING;
+
+	static {
+		PRIMITIVE_TYPE_MAPPING = new HashMap<Class<?>, Integer>();
+		PRIMITIVE_TYPE_MAPPING.put(byte.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(short.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(int.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(long.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(float.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(double.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(char.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(boolean.class, SIGNED_BYTE_TYPE);
+
+		PRIMITIVE_TYPE_MAPPING.put(Byte.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Short.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Integer.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Long.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Float.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Double.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Character.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Boolean.class, SIGNED_BYTE_TYPE);
+
+		PRIMITIVE_TYPE_VLE_MAPPING = new HashMap<Class<?>, Integer>(PRIMITIVE_TYPE_MAPPING);
+
+		PRIMITIVE_TYPE_VLE_MAPPING.put(short.class, VLE_SIGNED_SHORT_TYPE);
+		PRIMITIVE_TYPE_VLE_MAPPING.put(int.class, VLE_SIGNED_INT_TYPE);
+		PRIMITIVE_TYPE_VLE_MAPPING.put(long.class, VLE_SIGNED_LONG_TYPE);
+		PRIMITIVE_TYPE_VLE_MAPPING.put(Short.class, VLE_SIGNED_SHORT_TYPE);
+		PRIMITIVE_TYPE_VLE_MAPPING.put(Integer.class, VLE_SIGNED_INT_TYPE);
+		PRIMITIVE_TYPE_VLE_MAPPING.put(Long.class, VLE_SIGNED_LONG_TYPE);
+
+	}
+
 }

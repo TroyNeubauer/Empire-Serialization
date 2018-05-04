@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import com.troy.empireserialization.EmpireOutput;
 import com.troy.empireserialization.io.out.ByteArrayOutput;
 import com.troy.empireserialization.serializers.FieldSerializer;

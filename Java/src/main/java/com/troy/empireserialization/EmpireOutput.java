@@ -3,6 +3,7 @@ package com.troy.empireserialization;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,13 +24,47 @@ public class EmpireOutput implements ObjectOut {
 	private IntCache<String> stringCache = new IntCache<String>();
 	private IntCache<Class<?>> classCache = new IntCache<Class<?>>();
 	private IntCache<Object> objectCache = new IntCache<Object>();
-
-	public EmpireOutput(Output out) {
-		this.out = out;
-	}
+	private SerializationSettings settings;
 
 	public EmpireOutput(File file) {
-		this.out = new NativeFileOutput(file);
+		this(new NativeFileOutput(file), SerializationSettings.defaultSettings);
+	}
+
+	public EmpireOutput(File file, SerializationSettings settings) {
+		this(new NativeFileOutput(file), settings);
+	}
+
+	public EmpireOutput(Output out) {
+		this(out, SerializationSettings.defaultSettings);
+	}
+
+	public EmpireOutput(Output out, SerializationSettings settings) {
+		this.out = out;
+		setSettings(settings);
+	}
+
+	private void setSettings(SerializationSettings newSettings) {
+		SerializationSettings oldSettings = this.settings;
+		this.settings = newSettings;
+
+		out.setByteOrder(settings.useLittleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+		boolean pluginsPresent = pluginsPresent();
+		if (newSettings.getFlagsData(pluginsPresent) != newSettings.getFlagsData(pluginsPresent)) {
+			writeFlags();
+		}
+	}
+
+	// Let subclasses override this in case they want to use plugins
+	protected boolean pluginsPresent() {
+		return false;
+	}
+
+	private void writeFlags() {
+
+	}
+
+	private boolean requireRewrite(SerializationSettings newSettings, SerializationSettings oldSettings) {
+		return false;
 	}
 
 	public <T> void writeObject(T obj) {
@@ -222,18 +257,71 @@ public class EmpireOutput implements ObjectOut {
 
 	@Override
 	public <T> void writeList(List<T> list, Class<List<?>> type) {
+		int size = list.size();
 		if (list instanceof LinkedList) {
-			for (Object element : list) {
-
-			}
+			out.writeByte(EmpireOpCodes.LINKED_LIST_TYPE);
 		} else if (list instanceof ArrayList) {
-			int size = list.size();
-			Object[] listData;
-			if (list instanceof ArrayList) {
-				listData = ReflectionUtils.getData((ArrayList<?>) list);
+			out.writeByte(EmpireOpCodes.ARRAY_LIST_TYPE);
+			Object[] listData = ReflectionUtils.getData((ArrayList<?>) list);
+			Class<?> lastType = null;
+			boolean sameType = true;
+			for (int i = 0; i < size; i++) {
+				Object obj = listData[i];
+				Class<?> currentType = obj.getClass();
+				if (lastType != null) {
+					if (lastType != currentType) {
+						sameType = false;
+						break;
+					}
+				}
+				lastType = currentType;
 			}
+
+			if (sameType) {
+				Class<?> elementType = listData[0].getClass();
+				writeTypeComplete(elementType);
+				for (int i = 0; i < size; i++) {
+					Object obj = listData[i];
+				}
+			} else {
+				for (int i = 0; i < size; i++) {
+
+				}
+			}
+
+		}
+	}
+
+	/**
+	 * Writes a full type descriptor for all types, primitive, user defined, writes a full type definition for a non
+	 * primitive type if nesscary
+	 * 
+	 * @param elementType
+	 */
+	private void writeTypeComplete(Class<?> type) {
+		int opcode;
+		//format:off
+		if (type.isPrimitive() 
+				|| type == Byte.class 		|| type == Short.class 
+				|| type == Integer.class 	|| type == Long.class 
+				|| type == Float.class 		|| type == Double.class 
+				|| type == Character.class 	|| type == Boolean.class) {
+			//format:on
+			opcode = EmpireConstants.PRIMITIVE_TYPE;
+			if (settings.useVLE) {
+				opcode |= EmpireOpCodes.PRIMITIVE_TYPE_VLE_MAPPING.get(type);
+			} else {
+				opcode |= EmpireOpCodes.PRIMITIVE_TYPE_MAPPING.get(type);
+			}
+			out.writeByte(opcode);
 		} else {
-			writeObjectImpl(list, type);
+			opcode = EmpireConstants.USER_DEFINED_TYPE;
+			 IntValue<Class<?>> entry = classCache.get(type);
+			 if(entry == null) {
+				 
+			 } else {
+				 int typeID = entry.value;
+			 }
 		}
 	}
 
