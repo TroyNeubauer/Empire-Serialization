@@ -24,6 +24,7 @@ public class Main {
 		
 		EmpireOutput eo = new EmpireOutput(out);
 		eo.writeObject(sup);
+
 		
 		System.out.println(StringFormatter.toBinaryString(out.getBuffer()));
 		eo.close();
