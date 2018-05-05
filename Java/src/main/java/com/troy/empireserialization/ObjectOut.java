@@ -51,7 +51,7 @@ public interface ObjectOut extends Flushable, AutoCloseable {
 	
 	/**
 	 * Handles cases where the user passes a "primitive" into the write object method as an object 
-	 * (ie a set, list, map, Integer, Float, Character)
+	 * (ie a string, set, list, map)
 	 * This method only checks the primitive non wrapper classes.
 	 * 
 	 * @return {@code true} If the type passed in was a primitive and was written using the correct writeX() method

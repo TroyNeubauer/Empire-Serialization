@@ -122,13 +122,16 @@ public class EmpireOutput implements ObjectOut {
 		}
 		return checkForPrimitiveFast(obj, clazz);
 	}
+	
+	private void registerClass(Class<?> type) {
+		classCache.add(type, classCache.size() + 1);// Start with id #1
+	}
 
 	private void writeObjectImpl(Object obj, Class<?> type) {
 		IntValue<Class<?>> classEntry = classCache.get(type);
 		if (classEntry == null) {// Determine if the class hasn't been written before
 			// We need to define the class and object
-			classCache.add(type, classCache.size());
-
+			registerClass(type);
 			out.writeByte(EmpireOpCodes.TYPE_DEF_OBJ_DEF_TYPE);
 			writeTypeDefinition(type);
 			writeObjectDefinition(obj);
@@ -291,7 +294,7 @@ public class EmpireOutput implements ObjectOut {
 
 		}
 	}
-	
+
 	@Override
 	public void writeSet(Set<?> set) {
 		// TODO Auto-generated method stub
@@ -310,15 +313,9 @@ public class EmpireOutput implements ObjectOut {
 	 * 
 	 * @param elementType
 	 */
-	private void writeTypeComplete(Class<?> type) {
+	public void writeTypeComplete(Class<?> type) {
 		int opcode;
-		//format:off
-		if (type.isPrimitive() 
-				|| type == Byte.class 		|| type == Short.class 
-				|| type == Integer.class 	|| type == Long.class 
-				|| type == Float.class 		|| type == Double.class 
-				|| type == Character.class 	|| type == Boolean.class) {
-			//format:on
+		if (ClassHelper.isPrimitive(type)) {
 			opcode = EmpireConstants.PRIMITIVE_TYPE;
 			if (settings.useVLE) {
 				opcode |= EmpireOpCodes.PRIMITIVE_TYPE_VLE_MAPPING.get(type);
@@ -329,10 +326,27 @@ public class EmpireOutput implements ObjectOut {
 		} else {
 			opcode = EmpireConstants.USER_DEFINED_TYPE;
 			IntValue<Class<?>> entry = classCache.get(type);
+			boolean idFitsInOpCode = true;
+			int typeID = -1;
 			if (entry == null) {
-
+				opcode |= EmpireConstants.TYPE_DEF_TYPE;
 			} else {
-				int typeID = entry.value;
+				opcode |= EmpireConstants.TYPE_REF_TYPE;
+				typeID = entry.value;
+				idFitsInOpCode = typeID < EmpireConstants.TYPE_DEF_TYPE;
+				if (idFitsInOpCode) {
+					opcode |= typeID;
+				} else {
+					opcode |= 0b000000;// Zero indicates that we will encode the Id after the opcode using VLE
+				}
+			}
+			out.writeByte(opcode);
+			if (!idFitsInOpCode) {
+				out.writeVLEInt(typeID);
+			}
+			if(entry == null) {
+				registerClass(type);
+				writeTypeDefinition(type);
 			}
 		}
 	}

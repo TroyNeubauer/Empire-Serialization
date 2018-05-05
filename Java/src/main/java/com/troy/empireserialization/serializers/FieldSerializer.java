@@ -7,7 +7,6 @@ import com.troy.empireserialization.ObjectOut;
 import com.troy.empireserialization.io.in.Input;
 import com.troy.empireserialization.io.out.Output;
 import com.troy.empireserialization.util.MiscUtil;
-import com.troy.empireserialization.util.NativeUtils;
 
 import sun.misc.Unsafe;
 
@@ -72,8 +71,8 @@ public class FieldSerializer<T> extends AbstractSerializer<T> {
 					} catch (IllegalArgumentException | IllegalAccessException e) {
 						throw new RuntimeException(e);
 					}
-					if(objectOut.checkForPrimitiveSlow(fieldObject, (Class<T>) type)) {
-						
+					if (objectOut.checkForPrimitiveFast(fieldObject, type)) {
+						continue;// We were able to write the "primitive"
 					}
 					if (type.isArray()) {
 						Class<?> baseType = type.getComponentType();
@@ -93,7 +92,7 @@ public class FieldSerializer<T> extends AbstractSerializer<T> {
 	}
 
 	@Override
-	public T readFields(ObjectIn out, Object obj, Input in) {
-		return null;
+	public void readFields(ObjectIn out, T obj, Input in, Class<T> type) {
+
 	}
 }

@@ -40,6 +40,11 @@ public class OutputStreamOutput extends AbstractOutput {
 	}
 
 	@Override
+	public void setBufferPosition(int newPosition) {
+		throw new NoBufferException();
+	}
+
+	@Override
 	public byte[] getBuffer() {
 		throw new NoBufferException();
 	}
@@ -48,7 +53,7 @@ public class OutputStreamOutput extends AbstractOutput {
 	public void require(long bytes) {
 		// Nop
 	}
-	
+
 	@Override
 	public void addRequired() {
 		// Nop
@@ -87,7 +92,7 @@ public class OutputStreamOutput extends AbstractOutput {
 			throw new EmpireSerializationIOException(e);
 		}
 	}
-	
+
 	@Override
 	public void writeShorts(short[] src, int offset, int bytes) {
 	}
@@ -132,7 +137,8 @@ public class OutputStreamOutput extends AbstractOutput {
 
 	@Override
 	public void unmap(NativeMemoryBlock block) {
-		if(block.position() > Integer.MAX_VALUE) NativeUtils.throwByteIndexOutOfBounds();
+		if (block.position() > Integer.MAX_VALUE)
+			NativeUtils.throwByteIndexOutOfBounds();
 		int size = (int) block.position();
 		byte[] temp = ByteArrayPool.aquire(size);
 		NativeUtils.nativeToBytes(temp, block.address(), 0, size);
@@ -150,9 +156,6 @@ public class OutputStreamOutput extends AbstractOutput {
 
 	@Override
 	public boolean isNative() {
-		return false;//NO
+		return false;// NO
 	}
-
-
-
 }
