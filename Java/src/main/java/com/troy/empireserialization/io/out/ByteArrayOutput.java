@@ -50,6 +50,12 @@ public class ByteArrayOutput extends AbstractOutput {
 	public int getBufferPosition() {
 		return position;
 	}
+	
+	@Override
+	public void setBufferPosition(int newPosition) {
+		if(newPosition < 0 || newPosition >= buffer.length) throw new IllegalArgumentException("New position out of range! " + newPosition);
+		this.position = newPosition;
+	}
 
 	@Override
 	public byte[] getBuffer() {

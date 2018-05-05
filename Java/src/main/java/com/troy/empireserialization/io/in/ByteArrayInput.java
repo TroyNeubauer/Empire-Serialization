@@ -35,9 +35,9 @@ public class ByteArrayInput extends AbstractInput {
 
 	@Override
 	public NativeMemoryBlock map(long bytes) {
-		//Will throw an exception if there aren't x unconsumed bytes
+		// Will throw an exception if there aren't x unconsumed bytes
 		require(bytes);
-		if(block == null) {
+		if (block == null) {
 			block = MasterMemoryBlock.allocate(bytes);
 		} else {
 			block.require(bytes);
@@ -63,8 +63,16 @@ public class ByteArrayInput extends AbstractInput {
 	}
 
 	@Override
+	public void setBufferPosition(int newPosition) {
+		if (newPosition < 0 || newPosition >= buffer.length)
+			throw new IllegalArgumentException("New position out of range! " + newPosition);
+		this.position = newPosition;
+	}
+
+	@Override
 	public byte[] getBuffer() {
-		if(buffer == null) throw new AlreadyClosedException();
+		if (buffer == null)
+			throw new AlreadyClosedException();
 		return buffer;
 	}
 
@@ -83,7 +91,7 @@ public class ByteArrayInput extends AbstractInput {
 	@Override
 	public void readBytes(byte[] dest, int offset, int count) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

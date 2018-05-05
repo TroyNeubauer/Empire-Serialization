@@ -38,7 +38,7 @@ public interface EmpireIO extends Closeable {
 	 * Returns the current offset used with the internal buffer. If no buffer is present, a {@link NoBufferException}
 	 * will be thrown.
 	 * 
-	 * @return The offset in bytes if the buffer used
+	 * @return The offset in bytes if the buffer buffer is present
 	 * @throws NoBufferException
 	 *             If the implemenentation of this IO does not buffered by a java byte array
 	 * @throws AlreadyClosedException
@@ -46,6 +46,18 @@ public interface EmpireIO extends Closeable {
 	 * @see #hasBuffer()
 	 */
 	public int getBufferPosition();
+	
+	/**
+	 * Sets the current offset used with the internal buffer. If no buffer is present, a {@link NoBufferException}
+	 * will be thrown.
+	 * 
+	 * @throws NoBufferException
+	 *             If the implemenentation of this IO does not buffered by a java byte array
+	 * @throws AlreadyClosedException
+	 *             If {@link #close()} has already been called on this IO.
+	 * @see #hasBuffer()
+	 */
+	public void setBufferPosition(int newPosition);
 
 	/**
 	 * Returns the byte array backing this IO. If no buffer is present, a {@link NoBufferException} will be thrown.

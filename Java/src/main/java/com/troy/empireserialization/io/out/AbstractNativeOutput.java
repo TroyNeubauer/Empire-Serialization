@@ -1,5 +1,6 @@
 package com.troy.empireserialization.io.out;
 
+import com.troy.empireserialization.exception.NoBufferException;
 import com.troy.empireserialization.util.*;
 
 import sun.misc.Cleaner;
@@ -35,6 +36,26 @@ public abstract class AbstractNativeOutput<Deallocator extends Runnable> extends
 	@Override
 	public boolean isNative() {
 		return true;// Hell yeah we are!
+	}
+
+	@Override
+	public void setBufferPosition(int newPosition) {
+		throw new NoBufferException();
+	}
+
+	@Override
+	public boolean hasBuffer() {
+		return false;
+	}
+
+	@Override
+	public int getBufferPosition() {
+		throw new NoBufferException();
+	}
+
+	@Override
+	public byte[] getBuffer() {
+		throw new NoBufferException();
 	}
 
 }

@@ -130,21 +130,6 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.empireserial
 	}
 
 	@Override
-	public boolean hasBuffer() {
-		return false;
-	}
-
-	@Override
-	public int getBufferPosition() {
-		throw new NoBufferException();
-	}
-
-	@Override
-	public byte[] getBuffer() {
-		throw new NoBufferException();
-	}
-
-	@Override
 	public void require(long bytes) {
 		// fwrite does everything for us so we don't need to insure anything
 	}

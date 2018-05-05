@@ -1,10 +1,11 @@
 package com.troy.empireserialization.io.out;
 
-import com.troy.empireserialization.*;
-import com.troy.empireserialization.exception.*;
+import com.troy.empireserialization.exception.NoBufferException;
 import com.troy.empireserialization.memory.MasterMemoryBlock;
 import com.troy.empireserialization.memory.NativeMemoryBlock;
-import com.troy.empireserialization.util.*;
+import com.troy.empireserialization.util.MiscUtil;
+import com.troy.empireserialization.util.NativeUtils;
+import com.troy.empireserialization.util.SerializationUtils;
 
 import sun.misc.Unsafe;
 
@@ -56,23 +57,6 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 	}
 
 	@Override
-	public boolean hasBuffer() {
-		return impl.position < Integer.MAX_VALUE;
-	}
-
-	@Override
-	public int getBufferPosition() {
-		if (impl.position >= Integer.MAX_VALUE)
-			throw new NoBufferException();
-		return (int) impl.position;
-	}
-
-	@Override
-	public byte[] getBuffer() {
-		throw new NoBufferException();
-	}
-
-	@Override
 	public void require(long bytes) {
 		impl.require(bytes);
 		requested = bytes;
@@ -90,7 +74,8 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 			NativeUtils.bytesToNative(impl.address + impl.position, src, offset, elements);
 			addRequired();
 		} else {
-			super.writeBytes(src, offset, elements);// The superclass increments position so we're ok without addRequired();
+			super.writeBytes(src, offset, elements);// The superclass increments position so we're ok without
+													// addRequired();
 		}
 	}
 
@@ -101,7 +86,8 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 			NativeUtils.shortsToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
-			super.writeShorts(src, offset, elements);// The superclass increments position so we're ok without addRequired();
+			super.writeShorts(src, offset, elements);// The superclass increments position so we're ok without
+														// addRequired();
 		}
 	}
 
@@ -112,7 +98,8 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 			NativeUtils.intsToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
-			super.writeInts(src, offset, elements);// The superclass increments position so we're ok without addRequired();
+			super.writeInts(src, offset, elements);// The superclass increments position so we're ok without
+													// addRequired();
 		}
 	}
 
@@ -123,7 +110,8 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 			NativeUtils.longsToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
-			super.writeLongs(src, offset, elements);// The superclass increments position so we're ok without addRequired();
+			super.writeLongs(src, offset, elements);// The superclass increments position so we're ok without
+													// addRequired();
 		}
 	}
 
@@ -134,7 +122,8 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 			NativeUtils.floatsToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
-			super.writeFloats(src, offset, elements);// The superclass increments position so we're ok without addRequired();
+			super.writeFloats(src, offset, elements);// The superclass increments position so we're ok without
+														// addRequired();
 		}
 	}
 
@@ -145,7 +134,8 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 			NativeUtils.doublesToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
-			super.writeDoubles(src, offset, elements);// The superclass increments position so we're ok without addRequired();
+			super.writeDoubles(src, offset, elements);// The superclass increments position so we're ok without
+														// addRequired();
 		}
 	}
 
@@ -156,7 +146,8 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 			NativeUtils.charsToNative(impl.address + impl.position, src, offset, elements, swapEndinessInNative());
 			addRequired();
 		} else {
-			super.writeChars(src, offset, elements);// The superclass increments position so we're ok without addRequired();
+			super.writeChars(src, offset, elements);// The superclass increments position so we're ok without
+													// addRequired();
 		}
 	}
 
@@ -167,13 +158,15 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 			NativeUtils.booleansToNative(impl.address + impl.position, src, offset, elements);
 			addRequired();
 		} else {
-			super.writeBooleans(src, offset, elements);// The superclass increments position so we're ok without addRequired();
+			super.writeBooleans(src, offset, elements);// The superclass increments position so we're ok without
+														// addRequired();
 		}
 	}
 
 	@Override
 	public void writeBooleansCompact(boolean[] src, int offset, int elements) {
-		super.writeBooleansCompact(src, offset, elements);// The superclass increments position so we're ok without addRequired();
+		super.writeBooleansCompact(src, offset, elements);// The superclass increments position so we're ok without
+															// addRequired();
 	}
 
 	@Override
@@ -187,7 +180,7 @@ public class NativeOutput extends AbstractNativeOutput<com.troy.empireserializat
 		// Only add to position
 		impl.position += block.position();
 	}
-	
+
 	/**
 	 * Returns the address of the buffer used by this out
 	 */

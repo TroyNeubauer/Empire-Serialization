@@ -52,7 +52,8 @@ public class InputStreamInput extends AbstractInput {
 		try {
 			try {
 				block = MasterMemoryBlock.allocate(bytes);
-				System.out.println("allocated " + bytes + " for the native buffer. Temp buffer " + temp.length + "bytes");
+				System.out
+						.println("allocated " + bytes + " for the native buffer. Temp buffer " + temp.length + "bytes");
 				int read = 0;
 				long total = 0;
 				while (total < bytes) {
@@ -84,7 +85,7 @@ public class InputStreamInput extends AbstractInput {
 	@Override
 	public void unmap(NativeMemoryBlock block) {
 		block.setPosition(0);
-		
+
 	}
 
 	@Override
@@ -94,6 +95,11 @@ public class InputStreamInput extends AbstractInput {
 
 	@Override
 	public int getBufferPosition() {
+		throw new NoBufferException();
+	}
+
+	@Override
+	public void setBufferPosition(int newPosition) {
 		throw new NoBufferException();
 	}
 
@@ -120,8 +126,13 @@ public class InputStreamInput extends AbstractInput {
 
 	@Override
 	public void readBytes(byte[] dest, int offset, int count) {
-		// TODO Auto-generated method stub
-		
+		try {
+			in.read(dest, offset, count);
+		} catch (NullPointerException e) {
+			throw new AlreadyClosedException();
+		} catch (IOException e) {
+			throw new EmpireSerializationIOException(e);
+		}
 	}
 
 }
