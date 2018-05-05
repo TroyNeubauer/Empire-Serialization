@@ -1,7 +1,9 @@
 package com.troy.empireserialization;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * 
@@ -31,7 +33,7 @@ public class EmpireOpCodes {
 	public static final int BOOLEAN_FALSE_CONST 		= 0x06 | GENERAL_OPCODE_MAJOR_CODE;
 	public static final int BOOLEAN_TRUE_CONST 			= 0x07 | GENERAL_OPCODE_MAJOR_CODE;
 	
-	//8 Unassigned
+	public static final int STRING_TYPE 				= 0x08 | GENERAL_OPCODE_MAJOR_CODE;
 	//9 Unassigned
 	public static final int UNSIGNED_BYTE_TYPE 			= 0x0A | GENERAL_OPCODE_MAJOR_CODE;
 	public static final int UNSIGNED_SHORT_TYPE 		= 0x0B | GENERAL_OPCODE_MAJOR_CODE;
@@ -92,22 +94,27 @@ public class EmpireOpCodes {
 	static {
 		PRIMITIVE_TYPE_MAPPING = new HashMap<Class<?>, Integer>();
 		PRIMITIVE_TYPE_MAPPING.put(byte.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(short.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(int.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(long.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(float.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(double.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(char.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(boolean.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(short.class, SIGNED_SHORT_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(int.class, SIGNED_INT_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(long.class, SIGNED_LONG_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(float.class, FLOAT_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(double.class, DOUBLE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(char.class, UNSIGNED_SHORT_TYPE);
 
 		PRIMITIVE_TYPE_MAPPING.put(Byte.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(Short.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(Integer.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(Long.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(Float.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(Double.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(Character.class, SIGNED_BYTE_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(Boolean.class, SIGNED_BYTE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Short.class, SIGNED_SHORT_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Integer.class, SIGNED_INT_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Long.class, SIGNED_LONG_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Float.class, FLOAT_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Double.class, DOUBLE_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Character.class, SIGNED_SHORT_TYPE);
+		
+		PRIMITIVE_TYPE_MAPPING.put(String.class, STRING_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(LinkedList.class, LINKED_LIST_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(ArrayList.class, ARRAY_LIST_TYPE);
+		//PRIMITIVE_TYPE_MAPPING.put(Set.class, SET_TYPE);
+		//PRIMITIVE_TYPE_MAPPING.put(Map.class, MAP_TYPE);
+		
 
 		PRIMITIVE_TYPE_VLE_MAPPING = new HashMap<Class<?>, Integer>(PRIMITIVE_TYPE_MAPPING);
 
