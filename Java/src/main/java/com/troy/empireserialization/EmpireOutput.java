@@ -67,35 +67,35 @@ public class EmpireOutput implements ObjectOut {
 		return false;
 	}
 
-	public <T> void writeObject(T obj) {
-		Class<T> clazz = (Class<T>) obj.getClass();
-		if (checkForPrimitive(obj, clazz))
+	public void writeObject(Object obj) {
+		Class<?> clazz = (Class<?>) obj.getClass();
+		if (checkForPrimitiveSlow(obj, clazz))
 			return;
 		else
 			writeObjectImpl(obj, clazz);
 
 	}
 
-	/**
-	 * Handles cases where the user passes a "primitive" into the write object method
-	 * 
-	 * @return {@code true} If the type passed in was a primitive and was written using the correct writeX() method
-	 *         {@code false} otherwise
-	 */
-	private <T> boolean checkForPrimitive(T obj, Class<T> clazz) {
+	public boolean checkForPrimitiveFast(Object obj, Class<?> clazz) {
 		if (clazz == String.class) {
 			writeString((String) obj);
 			return true;
 		} else if (List.class.isAssignableFrom(clazz)) {
-			writeList((List<T>) obj, (Class<List<?>>) clazz);
+			writeList((List<?>) obj);
 			return true;
 		} else if (Set.class.isAssignableFrom(clazz)) {
-			writeSet((Set<?>) obj, (Class<Set<?>>) clazz);
+			writeSet((Set<?>) obj);
 			return true;
 		} else if (Map.class.isAssignableFrom(clazz)) {
-			writeMap((Map<?, ?>) obj, (Class<Map<?, ?>>) clazz);
+			writeMap((Map<?, ?>) obj);
 			return true;
-		} else if (clazz == Byte.class) {
+		}
+		return false;
+	}
+
+	public boolean checkForPrimitiveSlow(Object obj, Class<?> clazz) {
+		// Ew! Wrapper classes
+		if (clazz == Byte.class) {
 			writeByte(((Byte) obj).byteValue());
 			return true;
 		} else if (clazz == Short.class) {
@@ -120,10 +120,10 @@ public class EmpireOutput implements ObjectOut {
 			writeBoolean(((Boolean) obj).booleanValue());
 			return true;
 		}
-		return false;
+		return checkForPrimitiveFast(obj, clazz);
 	}
 
-	private <T> void writeObjectImpl(T obj, Class<T> type) {
+	private void writeObjectImpl(Object obj, Class<?> type) {
 		IntValue<Class<?>> classEntry = classCache.get(type);
 		if (classEntry == null) {// Determine if the class hasn't been written before
 			// We need to define the class and object
@@ -131,7 +131,7 @@ public class EmpireOutput implements ObjectOut {
 
 			out.writeByte(EmpireOpCodes.TYPE_DEF_OBJ_DEF_TYPE);
 			writeTypeDefinition(type);
-			writeObjectDefinition(obj, type);
+			writeObjectDefinition(obj);
 		} else {// The class has been written before - we either need to define the fields, or reference the previously
 				// written object
 			IntValue<Object> objEntry = objectCache.get(obj);
@@ -141,7 +141,7 @@ public class EmpireOutput implements ObjectOut {
 				out.writeByte(EmpireOpCodes.TYPE_REF_OBJ_DEF_TYPE);
 				// Write the type's id
 				out.writeVLEInt(classEntry.value);
-				writeObjectDefinition(obj, type);
+				writeObjectDefinition(obj);
 			} else {// The object already exists so just reference it
 				out.writeByte(EmpireOpCodes.OBJ_REF_TYPE);
 				// Write only the object's id
@@ -150,12 +150,12 @@ public class EmpireOutput implements ObjectOut {
 		}
 	}
 
-	private <T> void writeObjectDefinition(T obj, Class<T> type) {
-		Serializer<T> serializer = Serializers.getSerializer(type);
+	private <T> void writeObjectDefinition(T obj) {
+		Serializer<T> serializer = Serializers.getSerializer((Class<T>) obj.getClass());
 		serializer.writeFields(this, obj, out);
 	}
 
-	private <T> void writeTypeDefinition(Class<T> type) {
+	private void writeTypeDefinition(Class<?> type) {
 		Serializers.getSerializer(type).writeTypeDefinition(out);
 	}
 
@@ -256,7 +256,7 @@ public class EmpireOutput implements ObjectOut {
 	}
 
 	@Override
-	public <T> void writeList(List<T> list, Class<List<?>> type) {
+	public void writeList(List<?> list) {
 		int size = list.size();
 		if (list instanceof LinkedList) {
 			out.writeByte(EmpireOpCodes.LINKED_LIST_TYPE);
@@ -291,10 +291,22 @@ public class EmpireOutput implements ObjectOut {
 
 		}
 	}
+	
+	@Override
+	public void writeSet(Set<?> set) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void writeMap(Map<?, ?> map) {
+		// TODO Auto-generated method stub
+
+	}
 
 	/**
 	 * Writes a full type descriptor for all types, primitive, user defined, writes a full type definition for a non
-	 * primitive type if nesscary
+	 * primitive type if necessary
 	 * 
 	 * @param elementType
 	 */
@@ -316,25 +328,13 @@ public class EmpireOutput implements ObjectOut {
 			out.writeByte(opcode);
 		} else {
 			opcode = EmpireConstants.USER_DEFINED_TYPE;
-			 IntValue<Class<?>> entry = classCache.get(type);
-			 if(entry == null) {
-				 
-			 } else {
-				 int typeID = entry.value;
-			 }
+			IntValue<Class<?>> entry = classCache.get(type);
+			if (entry == null) {
+
+			} else {
+				int typeID = entry.value;
+			}
 		}
-	}
-
-	@Override
-	public <T> void writeSet(Set<T> set, Class<Set<?>> type) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public <K, V> void writeMap(Map<K, V> map, Class<Map<?, ?>> type) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override

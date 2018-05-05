@@ -6,7 +6,7 @@ import java.util.*;
 
 public interface ObjectOut extends Flushable, AutoCloseable {
 
-	public <T> void writeObject(T obj);
+	public void writeObject(Object obj);
 
 	// For writing "primitives"
 
@@ -34,11 +34,30 @@ public interface ObjectOut extends Flushable, AutoCloseable {
 
 	public void writeArray(Object[] array);
 
-	public <T> void writeList(List<T> list, Class<List<?>> type);
+	public void writeList(List<?> list);
 
-	public <T> void writeSet(Set<T> set, Class<Set<?>> type);
+	public void writeSet(Set<?> set);
 
-	public <K, V> void writeMap(Map<K, V> map, Class<Map<?, ?>> type);
+	public void writeMap(Map<?, ?> map);
+	
+	/**
+	 * Handles cases where the user passes a "primitive" into the write object method as an object 
+	 * (ie a set, list, map, Integer, Float, Character)
+	 * This ,method checks all primitives as opposed to {@link #checkForPrimitiveFast(Object, Class)}
+	 * @return {@code true} If the type passed in was a primitive and was written using the correct writeX() method
+	 *         {@code false} otherwise
+	 */
+	public boolean checkForPrimitiveSlow(Object obj, Class<?> clazz);
+	
+	/**
+	 * Handles cases where the user passes a "primitive" into the write object method as an object 
+	 * (ie a set, list, map, Integer, Float, Character)
+	 * This method only checks the primitive non wrapper classes.
+	 * 
+	 * @return {@code true} If the type passed in was a primitive and was written using the correct writeX() method
+	 *         {@code false} otherwise
+	 */
+	public boolean checkForPrimitiveFast(Object obj, Class<?> clazz);
 
 	public void flush();
 
