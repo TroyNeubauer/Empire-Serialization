@@ -14,12 +14,12 @@ import sun.misc.*;
 public class ClassData<T> {
 	private static final Unsafe unsafe = MiscUtil.getUnsafe();
 
-	private Class<?> type;
+	private final Class<?> type;
 
-	private Field[] rawFields;
-	private String[] fieldNames;
-	private Class<?>[] fieldTypes;
-	private long[] fieldOffsets;
+	public Field[] rawFields;
+	public String[] fieldNames;
+	public Class<?>[] fieldTypes;
+	public long[] fieldOffsets;
 
 	private byte[] typeDefinition;
 
@@ -114,10 +114,10 @@ public class ClassData<T> {
 	}
 
 	private void addField(Field field, int index) {
+		field.setAccessible(true);
 		rawFields[index] = field;
 		fieldNames[index] = field.getName();
 		fieldTypes[index] = field.getType();
-		System.out.println(field);
 		if (unsafe != null)
 			fieldOffsets[index] = unsafe.objectFieldOffset(field);
 	}

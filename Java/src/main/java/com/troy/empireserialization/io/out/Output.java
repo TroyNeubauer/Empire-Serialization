@@ -251,5 +251,15 @@ public interface Output extends EmpireIO, ArrayOutput, Flushable {
 	}
 
 	public void writeBytes(byte[] src, int offset, int bytes);
+	
+	/**
+	 * Returns {@code true} if this is internally backed by some native IO, {@code false} otherwise. 
+	 * If this method returns true, using {@link #map(long)} will be very efficient and desired.
+	 * If this method returns false, it doesn't mean that {@link #map(long)} shouldn't be used, 
+	 * (in most cases for large data sets it will be faster) it only means to serve as a hint for optimization
+	 * 
+	 * @return Weather or not this Output is backed by some native IO.
+	 */
+	public boolean isNative();
 
 }

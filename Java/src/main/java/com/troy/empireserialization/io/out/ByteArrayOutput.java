@@ -208,4 +208,9 @@ public class ByteArrayOutput extends AbstractOutput {
 		position += block.position();
 		block.setPosition(0);
 	}
+
+	@Override
+	public boolean isNative() {
+		return false;//We use a Java array. So no
+	}
 }

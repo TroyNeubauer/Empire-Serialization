@@ -29,7 +29,7 @@ public interface Serializer<T> {
 	 * @param in
 	 *            The input to read from
 	 */
-	public T readFields(ObjectIn objIn, Object obj, Input in);
+	public T readFields(ObjectIn objIn, T obj, Input in);
 
 	/**
 	 * Returns a new instance of the type represented by this serializer. If an instance cannot be created by this

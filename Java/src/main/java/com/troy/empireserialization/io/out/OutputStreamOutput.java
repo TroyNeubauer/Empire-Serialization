@@ -148,6 +148,11 @@ public class OutputStreamOutput extends AbstractOutput {
 		block.setPosition(0);
 	}
 
+	@Override
+	public boolean isNative() {
+		return false;//NO
+	}
+
 
 
 }

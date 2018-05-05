@@ -21,15 +21,16 @@ public enum FieldType {
 	}
 
 	public static FieldType identifyFieldType(Field field, SerializationSettings settings) {
-		Class<?> type = field.getDeclaringClass();
-		if (type.isPrimitive())
+		Class<?> clazz = field.getDeclaringClass();
+		Class<?> type = field.getType();
+		if (type.isPrimitive() || ClassHelper.isPrimitive(type))
 			return FieldType.PRIMITIVE;
-		if (Modifier.isFinal(type.getModifiers()))
+		if (Modifier.isFinal(clazz.getModifiers()))
 			return FieldType.USER_DEFINED;
-		if (type == Object.class)
+		if (clazz == Object.class)
 			return FieldType.WILDCARD;
 		if (settings.inferFinalClasses) {
-			if (ClassHelper.hasSubClass(type))
+			if (ClassHelper.hasSubClass(clazz))
 				return FieldType.WILDCARD;
 			else
 				return FieldType.USER_DEFINED;

@@ -2,6 +2,8 @@ package com.troy.empireserialization.util;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -35,7 +37,7 @@ public class ClassHelper {
 		provider.addIncludeFilter(new AssignableTypeFilter(type));
 
 		String name = type.getName();
-		String binaryPackage = name.substring(0, name.lastIndexOf('.')).replaceAll(".", "/");
+		String binaryPackage = name.substring(0, name.lastIndexOf('.')).replaceAll("\\.", "/");
 		Set<BeanDefinition> components = provider.findCandidateComponents(binaryPackage);
 		boolean hasSubclass = false;
 		for (BeanDefinition component : components) {
@@ -50,5 +52,11 @@ public class ClassHelper {
 
 		CACHE.put(type, Boolean.valueOf(hasSubclass));
 		return hasSubclass;
+	}
+
+	public static boolean isPrimitive(Class<?> type) {
+		return type.isPrimitive() || type == String.class || type == Integer.class || type == Long.class || type == Float.class
+				|| type == Double.class || type == Short.class || type == Byte.class || type == Character.class
+				|| type == Boolean.class || List.class.isAssignableFrom(type) || Set.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type);
 	}
 }

@@ -13,16 +13,16 @@ public abstract class AbstractNativeOutput<Deallocator extends Runnable> extends
 		cleaner = Cleaner.create(this, new AbstractNativeOutputRunnable());
 		this.deallocator = deallocator;
 	}
-	
+
 	private class AbstractNativeOutputRunnable implements Runnable {
 		@Override
 		public void run() {
 			deallocator.run();
 			InternalLog.log("Releasing native output " + this);
 		}
-		
+
 	}
-	
+
 	protected Deallocator getDeallocator() {
 		return deallocator;
 	}
@@ -30,6 +30,11 @@ public abstract class AbstractNativeOutput<Deallocator extends Runnable> extends
 	@Override
 	public void close() {
 		cleaner.clean();
+	}
+
+	@Override
+	public boolean isNative() {
+		return true;// Hell yeah we are!
 	}
 
 }

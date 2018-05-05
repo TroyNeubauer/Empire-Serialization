@@ -1,15 +1,35 @@
 package com.troy.empireserialization.io.out;
 
+import static com.troy.empireserialization.util.NativeUtils.booleanToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.booleansToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.byteToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.bytesToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.charToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.charsToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.doubleToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.doublesToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.fclose;
+import static com.troy.empireserialization.util.NativeUtils.fflush;
+import static com.troy.empireserialization.util.NativeUtils.floatToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.floatsToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.fopen;
+import static com.troy.empireserialization.util.NativeUtils.fputc;
+import static com.troy.empireserialization.util.NativeUtils.intToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.intsToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.longToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.longsToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.nativeToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.shortToFWrite;
+import static com.troy.empireserialization.util.NativeUtils.shortsToFWrite;
+
 import java.io.File;
 import java.nio.file.Path;
 
-import com.troy.empireserialization.*;
-import com.troy.empireserialization.exception.*;
+import com.troy.empireserialization.exception.EmpireSerializationIOException;
+import com.troy.empireserialization.exception.NoBufferException;
 import com.troy.empireserialization.memory.MasterMemoryBlock;
 import com.troy.empireserialization.memory.NativeMemoryBlock;
-import com.troy.empireserialization.util.*;
-
-import static com.troy.empireserialization.util.NativeUtils.*;
+import com.troy.empireserialization.util.SerializationUtils;
 
 public class NativeFileOutput extends AbstractNativeOutput<com.troy.empireserialization.io.out.NativeFileOutput.Deallocator> {
 
@@ -66,58 +86,42 @@ public class NativeFileOutput extends AbstractNativeOutput<com.troy.empireserial
 
 	@Override
 	public void writeByte(byte b) {
-		require(Byte.BYTES);
 		byteToFWrite(fd, b);
-		addRequired();
 	}
 
 	@Override
 	public void writeShort(short s) {
-		require(Short.BYTES);
 		shortToFWrite(fd, s, swapEndinessInNative());
-		addRequired();
 	}
 
 	@Override
 	public void writeInt(int i) {
-		require(Integer.BYTES);
 		intToFWrite(fd, i, swapEndinessInNative());
-		addRequired();
 	}
 
 	@Override
 	public void writeLong(long l) {
-		require(Long.BYTES);
 		longToFWrite(fd, l, swapEndinessInNative());
-		addRequired();
 	}
 
 	@Override
 	public void writeFloat(float f) {
-		require(Float.BYTES);
 		floatToFWrite(fd, f, swapEndinessInNative());
-		addRequired();
 	}
 
 	@Override
 	public void writeDouble(double d) {
-		require(Double.BYTES);
 		doubleToFWrite(fd, d, swapEndinessInNative());
-		addRequired();
 	}
 
 	@Override
 	public void writeChar(char c) {
-		require(Character.BYTES);
 		charToFWrite(fd, c, swapEndinessInNative());
-		addRequired();
 	}
 	
 	@Override
 	public void writeBoolean(boolean b) {
-		require(1);
 		booleanToFWrite(fd, b);
-		addRequired();
 	}
 
 	@Override
