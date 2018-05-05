@@ -23,7 +23,7 @@ public enum FieldType {
 	public static FieldType identifyFieldType(Field field, SerializationSettings settings) {
 		Class<?> clazz = field.getDeclaringClass();
 		Class<?> type = field.getType();
-		if (type.isPrimitive() || ClassHelper.isPrimitive(type))
+		if (ClassHelper.isPrimitive(type))
 			return FieldType.PRIMITIVE;
 		if (Modifier.isFinal(clazz.getModifiers()))
 			return FieldType.USER_DEFINED;

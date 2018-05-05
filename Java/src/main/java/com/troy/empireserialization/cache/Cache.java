@@ -2,7 +2,7 @@ package com.troy.empireserialization.cache;
 
 public abstract class Cache<Entry, E> {
 	protected static final double DEFAULT_LOAD_FACTOR = 0.5;
-	protected static final int DEFAULT_CAPACITY = 16;
+	protected static final int DEFAULT_CAPACITY = 32;
 
 	protected Entry[] table;
 	protected double loadFactor;

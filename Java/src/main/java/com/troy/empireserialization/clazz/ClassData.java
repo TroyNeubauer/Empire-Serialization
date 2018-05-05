@@ -3,6 +3,7 @@ package com.troy.empireserialization.clazz;
 import java.lang.reflect.*;
 import java.util.*;
 
+import com.troy.empireserialization.EmpireOpCodes;
 import com.troy.empireserialization.SerializationSettings;
 import com.troy.empireserialization.charset.EmpireCharsets;
 import com.troy.empireserialization.io.out.*;
@@ -20,6 +21,7 @@ public class ClassData<T> {
 	public String[] fieldNames;
 	public Class<?>[] fieldTypes;
 	public long[] fieldOffsets;
+	public FieldType[] myFieldTypes;
 
 	private byte[] typeDefinition;
 
@@ -44,6 +46,7 @@ public class ClassData<T> {
 					this.fieldTypes = new Class[fieldsLength];
 					this.fieldOffsets = new long[fieldsLength];
 					this.rawFields = new Field[fieldsLength];
+					this.myFieldTypes = new FieldType[fieldsLength];
 					for (int i = 0; i < fieldsLength; i++) {
 						Field field = fields[i];
 						if (isValidField(field))
@@ -75,6 +78,7 @@ public class ClassData<T> {
 				this.fieldNames = new String[fieldsList.size()];
 				this.fieldTypes = new Class[fieldsList.size()];
 				this.rawFields = new Field[fieldsList.size()];
+				this.myFieldTypes = new FieldType[fieldsList.size()];
 				if (unsafe != null)
 					this.fieldOffsets = new long[fieldsList.size()];
 
@@ -93,20 +97,38 @@ public class ClassData<T> {
 	}
 
 	private void writeTypeDefinition(SerializationSettings settings) {
-		ByteArrayOutput out = new ByteArrayOutput();
 		int length = rawFields.length;
 		int bitFieldBytes = (length + 3) / 4;
+		ByteArrayOutput out = new ByteArrayOutput(100 + bitFieldBytes);
 		byte[] bitfield = out.getBuffer();
-		for (int i = 0; i < length; i++) {
-			Field field = rawFields[i];
-			int shift = 6 - (i % 4) * 2;
-			FieldType type = FieldType.identifyFieldType(field, settings);
-			bitfield[i / 4] |= (type.getCode() << shift);
-			System.out.println(StringFormatter.toBinaryString(bitfield[i / 4]));
-		}
 
 		EmpireCharsets.write(type.getName(), out);
 		out.writeVLEInt(length);
+		for (int i = 0; i < length; i++) {
+			Field field = rawFields[i];
+			int shift = 6 - (i % 4) * 2;
+			FieldType type = myFieldTypes[i];
+			bitfield[out.getBufferPosition() + i / 4] |= (type.getCode() << shift);
+		}
+		out.setBufferPosition(out.getBufferPosition() + bitFieldBytes);
+		for (int i = 0; i < length; i++) {
+			Class<?> type = fieldTypes[i];
+			FieldType myType = myFieldTypes[i];
+			switch (myType) {
+			case PRIMITIVE:
+				out.writeByte((settings.useVLE ? EmpireOpCodes.PRIMITIVE_TYPE_VLE_MAPPING
+						: EmpireOpCodes.PRIMITIVE_TYPE_MAPPING).get(type));
+				break;
+			case USER_DEFINED:
+				
+				break;
+			case WILDCARD:
+				break;
+			default:
+				throw new Error();
+			}
+			EmpireCharsets.write(fieldNames[i], out);
+		}
 
 		// Write it
 		typeDefinition = Arrays.copyOf(out.getBuffer(), out.getBufferPosition());
@@ -118,6 +140,7 @@ public class ClassData<T> {
 		rawFields[index] = field;
 		fieldNames[index] = field.getName();
 		fieldTypes[index] = field.getType();
+		myFieldTypes[index] = FieldType.identifyFieldType(field);
 		if (unsafe != null)
 			fieldOffsets[index] = unsafe.objectFieldOffset(field);
 	}

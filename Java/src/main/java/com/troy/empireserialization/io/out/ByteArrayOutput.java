@@ -1,14 +1,14 @@
 package com.troy.empireserialization.io.out;
 
-import java.util.*;
+import java.util.Arrays;
 
-import com.troy.empireserialization.*;
-import com.troy.empireserialization.exception.*;
+import com.troy.empireserialization.exception.AlreadyClosedException;
 import com.troy.empireserialization.memory.MasterMemoryBlock;
 import com.troy.empireserialization.memory.NativeMemoryBlock;
-import com.troy.empireserialization.util.*;
+import com.troy.empireserialization.util.MiscUtil;
+import com.troy.empireserialization.util.NativeUtils;
 
-import sun.misc.*;
+import sun.misc.Unsafe;
 
 public class ByteArrayOutput extends AbstractOutput {
 	private static final Unsafe unsafe = MiscUtil.getUnsafe();

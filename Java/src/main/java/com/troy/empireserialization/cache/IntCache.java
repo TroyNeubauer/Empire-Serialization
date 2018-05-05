@@ -38,7 +38,8 @@ public class IntCache<E> extends Cache<IntValue<E>, E> {
 	}
 
 	public IntValue<E> get(E key) {
-		int index = key.hashCode() % table.length;
+		// Get a positive index using remainder
+		int index = Math.floorMod(key.hashCode(), table.length);
 		IntValue<E> entry = table[index];
 		if (entry != null) {
 			while (entry.next != null) {

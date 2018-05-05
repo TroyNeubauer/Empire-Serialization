@@ -85,7 +85,6 @@ public class InputStreamInput extends AbstractInput {
 	@Override
 	public void unmap(NativeMemoryBlock block) {
 		block.setPosition(0);
-
 	}
 
 	@Override
