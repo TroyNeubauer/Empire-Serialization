@@ -14,13 +14,13 @@ public abstract class Cache<Entry, E> {
 	}
 
 	protected abstract void resize(int newSize);
-	
+
 	public abstract Entry get(E key);
 
 	public int hash(Object key) {
-		return key.hashCode() % table.length;
+		return Math.floorMod(key == null ? 0 : key.hashCode(), table.length);
 	}
-	
+
 	public int size() {
 		return size;
 	}

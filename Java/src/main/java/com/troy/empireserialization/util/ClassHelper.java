@@ -1,10 +1,13 @@
 package com.troy.empireserialization.util;
 
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -32,21 +35,11 @@ public class ClassHelper {
 		Boolean cached = CACHE.get(type);
 		if (cached != null)
 			return cached.booleanValue();
-
-		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
-		provider.addIncludeFilter(new AssignableTypeFilter(type));
-
-		String name = type.getName();
-		String binaryPackage = name.substring(0, name.lastIndexOf('.')).replaceAll("\\.", "/");
-		Set<BeanDefinition> components = provider.findCandidateComponents(binaryPackage);
 		boolean hasSubclass = false;
-		for (BeanDefinition component : components) {
-			try {
-				Class<?> cls = Class.forName(component.getBeanClassName());
+		for (Class<?> temp : findAllSubclasses(type)) {
+			if (temp != type && type.isAssignableFrom(temp)) {
 				hasSubclass = true;
 				break;
-			} catch (Exception e) {
-
 			}
 		}
 
@@ -55,8 +48,34 @@ public class ClassHelper {
 	}
 
 	public static boolean isPrimitive(Class<?> type) {
-		return type.isPrimitive() || type == String.class || type == Integer.class || type == Long.class || type == Float.class
-				|| type == Double.class || type == Short.class || type == Byte.class || type == Character.class
-				|| type == Boolean.class || List.class.isAssignableFrom(type) || Set.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type);
+		return type.isPrimitive() || type == String.class || type == Integer.class || type == Long.class
+				|| type == Float.class || type == Double.class || type == Short.class || type == Byte.class
+				|| type == Character.class || type == Boolean.class || List.class.isAssignableFrom(type)
+				|| Stack.class.isAssignableFrom(type) || Queue.class.isAssignableFrom(type)
+				|| Set.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type);
+	}
+
+	public static List<Class<?>> findAllSubclasses(Class<?> parent) {
+		if (true)
+			throw new RuntimeException();
+		List<Class<?>> result = new ArrayList<Class<?>>();
+		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
+		provider.addIncludeFilter(new AssignableTypeFilter(parent));
+
+		String name = parent.getName();
+		// String binaryPackage = name.substring(0, name.lastIndexOf('.')).replaceAll("\\.", "/");
+		Set<BeanDefinition> components = provider.findCandidateComponents(/* binaryPackage */"");
+		boolean hasSubclass = false;
+		for (BeanDefinition component : components) {
+			try {
+				Class<?> cls = Class.forName(component.getBeanClassName());
+				if (parent != cls) {
+					result.add(parent);
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return result;
 	}
 }

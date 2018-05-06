@@ -3,6 +3,7 @@ package com.troy.empireserialization.clazz;
 import java.lang.reflect.*;
 import java.util.*;
 
+import com.troy.empireserialization.ClassIDProvider;
 import com.troy.empireserialization.EmpireOpCodes;
 import com.troy.empireserialization.SerializationSettings;
 import com.troy.empireserialization.charset.EmpireCharsets;
@@ -25,16 +26,16 @@ public class ClassData<T> {
 
 	private byte[] typeDefinition;
 
-	public ClassData(Class<T> type) {
-		this(type, SerializationSettings.defaultSettings);
+	public ClassData(Class<T> type, ClassIDProvider provider) {
+		this(type, SerializationSettings.defaultSettings, provider);
 	}
 
-	public ClassData(Class<T> type, SerializationSettings settings) {
+	public ClassData(Class<T> type, SerializationSettings settings, ClassIDProvider provider) {
 		this.type = type;
-		init(settings);
+		init(settings, provider);
 	}
 
-	private void init(SerializationSettings settings) {
+	private void init(SerializationSettings settings, ClassIDProvider provider) {
 		Class<?> superType = type.getSuperclass();
 		if (type == null) {
 		} else {
@@ -42,15 +43,22 @@ public class ClassData<T> {
 			int fieldsLength = fields.length;
 			if (superType == Object.class) {// We are a child of the object class the only fields are in this class
 				if (fieldsLength != 0) {
-					this.fieldNames = new String[fieldsLength];
-					this.fieldTypes = new Class[fieldsLength];
-					this.fieldOffsets = new long[fieldsLength];
-					this.rawFields = new Field[fieldsLength];
-					this.myFieldTypes = new FieldType[fieldsLength];
+					int fieldCount = 0;
 					for (int i = 0; i < fieldsLength; i++) {
 						Field field = fields[i];
 						if (isValidField(field))
-							addField(field, i);
+							fieldCount++;
+					}
+					this.fieldNames = new String[fieldCount];
+					this.fieldTypes = new Class[fieldCount];
+					this.fieldOffsets = new long[fieldCount];
+					this.rawFields = new Field[fieldCount];
+					this.myFieldTypes = new FieldType[fieldCount];
+					int realIndex = 0;
+					for (int i = 0; i < fieldsLength; i++) {
+						Field field = fields[i];
+						if (isValidField(field))
+							addField(field, realIndex++);
 					}
 
 				} else {
@@ -88,7 +96,7 @@ public class ClassData<T> {
 				}
 			}
 		}
-		writeTypeDefinition(settings);
+		writeTypeDefinition(settings, provider);
 	}
 
 	private boolean isValidField(Field field) {
@@ -96,7 +104,7 @@ public class ClassData<T> {
 		return !Modifier.isStatic(mods) && !Modifier.isTransient(mods);
 	}
 
-	private void writeTypeDefinition(SerializationSettings settings) {
+	private void writeTypeDefinition(SerializationSettings settings, ClassIDProvider provider) {
 		int length = rawFields.length;
 		int bitFieldBytes = (length + 3) / 4;
 		ByteArrayOutput out = new ByteArrayOutput(100 + bitFieldBytes);
@@ -112,15 +120,15 @@ public class ClassData<T> {
 		}
 		out.setBufferPosition(out.getBufferPosition() + bitFieldBytes);
 		for (int i = 0; i < length; i++) {
-			Class<?> type = fieldTypes[i];
+			Class<?> fieldType = fieldTypes[i];
 			FieldType myType = myFieldTypes[i];
 			switch (myType) {
 			case PRIMITIVE:
 				out.writeByte((settings.useVLE ? EmpireOpCodes.PRIMITIVE_TYPE_VLE_MAPPING
-						: EmpireOpCodes.PRIMITIVE_TYPE_MAPPING).get(type));
+						: EmpireOpCodes.PRIMITIVE_TYPE_MAPPING).get(fieldType));
 				break;
 			case USER_DEFINED:
-				
+				out.writeVLEInt(provider.getTypeID(fieldType));
 				break;
 			case WILDCARD:
 				break;

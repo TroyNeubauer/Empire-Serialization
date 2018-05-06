@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.util.ClassUtils;
+
 import com.troy.empireserialization.cache.IntCache;
 import com.troy.empireserialization.cache.IntValue;
 import com.troy.empireserialization.charset.*;
@@ -21,9 +23,9 @@ import com.troy.empireserialization.util.*;
 public class EmpireOutput implements ObjectOut {
 
 	private Output out;
-	private IntCache<String> stringCache = new IntCache<String>();
-	private IntCache<Class<?>> classCache = new IntCache<Class<?>>();
-	private IntCache<Object> objectCache = new IntCache<Object>();
+	private IntCache<String> stringCache = new IntCache<String>(100, 1.0);
+	private IntCache<Class<?>> classCache = new IntCache<Class<?>>(100, 1.0);
+	private IntCache<Object> objectCache = new IntCache<Object>(200, 1.0);
 	private SerializationSettings settings;
 
 	public EmpireOutput(File file) {
@@ -55,16 +57,12 @@ public class EmpireOutput implements ObjectOut {
 	}
 
 	// Let subclasses override this in case they want to use plugins
-	protected boolean pluginsPresent() {
+	public boolean pluginsPresent() {
 		return false;
 	}
 
 	private void writeFlags() {
 
-	}
-
-	private boolean requireRewrite(SerializationSettings newSettings, SerializationSettings oldSettings) {
-		return false;
 	}
 
 	public void writeObject(Object obj) {
@@ -122,44 +120,47 @@ public class EmpireOutput implements ObjectOut {
 		}
 		return checkForPrimitiveFast(obj, clazz);
 	}
-	
-	private void registerClass(Class<?> type) {
-		classCache.add(type, classCache.size() + 1);// Start with id #1
-	}
 
 	private void writeObjectImpl(Object obj, Class<?> type) {
 		IntValue<Class<?>> classEntry = classCache.get(type);
 		if (classEntry == null) {// Determine if the class hasn't been written before
 			// We need to define the class and object
-			registerClass(type);
 			out.writeByte(EmpireOpCodes.TYPE_DEF_OBJ_DEF_TYPE);
 			writeTypeDefinition(type);
 			writeObjectDefinition(obj);
 		} else {// The class has been written before - we either need to define the fields, or reference the previously
 				// written object
-			IntValue<Object> objEntry = objectCache.get(obj);
-			if (objEntry == null) {// We need to define the object but not the type
-				objectCache.add(obj, objectCache.size());
-
-				out.writeByte(EmpireOpCodes.TYPE_REF_OBJ_DEF_TYPE);
-				// Write the type's id
-				out.writeVLEInt(classEntry.value);
-				writeObjectDefinition(obj);
-			} else {// The object already exists so just reference it
-				out.writeByte(EmpireOpCodes.OBJ_REF_TYPE);
-				// Write only the object's id
-				out.writeVLEInt(objEntry.value);
-			}
+			writeObjectImplWithoutTypeDef(obj, type, classEntry);
 		}
 	}
 
+	private void writeObjectImplWithoutTypeDef(Object obj, Class<?> type, IntValue<Class<?>> classEntry) {
+		IntValue<Object> objEntry = objectCache.get(obj);
+		if (objEntry == null) {// We need to define the object but not the type
+			objectCache.add(obj, objectCache.size());
+
+			out.writeByte(EmpireOpCodes.TYPE_REF_OBJ_DEF_TYPE);
+			// Write the type's id
+			out.writeVLEInt(classEntry.value);
+			writeObjectDefinition(obj);
+		} else {// The object already exists so just reference it
+			out.writeByte(EmpireOpCodes.OBJ_REF_TYPE);
+			// Write only the object's id
+			out.writeVLEInt(objEntry.value);
+		}
+
+	}
+
 	private <T> void writeObjectDefinition(T obj) {
-		Serializer<T> serializer = Serializers.getSerializer((Class<T>) obj.getClass());
+		Serializer<T> serializer = Serializers.getSerializer((Class<T>) obj.getClass(), this);
 		serializer.writeFields(this, obj, out);
 	}
 
 	private void writeTypeDefinition(Class<?> type) {
-		Serializers.getSerializer(type).writeTypeDefinition(out);
+		// Assign the type an id based on its order
+		int id = classCache.size() + 1;// Start with id #1
+		classCache.add(type, id);
+		Serializers.getSerializer(type, this).writeTypeDefinition(out);
 	}
 
 	@Override
@@ -252,45 +253,57 @@ public class EmpireOutput implements ObjectOut {
 	@Override
 	public void writeArray(Object[] array) {
 		int length = array.length;
-		out.writeVLEInt(length);
+		boolean sameType = true;
+		Class<?> lastType = null;
 		for (int i = 0; i < length; i++) {
-			writeObject(array[i]);
+			Object element = array[i];
+			Class<?> current = element.getClass();
+			if (lastType != null && current != lastType) {
+				sameType = false;
+				break;
+			}
+			lastType = current;
 		}
+		if (sameType) {
+			IntValue<Class<?>> entry = classCache.get(lastType);
+			if (ClassHelper.isPrimitive(lastType)) {
+				out.writeByte(EmpireOpCodes.PRIMITIVE_ARRAY_TYPE);
+			} else if (entry == null) {
+				out.writeByte(EmpireOpCodes.USER_DEFINED_ARRAY_TYPE_DEF_TYPE);
+			} else {
+				out.writeByte(EmpireOpCodes.USER_DEFINED_ARRAY_TYPE_REF_TYPE);
+			}
+		} else {
+			out.writeByte(EmpireOpCodes.WILD_CARD_ARRAY_TYPE);
+		}
+		out.writeVLEInt(length);
+		if (sameType) {
+			writeTypeComplete(lastType);
+			if (ClassHelper.isPrimitive(lastType)) {
+				for (int i = 0; i < length; i++) {
+					checkForPrimitiveSlow(array[i], lastType);
+				}
+			} else {
+				for (int i = 0; i < length; i++) {
+					writeObjectImplWithoutTypeDef(array[i], lastType, classCache.get(lastType));
+				}
+			}
+		} else {
+			for (int i = 0; i < length; i++) {
+				writeObject(array[i]);
+			}
+		}
+
 	}
 
 	@Override
 	public void writeList(List<?> list) {
+		out.writeByte(EmpireOpCodes.LIST_TYPE);
 		int size = list.size();
 		if (list instanceof LinkedList) {
-			out.writeByte(EmpireOpCodes.LINKED_LIST_TYPE);
 		} else if (list instanceof ArrayList) {
-			out.writeByte(EmpireOpCodes.ARRAY_LIST_TYPE);
 			Object[] listData = ReflectionUtils.getData((ArrayList<?>) list);
-			Class<?> lastType = null;
-			boolean sameType = true;
-			for (int i = 0; i < size; i++) {
-				Object obj = listData[i];
-				Class<?> currentType = obj.getClass();
-				if (lastType != null) {
-					if (lastType != currentType) {
-						sameType = false;
-						break;
-					}
-				}
-				lastType = currentType;
-			}
-
-			if (sameType) {
-				Class<?> elementType = listData[0].getClass();
-				writeTypeComplete(elementType);
-				for (int i = 0; i < size; i++) {
-					Object obj = listData[i];
-				}
-			} else {
-				for (int i = 0; i < size; i++) {
-
-				}
-			}
+			writeArray(listData);
 
 		}
 	}
@@ -344,8 +357,7 @@ public class EmpireOutput implements ObjectOut {
 			if (!idFitsInOpCode) {
 				out.writeVLEInt(typeID);
 			}
-			if(entry == null) {
-				registerClass(type);
+			if (entry == null) {
 				writeTypeDefinition(type);
 			}
 		}
@@ -359,6 +371,15 @@ public class EmpireOutput implements ObjectOut {
 	@Override
 	public void flush() {
 		out.flush();
+	}
+
+	@Override
+	public int getTypeID(Class<?> type) {
+		IntValue<Class<?>> entry = classCache.get(type);
+		if (entry == null) {
+			return -1;
+		} else
+			return entry.value;
 	}
 
 }

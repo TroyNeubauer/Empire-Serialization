@@ -1,5 +1,6 @@
 package com.troy.empireserialization.serializers;
 
+import com.troy.empireserialization.ClassIDProvider;
 import com.troy.empireserialization.clazz.ClassData;
 import com.troy.empireserialization.io.out.*;
 
@@ -7,9 +8,9 @@ public abstract class AbstractSerializer<T> implements Serializer<T> {
 	protected Class<T> type;
 	protected ClassData<T> data;
 
-	public AbstractSerializer(Class<T> type) {
+	public AbstractSerializer(Class<T> type, ClassIDProvider provider) {
 		this.type = type;
-		this.data = new ClassData<T>(type);
+		this.data = new ClassData<T>(type, provider);
 	}
 
 	@Override

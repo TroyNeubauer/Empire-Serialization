@@ -24,11 +24,9 @@ public class ReflectionUtils {
 		for (Field field : ArrayList.class.getDeclaredFields()) {
 			if (field.getType().isArray() && field.getName().equals("elementData")) {
 				data = field;
-				System.out.println("Array List data: " + data);
 			}
 			if (field.getName().equals("size") && field.getType().isPrimitive()) {
 				size = field;
-				System.out.println("ALsize " + size);
 
 			}
 		}

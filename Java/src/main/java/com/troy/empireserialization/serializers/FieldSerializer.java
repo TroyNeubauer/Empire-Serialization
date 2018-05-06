@@ -2,6 +2,7 @@ package com.troy.empireserialization.serializers;
 
 import java.lang.reflect.Field;
 
+import com.troy.empireserialization.ClassIDProvider;
 import com.troy.empireserialization.ObjectIn;
 import com.troy.empireserialization.ObjectOut;
 import com.troy.empireserialization.io.in.Input;
@@ -12,8 +13,8 @@ import sun.misc.Unsafe;
 
 public class FieldSerializer<T> extends AbstractSerializer<T> {
 
-	public FieldSerializer(Class<T> type) {
-		super(type);
+	public FieldSerializer(Class<T> type, ClassIDProvider provider) {
+		super(type, provider);
 	}
 
 	private static final Unsafe unsafe = MiscUtil.getUnsafe();

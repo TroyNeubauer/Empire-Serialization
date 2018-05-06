@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import com.esotericsoftware.kryo.Kryo;
 import com.troy.empireserialization.EmpireOutput;
 import com.troy.empireserialization.io.out.ByteArrayOutput;
 import com.troy.empireserialization.util.ReflectionUtils;
@@ -19,13 +20,18 @@ public class Main {
 	// C:\Empire Serialization\Java Natives\bin\x64\Release
 	public static void main(String[] args) throws Throwable {
 		init();
-		TestSuper sup = new TestSuper(10, "test String");
-		ByteArrayOutput out = new ByteArrayOutput();
-		
-		EmpireOutput eo = new EmpireOutput(out);
-		eo.writeObject(sup);
 
-		
+		Kryo k = new Kryo();
+		TestSuper sup = new TestSuper(10, "test String");
+		ClassA instance = new ClassA("Class A test!", 5);
+
+		//k.writeClassAndObject(new Output(1000), instance);
+
+		ByteArrayOutput out = new ByteArrayOutput();
+		EmpireOutput eo = new EmpireOutput(out);
+		eo.writeTypeComplete(String.class);
+		// eo.writeObject(instance);
+		eo.writeArray(new String[] { "one", "one", "one", "one", "one" });
 		System.out.println(StringFormatter.toBinaryString(out.getBuffer()));
 		eo.close();
 	}
@@ -59,7 +65,6 @@ public class Main {
 
 		Object[] objects = new Object[] { 5, "test", "test2", "test3" };
 		ReflectionUtils.setData(list, objects);
-		System.out.println(list);
 
 		ByteArrayOutput bOut = new ByteArrayOutput();
 		EmpireOutput out = new EmpireOutput(bOut);
