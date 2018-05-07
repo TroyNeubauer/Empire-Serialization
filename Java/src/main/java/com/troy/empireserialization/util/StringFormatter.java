@@ -8,8 +8,8 @@ package com.troy.empireserialization.util;
  */
 public class StringFormatter {
 
-	final static char[] DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-			'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+	final static char[] DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+			'N', 'O', 'p', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'z' };
 
 	private final static String[] binarySizes = { "", "kilo", "mega", "giga", "tera", "peta", "exa", "zetta", "yotta" };
 
@@ -83,24 +83,34 @@ public class StringFormatter {
 
 	public static String toHexString(int b) {
 		StringBuilder sb = new StringBuilder(8);
-		sb.append(DIGITS[b >>> 28 & 0b1111]);
-		sb.append(DIGITS[b >>> 24 & 0b1111]);
-		sb.append(DIGITS[b >>> 20 & 0b1111]);
-		sb.append(DIGITS[b >>> 16 & 0b1111]);
-		sb.append(DIGITS[b >>> 12 & 0b1111]);
-		sb.append(DIGITS[b >>>  8 & 0b1111]);
-		sb.append(DIGITS[b >>>  4 & 0b1111]);
-		sb.append(DIGITS[b >>>  0 & 0b1111]);
+		sb.append(DIGITS[b >>> 28 & 0x0F]);
+		sb.append(DIGITS[b >>> 24 & 0x0F]);
+		sb.append(DIGITS[b >>> 20 & 0x0F]);
+		sb.append(DIGITS[b >>> 16 & 0x0F]);
+		sb.append(DIGITS[b >>> 12 & 0x0F]);
+		sb.append(DIGITS[b >>> 8 & 0x0F]);
+		sb.append(DIGITS[b >>> 4 & 0x0F]);
+		sb.append(DIGITS[b >>> 0 & 0x0F]);
 
 		return sb.toString();
 
 	}
 
 	public static String toHexString(long b) {
-		return "" + DIGITS[(int) (b >> 60 & 0x0F)] + DIGITS[(int) (b >> 56 & 0x0F)] + DIGITS[(int) (b >> 52 & 0x0F)] + DIGITS[(int) (b >> 48 & 0x0F)]
-				+ DIGITS[(int) (b >> 44 & 0x0F)] + DIGITS[(int) (b >> 40 & 0x0F)] + DIGITS[(int) (b >> 36 & 0x0F)] + DIGITS[(int) (b >> 32 & 0x0F)]
-				+ DIGITS[(int) (b >> 28 & 0x0F)] + DIGITS[(int) (b >> 24 & 0x0F)] + DIGITS[(int) (b >> 20 & 0x0F)] + DIGITS[(int) (b >> 16 & 0x0F)]
-				+ DIGITS[(int) (b >> 12 & 0x0F)] + DIGITS[(int) (b >> 8 & 0x0F)] + DIGITS[(int) (b >> 4 & 0x0F)] + DIGITS[(int) (b >> 0 & 0x0F)];
+		return "" + DIGITS[(int) (b >>> 60 & 0x0F)] + DIGITS[(int) (b >>> 56 & 0x0F)] + DIGITS[(int) (b >>> 52 & 0x0F)]
+				+ DIGITS[(int) (b >>> 48 & 0x0F)] + DIGITS[(int) (b >>> 44 & 0x0F)] + DIGITS[(int) (b >>> 40 & 0x0F)]
+				+ DIGITS[(int) (b >>> 36 & 0x0F)] + DIGITS[(int) (b >>> 32 & 0x0F)] + DIGITS[(int) (b >>> 28 & 0x0F)]
+				+ DIGITS[(int) (b >>> 24 & 0x0F)] + DIGITS[(int) (b >>> 20 & 0x0F)] + DIGITS[(int) (b >>> 16 & 0x0F)]
+				+ DIGITS[(int) (b >>> 12 & 0x0F)] + DIGITS[(int) (b >>> 8 & 0x0F)] + DIGITS[(int) (b >>> 4 & 0x0F)] + DIGITS[(int) (b >>> 0 & 0x0F)];
+	}
+
+	public static String toHexString(long l, int digits) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = digits - 1; i > -1; i--) {
+			sb.append(DIGITS[(int) ((l >>> (i * 4)) & 0x0F)]);
+		}
+
+		return sb.toString();
 	}
 
 	public static String toHexString(float b) {
@@ -178,8 +188,8 @@ public class StringFormatter {
 	}
 
 	/**
-	 * Ensures that a particular String is always a certain length by adding whitespace at the end or trimming to a shorter
-	 * length<br>
+	 * Ensures that a particular String is always a certain length by adding
+	 * whitespace at the end or trimming to a shorter length<br>
 	 * Because of Javadoc formatting issues, assume that '-' means space<br>
 	 * IE: <code> cutToSize("Hi,-i'm-here", 20) ->  "Hi,-i'm-here--------"<br>
 	 * cutToSize("This-is-very-interesting,-I-am-a-particularly-long-String,-what-a-waste-of-memory...", 10) -> "This-is-ve"<br> 
@@ -204,7 +214,8 @@ public class StringFormatter {
 	}
 
 	/**
-	 * Returns a String representing the double where all decimals after decimalPlaces are clipped.</br>
+	 * Returns a String representing the double where all decimals after
+	 * decimalPlaces are clipped.</br>
 	 * Example: <code></br>
 	 * System.out.println(clip(123.456789091234, 3));
 	 * </code></br>
@@ -222,7 +233,8 @@ public class StringFormatter {
 	}
 
 	/**
-	 * Returns a String representing the float where all decimals after decimalPlaces are clipped.</br>
+	 * Returns a String representing the float where all decimals after
+	 * decimalPlaces are clipped.</br>
 	 * Example: <code></br>
 	 * System.out.println(clip(123.456789091234f, 3));
 	 * </code></br>
@@ -240,7 +252,8 @@ public class StringFormatter {
 	}
 
 	/**
-	 * Returns a string representing the amount of bytes in "Standard data form" base 1024</br>
+	 * Returns a string representing the amount of bytes in "Standard data form"
+	 * base 1024</br>
 	 * Examples:<code> 33 -> "33B", 15360 -> "15K", 583008256 -> "556MB", 3221225472 -> "3TB" etc.</code></br>
 	 * This method assumes 1024 bytes to one kilobyte, 1024^2 to one megabyte etc.
 	 * 
@@ -259,7 +272,8 @@ public class StringFormatter {
 	}
 
 	/**
-	 * Returns a string representing the amount of bytes in "Standard data form" base 1024</br>
+	 * Returns a string representing the amount of bytes in "Standard data form"
+	 * base 1024</br>
 	 * Examples:<code> 33 -> "33B", 15360 -> "15K", 583008256 -> "556MB", 3221225472 -> "3TB" etc.</code></br>
 	 * This method assumes 1024 bytes to one kilobyte, 1024^2 to one megabyte etc.
 	 * 
@@ -308,7 +322,8 @@ public class StringFormatter {
 	 * @param str
 	 *            The string to search in
 	 * @param isCaseInsensitive
-	 *            Weather or not expressions in a different case then findtxt should be replaced
+	 *            Weather or not expressions in a different case then findtxt should
+	 *            be replaced
 	 * @return The resulting string
 	 */
 	public String replaceAll(String findtxt, String replacetxt, String str, boolean isCaseInsensitive) {
@@ -370,7 +385,8 @@ public class StringFormatter {
 	}
 
 	/**
-	 * Appends an s to the end of {@code string} if the value is not one, otherwise the origional string is returned
+	 * Appends an s to the end of {@code string} if the value is not one, otherwise
+	 * the origional string is returned
 	 * 
 	 * @param string
 	 *            The string to add an s to
