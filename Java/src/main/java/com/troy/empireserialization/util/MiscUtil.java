@@ -665,4 +665,8 @@ public class MiscUtil {
 	public static void init() {
 		// Nothing. Forces static inatilizer to be called if it hasnt already
 	}
+
+	public static long clamp(long min, long max, long value) {
+		return Math.max(Math.min(value, max), min);
+	}
 }

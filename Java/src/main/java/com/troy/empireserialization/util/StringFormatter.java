@@ -8,7 +8,7 @@ package com.troy.empireserialization.util;
  */
 public class StringFormatter {
 
-	final static char[] DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+	public final static char[] DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
 			'N', 'O', 'p', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'z' };
 
 	private final static String[] binarySizes = { "", "kilo", "mega", "giga", "tera", "peta", "exa", "zetta", "yotta" };
