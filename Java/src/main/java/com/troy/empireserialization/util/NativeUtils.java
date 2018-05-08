@@ -46,7 +46,7 @@ public class NativeUtils {
 		InternalLog.log("Called " + count + " methods in " + (end - start) / 1000000.0 + " milliseconds");
 	}
 
-	public static boolean NATIVES_ENABLED = true;
+	public static boolean NATIVES_ENABLED = false;
 
 	// Always use native
 	public static final int MIN_NATIVE_THRESHOLD = 0;
@@ -155,6 +155,8 @@ public class NativeUtils {
 	public static native void fflush(long fd);
 
 	public static native int fputc(byte c, long fd);
+	
+	public static native int fgetc(byte c, long fd);
 
 	// Single primitive
 

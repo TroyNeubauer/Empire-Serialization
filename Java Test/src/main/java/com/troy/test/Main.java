@@ -13,12 +13,19 @@ import java.util.TreeMap;
 import com.esotericsoftware.kryo.Kryo;
 import com.troy.empireserialization.EmpireOutput;
 import com.troy.empireserialization.io.out.ByteArrayOutput;
+import com.troy.empireserialization.io.out.NativeFileOutput;
 import com.troy.empireserialization.util.ReflectionUtils;
 import com.troy.empireserialization.util.StringFormatter;
 
 public class Main {
 	// C:\Empire Serialization\Java Natives\bin\x64\Release
 	public static void main(String[] args) throws Throwable {
+		NativeFileOutput out = new NativeFileOutput(new File("./out.emp"));
+		EmpireOutput emp = new EmpireOutput(out);
+		emp.writeString("Test String!");
+		emp.close();
+		
+		System.exit(0);
 		init();
 
 		Kryo k = new Kryo();
@@ -26,14 +33,14 @@ public class Main {
 		ClassA instance = new ClassA("Class A test!", 5);
 
 		//k.writeClassAndObject(new Output(1000), instance);
-
+/*
 		ByteArrayOutput out = new ByteArrayOutput();
 		EmpireOutput eo = new EmpireOutput(out);
 		eo.writeTypeComplete(String.class);
 		// eo.writeObject(instance);
 		eo.writeArray(new String[] { "one", "one", "one", "one", "one" });
 		System.out.println(StringFormatter.toBinaryString(out.getBuffer()));
-		eo.close();
+		eo.close();*/
 	}
 
 	private static void arrayListTest() {
