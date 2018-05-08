@@ -4,8 +4,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
@@ -17,6 +16,8 @@ import java.nio.file.StandardOpenOption;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 
+import com.troy.empireserialization.util.MiscUtil;
+
 public class FileViewer extends JPanel {
 	private File file;
 	private FileChannel channel;
@@ -24,13 +25,14 @@ public class FileViewer extends JPanel {
 	private FileViewerImpl impl;
 
 	public FileViewer(File file, Settings settings) throws IOException {
-		super(new GridBagLayout(), true);
+		super(new GridBagLayout(), false);
+		setFocusable(true);
+		requestFocusInWindow();
 		this.file = file;
 		channel = FileChannel.open(Paths.get(file.toURI()), StandardOpenOption.READ);
 		updateSettings(settings);
 		update();
 		bar.addAdjustmentListener(new AdjustmentListener() {
-
 			@Override
 			public void adjustmentValueChanged(AdjustmentEvent e) {
 				update();
@@ -44,7 +46,6 @@ public class FileViewer extends JPanel {
 			}
 		});
 	}
-	
 
 	public void updateSettings(Settings settings) {
 		this.removeAll();
@@ -52,7 +53,7 @@ public class FileViewer extends JPanel {
 		bar = new JScrollBar(JScrollBar.VERTICAL, 0, 0, 0, 0);
 		GridBagConstraints g = new GridBagConstraints();
 		onResize();
-		
+
 		g.weightx = 1000.0;
 		g.weighty = 10.0;
 		g.fill = GridBagConstraints.BOTH;
@@ -95,6 +96,35 @@ public class FileViewer extends JPanel {
 		int max = mapDirectly ? (int) totalRows : Integer.MAX_VALUE;
 		bar.getModel().setMaximum(max);
 		impl.updateSize(rows, impl.cols);
+	}
+
+	public void onKeyPressed(KeyEvent e) {
+		int move = 0;
+		System.out.println(e);
+		if (e.getKeyCode() == KeyEvent.VK_LEFT)
+			move = -1;
+		else if (e.getKeyCode() == KeyEvent.VK_RIGHT)
+			move = +1;
+		else if (e.getKeyCode() == KeyEvent.VK_UP)
+			move = -impl.cols;
+		else if (e.getKeyCode() == KeyEvent.VK_DOWN)
+			move = +impl.cols;
+		if (move != 0) {
+			if (impl.selectionStart == -1)
+				return;
+			impl.selectionEnd += move;
+			impl.selectionEnd = MiscUtil.clamp(0, impl.length - 1, impl.selectionEnd);
+			if (impl.selectionEnd / impl.cols - impl.scroll > impl.rows - 2) {
+				bar.getModel().setValue(bar.getModel().getValue() + 1);
+			}
+			if (impl.selectionEnd / impl.cols - impl.scroll < 0) {
+				bar.getModel().setValue(bar.getModel().getValue() - 1);
+			}
+		}
+	}
+
+	public boolean needsRepaint() {
+		return impl.needsRepaint();
 	}
 
 }

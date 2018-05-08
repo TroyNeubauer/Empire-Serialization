@@ -1,6 +1,7 @@
 package com.troy.byteviewer;
 
 import java.awt.Component;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -12,6 +13,8 @@ public class MainPanel extends JTabbedPane {
 	JFileChooser chooser = new JFileChooser();
 
 	public MainPanel(Settings settings) {
+		setFocusable(true);
+		requestFocusInWindow();
 	}
 
 	public void openFile(File file) {
@@ -45,5 +48,20 @@ public class MainPanel extends JTabbedPane {
 			FileViewer viewer = (FileViewer) getComponentAt(i);
 			viewer.onResize();
 		}
+	}
+
+	public void onKeyPressed(KeyEvent e) {
+		if (getSelectedIndex() != -1) {
+			FileViewer viewer = (FileViewer) getComponentAt(getSelectedIndex());
+			viewer.onKeyPressed(e);
+		}
+	}
+
+	public boolean needsRepaint() {
+		if (getSelectedIndex() != -1) {
+			FileViewer viewer = (FileViewer) getComponentAt(getSelectedIndex());
+			return viewer.needsRepaint();
+		}
+		return false;
 	}
 }
