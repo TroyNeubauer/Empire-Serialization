@@ -1,6 +1,7 @@
 package com.troy.byteviewer.guess;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.troy.empireserialization.io.in.Input;
@@ -8,16 +9,24 @@ import com.troy.empireserialization.io.in.Input;
 public abstract class AbstractGuess {
 
 	private long maxOffset;
-	private List<AnnotatedSection> guesses;
+	private List<AnnotatedSection> guesses = new ArrayList<AnnotatedSection>();
 
 	private static final Color[] ROTATION = { Color.MAGENTA, Color.ORANGE, Color.LIGHT_GRAY, Color.PINK, Color.RED };
 	private static int colorIndex;
+	
+	protected long getOffset() {
+		return maxOffset;
+	}
 
 	public void read(Input input, long minimunIndex) {
-		long toRead = maxOffset - minimunIndex;
+		long toRead = minimunIndex - maxOffset;
 		if (toRead <= 0)
 			return;
 		maxOffset += readImpl(input, toRead, guesses);
+	}
+	
+	public List<AnnotatedSection> getGuesses() {
+		return guesses;
 	}
 
 	/**

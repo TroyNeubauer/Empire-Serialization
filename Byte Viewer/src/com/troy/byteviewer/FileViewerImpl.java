@@ -8,12 +8,14 @@ import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import javafx.scene.media.MediaPlayer;
 
 import javax.swing.JPanel;
 
+import com.troy.byteviewer.guess.AnnotatedSection;
+import com.troy.byteviewer.guess.GuessCoordinator;
 import com.troy.empireserialization.util.StringFormatter;
 
 public class FileViewerImpl extends JPanel {
@@ -31,13 +33,14 @@ public class FileViewerImpl extends JPanel {
 	protected int xOffset = -1;
 	// How wide is a single character
 	protected int pixelsSingleChar;
-	protected long selectionStart = 17, selectionEnd = 25;
+	protected long selectionStart = -1, selectionEnd = -1;
 	protected boolean dragged = false, draggedInText = false;
 	private long lastChannelPosition = -1;
 	private int bytes;
 	private int renderCount = 0;
+	private GuessCoordinator coordinator;
 
-	public FileViewerImpl(FileChannel channel, Settings settings, boolean mapDirectly, long length) {
+	public FileViewerImpl(FileChannel channel, File file, Settings settings, boolean mapDirectly, long length) {
 		super(new FlowLayout());
 		setFocusable(true);
 		requestFocusInWindow();
@@ -46,6 +49,7 @@ public class FileViewerImpl extends JPanel {
 		this.channel = channel;
 		this.mapDirectly = mapDirectly;
 		updateSettings(settings);
+		this.coordinator = new GuessCoordinator(length, file);
 
 		this.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
@@ -58,7 +62,6 @@ public class FileViewerImpl extends JPanel {
 					if (draggedInText) {
 						x = getTileTextX(e.getX());
 						finalIndex = x + y * cols;
-						System.out.println("dragged in text");
 					}
 					if (finalIndex < length)
 						selectionEnd = finalIndex;
@@ -67,8 +70,6 @@ public class FileViewerImpl extends JPanel {
 						draggedInText = true;
 						x = getTileTextX(e.getX());
 						finalIndex = x + y * cols;
-						System.out.println("in text " + x + ", " + y);
-
 					} else {
 						draggedInText = false;
 					}
@@ -137,6 +138,10 @@ public class FileViewerImpl extends JPanel {
 			g.setColor(Color.BLUE);
 			g.drawString(OFFSET, OFFSET_X, OFFSET_Y);
 			long index = (long) scroll * (long) cols;
+			long visibleCount = cols * rows;
+			if(length - scroll * cols < visibleCount) {
+				visibleCount = length - scroll * cols;
+			}
 
 			FontMetrics m = g.getFontMetrics();
 			if (fontHeight == -1) {
@@ -230,6 +235,11 @@ public class FileViewerImpl extends JPanel {
 					int finalY = y * getSpacingBetweenRows() + Y_OFFSET - fontHeight * 7 / 8;
 					g.fillRect(finalX, finalY, pixelsSingleChar, fontHeight);
 				}
+			}
+			coordinator.ensureAnalyzed(index + visibleCount);
+			System.out.println("================");
+			for(AnnotatedSection sec : coordinator.getAnnotations(index, visibleCount)) {
+				System.out.println(sec);
 			}
 
 		} catch (Exception e) {

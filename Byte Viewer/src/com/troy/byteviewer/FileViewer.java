@@ -49,7 +49,7 @@ public class FileViewer extends JPanel {
 
 	public void updateSettings(Settings settings) {
 		this.removeAll();
-		impl = new FileViewerImpl(channel, new Settings(), false, file.length());
+		impl = new FileViewerImpl(channel, file, new Settings(), false, file.length());
 		bar = new JScrollBar(JScrollBar.VERTICAL, 0, 0, 0, 0);
 		GridBagConstraints g = new GridBagConstraints();
 		onResize();
@@ -100,7 +100,6 @@ public class FileViewer extends JPanel {
 
 	public void onKeyPressed(KeyEvent e) {
 		int move = 0;
-		System.out.println(e);
 		if (e.getKeyCode() == KeyEvent.VK_LEFT)
 			move = -1;
 		else if (e.getKeyCode() == KeyEvent.VK_RIGHT)

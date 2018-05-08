@@ -6,7 +6,7 @@ public class AnnotatedSection {
 	private long offset, length;
 	private String name, description;
 	private Color color;
-	
+
 	public AnnotatedSection(long offset, long length, String name, String description, Color color) {
 		this.offset = offset;
 		this.length = length;
@@ -34,8 +34,10 @@ public class AnnotatedSection {
 	public Color getColor() {
 		return color;
 	}
-	
-	
-	
-	
+
+	@Override
+	public String toString() {
+		return "AnnotatedSection [offset=" + offset + ", length=" + length + ", name=" + name + ", description=" + description + "]";
+	}
+
 }
