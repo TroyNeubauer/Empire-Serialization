@@ -1,10 +1,9 @@
 package com.troy.empireserialization.charset;
 
-import com.troy.empireserialization.*;
-import com.troy.empireserialization.io.in.*;
-import com.troy.empireserialization.io.out.*;
+import com.troy.empireserialization.io.in.Input;
+import com.troy.empireserialization.io.out.Output;
 import com.troy.empireserialization.memory.NativeMemoryBlock;
-import com.troy.empireserialization.util.*;
+import com.troy.empireserialization.util.NativeUtils;
 
 public interface EmpireCharset {
 	/**
@@ -18,8 +17,9 @@ public interface EmpireCharset {
 	 *            The offset on where to start writing to into dest
 	 * @param chars
 	 *            The number of characters to decode
+	 * @return The number of bytes read from src
 	 */
-	public void decode(Input src, final char[] dest, int destOffset, final int chars);
+	public long decode(Input src, final char[] dest, int destOffset, final int chars);
 
 	/**
 	 * Encodes bytes from a char array into an output
@@ -32,8 +32,9 @@ public interface EmpireCharset {
 	 *            The offset to start reading from in the source array
 	 * @param chars
 	 *            The number of characters to encode
+	 * @return The number of bytes written to dest
 	 */
-	public default void encode(final char[] src, Output dest, int srcOffset, final int chars, int info) {
+	public default long encode(final char[] src, Output dest, int srcOffset, final int chars, int info) {
 		if (NativeUtils.NATIVES_ENABLED && chars > NativeUtils.MIN_NATIVE_THRESHOLD) {
 			long size = (long) (chars / getMinCharactersPerByte() + 1);
 			dest.require(size);
@@ -41,19 +42,23 @@ public interface EmpireCharset {
 			int bytesEncoded = nEncodeImpl(src, block.address(), srcOffset, chars, info);
 			block.setPosition(bytesEncoded);
 			dest.unmap(block);
+			return bytesEncoded;
 		} else {
-			encodeImpl(src, dest, srcOffset, chars, info);
+			return encodeImpl(src, dest, srcOffset, chars, info);
 		}
 	}
-	
-	/**
-	 * Encodes a subset of the given character array to the desired output
-	 * @see #encode(char[], Output, int, int)
-	 */
-	public void encodeImpl(final char[] src, Output dest, int srcOffset, final int chars, int info);
 
 	/**
-	 * Encodes a subset of the given character array to the desired output using a native alternative
+	 * Encodes a subset of the given character array to the desired output
+	 * 
+	 * @see #encode(char[], Output, int, int)
+	 */
+	public long encodeImpl(final char[] src, Output dest, int srcOffset, final int chars, int info);
+
+	/**
+	 * Encodes a subset of the given character array to the desired output using a
+	 * native alternative
+	 * 
 	 * @see #encode(char[], Output, int, int)
 	 */
 	public abstract int nEncodeImpl(char[] src, long dest, int srcOffset, int chars, int info);
@@ -65,8 +70,8 @@ public interface EmpireCharset {
 	public float getMinCharactersPerByte();
 
 	/*
-	 * public int encodeNative(final char[] src, Output dest, int srcOffset, final int chars, boolean checkForErrors) {
-	 * NativeM
+	 * public int encodeNative(final char[] src, Output dest, int srcOffset, final
+	 * int chars, boolean checkForErrors) { NativeM
 	 * 
 	 * return 0; }
 	 */

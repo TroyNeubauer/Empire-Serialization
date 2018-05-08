@@ -22,17 +22,54 @@ public class SixBitCharset implements EmpireCharset {
 	public static final int[] ENCODING_CACHE = SerializationUtils.constructEncodingFromDecoding(DECODING_CACHE);
 
 	@Override
-	public void decode(Input src, char[] dest, int destOffset, int chars) {
-		
+	public long decode(Input src, char[] dest, int destOffset, int chars) {
+		int result;
+		final int end = (chars / 3) * 3;// round down to next multiple of two
+		long count = 0;
+		while (count < end) {
+			result = ((int) src.readByte() << 16) | ((int) src.readByte() << 8) | (int) src.readByte();
+			System.out.println(StringFormatter.toHexString(result));
+			int c0 = (result >> 18) & 0b111111;
+			int c1 = (result >> 12) & 0b111111;
+			int c2 = (result >> 6) & 0b111111;
+			int c3 = (result >> 0) & 0b111111;
+			dest[destOffset++] = DECODING_CACHE[c0];
+			dest[destOffset++] = DECODING_CACHE[c1];
+			dest[destOffset++] = DECODING_CACHE[c2];
+			dest[destOffset++] = DECODING_CACHE[c3];
+			count += 3;
+		}
+		if (chars % 4 == 3) {// Write the remaining byte if there was an odd number
+			result = src.readByte() << 16 | src.readByte() << 8 | src.readByte();
+			int c1 = (result >> 12) & 0b111111;
+			int c2 = (result >> 6) & 0b111111;
+			int c3 = (result >> 0) & 0b111111;
+			dest[destOffset++] = DECODING_CACHE[c1];
+			dest[destOffset++] = DECODING_CACHE[c2];
+			dest[destOffset++] = DECODING_CACHE[c3];
+			count += 3;
+		} else if (chars % 4 == 2) {// Write the remaining byte if there was an odd number
+			result = src.readByte() << 8 | src.readByte();
+			int c2 = (result >> 6) & 0b111111;
+			int c3 = (result >> 0) & 0b111111;
+			dest[destOffset++] = DECODING_CACHE[c2];
+			dest[destOffset++] = DECODING_CACHE[c3];
+			count += 2;
+		} else if (chars % 4 == 1) {// Write the remaining byte if there was an odd number
+			dest[destOffset++] = DECODING_CACHE[src.readByte()];
+			count += 1;
+		}
+		return count;
 	}
 
 	public native int nEncodeImpl(char[] src, long dest, int srcOffset, int chars, int info);
 
 	@Override
-	public void encodeImpl(char[] src, Output dest, int srcOffset, int chars, int info) {
+	public long encodeImpl(char[] src, Output dest, int srcOffset, int chars, int info) {
 		int i = srcOffset;
 		int result;
 		final int end = (chars / 4) * 4;// round down to next multiple of two
+		long count = 0;
 		while (i < end) {
 			int c0 = ENCODING_CACHE[src[i++]];
 			int c1 = ENCODING_CACHE[src[i++]];
@@ -46,6 +83,7 @@ public class SixBitCharset implements EmpireCharset {
 			dest.writeByte((byte) ((result >> 16) & 0xFF));
 			dest.writeByte((byte) ((result >> 8) & 0xFF));
 			dest.writeByte((byte) ((result >> 0) & 0xFF));
+			count += 3;
 		}
 		if (chars % 4 == 3) {// Write the remaining byte if there was an odd number
 			int c0 = ENCODING_CACHE[src[i++]];
@@ -59,6 +97,7 @@ public class SixBitCharset implements EmpireCharset {
 			dest.writeByte((byte) ((result >> 16) & 0xFF));
 			dest.writeByte((byte) ((result >> 8) & 0xFF));
 			dest.writeByte((byte) ((result >> 0) & 0xFF));
+			count += 3;
 		} else if (chars % 4 == 2) {// Write the remaining byte if there was an odd number
 			int c0 = ENCODING_CACHE[src[i++]];
 			int c1 = ENCODING_CACHE[src[i++]];
@@ -67,9 +106,12 @@ public class SixBitCharset implements EmpireCharset {
 
 			dest.writeByte((byte) ((result >> 8) & 0xFF));
 			dest.writeByte((byte) ((result >> 0) & 0xFF));
+			count += 2;
 		} else if (chars % 4 == 1) {// Write the remaining byte if there was an odd number
 			dest.writeByte((byte) (ENCODING_CACHE[src[end]]));
+			count += 1;
 		}
+		return count;
 	}
 
 	@Override

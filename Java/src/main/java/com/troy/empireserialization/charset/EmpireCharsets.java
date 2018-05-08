@@ -10,19 +10,19 @@ public class EmpireCharsets {
 
 	public static void init() {
 	}
-	
+
 	/**
 	 * Returns a charset capable of encoding the specified string
 	 * 
 	 * @param str
 	 *            The string to use when identifying an appropriate charset
-	 * @return A set of information containing a charset capable of encoding the specified string and some general info
+	 * @return A set of information containing a charset capable of encoding the
+	 *         specified string and some general info
 	 */
 	public static StringInfo identifyCharset(String str, int offset, int length) {
 		char[] chars = MiscUtil.getCharsFast(str);
 		return identifyCharset(chars, offset, length);
 	}
-
 
 	public static StringInfo identifyCharset(char[] chars, int offset, int length) {
 		if (NativeUtils.NATIVES_ENABLED) {
@@ -51,11 +51,13 @@ public class EmpireCharsets {
 					allASCII = false;
 				if (fourOK && (c > fourEncoding.length || fourEncoding[c] == -1)) {
 					fourOK = false;
-					// System.out.println("four failed on character: " +c + " ("+((int)c)+")line " + line);
+					// System.out.println("four failed on character: " +c + " ("+((int)c)+")line " +
+					// line);
 				}
 				if (sixOK && (c > sixEncoding.length || sixEncoding[c] == -1)) {
 					sixOK = false;
-					// System.out.println("six failed on character: " +c + " ("+((int)c)+")line " + line);
+					// System.out.println("six failed on character: " +c + " ("+((int)c)+")line " +
+					// line);
 				}
 				if (!fourOK && !sixOK && !allASCII) {
 					break;
@@ -81,5 +83,15 @@ public class EmpireCharsets {
 		int len = chars.length;
 		StringInfo charset = identifyCharset(chars, 0, len);
 		charset.charset.encode(chars, out, 0, len, charset.info);
+	}
+
+	public static EmpireCharset get(int charset) {
+		if (charset == FOUR_BIT_CHARSET.getCharsetCode())
+			return FOUR_BIT_CHARSET;
+		if (charset == SIX_BIT_CHARSET.getCharsetCode())
+			return SIX_BIT_CHARSET;
+		if (charset == VLE8_CHARSET.getCharsetCode())
+			return VLE8_CHARSET;
+		throw new IllegalArgumentException("Invalid charset code " + charset);
 	}
 }

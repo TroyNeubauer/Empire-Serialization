@@ -13,7 +13,8 @@ public class VLE8Charset implements EmpireCharset {
 	private static final int HAS_NEXT_BYTE = 0b10000000;
 	private static final int DOESNT_HAVE_NEXT_BYTE = 0b00000000;
 
-	// Not used for encoding since java natively uses unicode only for implementing methods
+	// Not used for encoding since java natively uses unicode only for implementing
+	// methods
 	private static final char[] DECODING_CACHE;
 	private static final int[] ENCODING_CACHE;
 
@@ -28,44 +29,55 @@ public class VLE8Charset implements EmpireCharset {
 	public native int nEncodeImpl(char[] src, long dest, int srcOffset, int chars, int info);
 
 	@Override
-	public void decode(Input src, char[] dest, int destOffset, int chars) {
+	public long decode(Input src, char[] dest, int destOffset, int chars) {
+		long count = 0;
 		final int end = destOffset + chars;
 		for (int i = destOffset; i < end; i++) {
 			int b = src.readByte();
+			count++;
 			int result = b & DATA_MASK;
 			if ((b & INFO_MASK) == HAS_NEXT_BYTE) {
 				b = src.readByte();
+				count++;
 				result |= (b & DATA_MASK) << 7;
 				if ((b & INFO_MASK) == HAS_NEXT_BYTE) {
 					b = src.readByte();
+					count++;
 					result |= (b & DATA_MASK) << 14;
 				}
 			}
 			dest[i] = (char) result;
 		}
+		return count;
 	}
 
 	@Override
-	public void encodeImpl(char[] src, Output dest, int srcOffset, int chars, int info) {
+	public long encodeImpl(char[] src, Output dest, int srcOffset, int chars, int info) {
+
 		final int end = srcOffset + chars;
 		if (info == StringInfo.ALL_ASCII) {
 			while (srcOffset < end)
 				dest.writeByte(src[srcOffset++]);
-
+			return chars;
 		} else {
+			long count = 0;
 			while (srcOffset < end) {
 				char value = src[srcOffset++];
 				if (value >>> 7 == 0) {
 					dest.writeByte((byte) value);
+					count++;
 				} else if (value >>> 14 == 0) {
 					dest.writeByte((byte) ((value & DATA_MASK) | HAS_NEXT_BYTE));
 					dest.writeByte((byte) (value >>> 7));
+					count++;
 				} else if (value >>> 21 == 0) {
 					dest.writeByte((byte) ((value & DATA_MASK) | HAS_NEXT_BYTE));
 					dest.writeByte((byte) (value >>> 7 | HAS_NEXT_BYTE));
 					dest.writeByte((byte) (value >>> 14));
+					count++;
 				}
 			}
+			return count;
 		}
 	}
 

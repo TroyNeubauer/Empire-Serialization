@@ -8,7 +8,7 @@ public final class FourBitCharset implements EmpireCharset {
 	static {
 		NativeUtils.init();
 	}
-	
+
 	public static final byte CODE = 0b00;
 	public static final int MASK = 0b00001111;
 	public static final int MIN_VALUE = 0, MAX_VALUE = 15;
@@ -20,35 +20,41 @@ public final class FourBitCharset implements EmpireCharset {
 	public native int nEncodeImpl(char[] src, long dest, int srcOffset, int chars, int info);
 
 	@Override
-	public void decode(Input src, char[] dest, int destOffset, final int chars) {
+	public long decode(Input src, char[] dest, int destOffset, final int chars) {
 		boolean shift = true;
 		final int end = destOffset + chars;
 		byte b = 0;
+		long count = 0;
 		while (destOffset < end) {
 			if (shift) {
 				b = src.readByte();
+				count++;
 				dest[destOffset++] = DECODING_CACHE[b >>> 4];
 			} else {
 				dest[destOffset++] = DECODING_CACHE[b & MASK];
 			}
 			shift = !shift;
 		}
+		return count;
 	}
 
 	@Override
-	public void encodeImpl(final char[] src, Output dest, final int srcOffset, final int chars, int info) {
+	public long encodeImpl(final char[] src, Output dest, final int srcOffset, final int chars, int info) {
 		int i = srcOffset;
 		final int end = (chars / 2) * 2;// round down to next multiple of two
-
+		long count = 0;
 		while (i < end) {
 			char c = src[i++];
 			char d = src[i++];
 			dest.writeByte((byte) ((ENCODING_CACHE[c] << 4) | ENCODING_CACHE[d]));
+			count++;
 		}
 
 		if (chars % 2 != 0) {// Write the remaining byte if there was an odd number
 			dest.writeByte((byte) (ENCODING_CACHE[src[end]] << 4));
+			count++;
 		}
+		return count;
 	}
 
 	@Override
