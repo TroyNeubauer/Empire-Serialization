@@ -9,7 +9,7 @@ import com.troy.empireserialization.io.*;
  * @author Troy Neubauer
  *
  */
-public interface Input extends EmpireIO {
+public interface Input extends EmpireIO, ArrayInput {
 	/**
 	 * Reads the next byte in this input without checking for errors. This method should be used as the base method to
 	 * implement reading primitives. This method should be called any number of times to retrieve the required data for
@@ -138,7 +138,7 @@ public interface Input extends EmpireIO {
 	 */
 	public long remaining();
 
-	public void readBytes(byte[] dest, int offset, int count);
+	public void readBytes(byte[] dest, int offset, int elements);
 
 	public default byte[] readBytes(int length) {
 		byte[] dest = new byte[length];

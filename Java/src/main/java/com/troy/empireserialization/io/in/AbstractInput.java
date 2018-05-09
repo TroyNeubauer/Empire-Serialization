@@ -56,11 +56,11 @@ public abstract class AbstractInput implements Input {
 	public long readLong() {
 		require(Long.BYTES);
 		if (bigEndian) {
-			return (long) (readByteImpl() << 56 | readByteImpl() << 48 | readByteImpl() << 40 | readByteImpl() << 32
-					| readByteImpl() << 24 | readByteImpl() << 16 | readByteImpl() << 8 | readByteImpl());
+			return (long) (readByteImpl() << 56 | readByteImpl() << 48 | readByteImpl() << 40 | readByteImpl() << 32 | readByteImpl() << 24
+					| readByteImpl() << 16 | readByteImpl() << 8 | readByteImpl());
 		} else {
-			return (long) (readByteImpl() | readByteImpl() << 8 | readByteImpl() << 16 | readByteImpl() << 24
-					| readByteImpl() << 32 | readByteImpl() << 40 | readByteImpl() << 48 | readByteImpl() << 56);
+			return (long) (readByteImpl() | readByteImpl() << 8 | readByteImpl() << 16 | readByteImpl() << 24 | readByteImpl() << 32
+					| readByteImpl() << 40 | readByteImpl() << 48 | readByteImpl() << 56);
 		}
 	}
 
@@ -186,6 +186,62 @@ public abstract class AbstractInput implements Input {
 	public boolean readBoolean() {
 		require(1);
 		return readByteImpl() != 0;
+	}
+
+	@Override
+	public void readShorts(short[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+			
+		}
+	}
+
+	@Override
+	public void readInts(int[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+
+		}
+	}
+
+	@Override
+	public void readLongs(long[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+
+		}
+	}
+
+	@Override
+	public void readFloats(float[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+
+		}
+	}
+
+	@Override
+	public void readDoubles(double[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+
+		}
+	}
+
+	@Override
+	public void readChars(char[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+
+		}
+	}
+
+	@Override
+	public void readBooleans(boolean[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+
+		}
+	}
+
+	@Override
+	public void readBooleansCompact(boolean[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+
+		}
 	}
 
 }

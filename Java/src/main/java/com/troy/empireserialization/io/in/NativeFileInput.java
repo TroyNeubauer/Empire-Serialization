@@ -9,21 +9,26 @@ import java.nio.file.Path;
 import com.troy.empireserialization.exception.EmpireSerializationIOException;
 import com.troy.empireserialization.memory.MasterMemoryBlock;
 import com.troy.empireserialization.memory.NativeMemoryBlock;
+import com.troy.empireserialization.util.NativeUtils;
 import com.troy.empireserialization.util.SerializationUtils;
 
 public class NativeFileInput extends AbstractNativeInput<com.troy.empireserialization.io.in.NativeFileInput.Deallocator> {
 
+	static {
+		SerializationUtils.init();
+	}
+
 	private long fd;
-	
+	private MasterMemoryBlock block;
+
 	public NativeFileInput(File file) {
 		this(file.getAbsolutePath());
 	}
-	
+
 	public NativeFileInput(Path file) {
 		this(file.toString());
 	}
-	
-	
+
 	public NativeFileInput(String file) {
 		fd = fopen(file, "rb");
 		if (fd == 0)
@@ -53,7 +58,7 @@ public class NativeFileInput extends AbstractNativeInput<com.troy.empireserializ
 			}
 		}
 	}
-	
+
 	@Override
 	public byte readByteImpl() {
 		return 0;
@@ -66,31 +71,37 @@ public class NativeFileInput extends AbstractNativeInput<com.troy.empireserializ
 
 	@Override
 	public void readBytes(byte[] dest, int offset, int count) {
-		
+		NativeUtils.fReadToBytes(fd, dest, offset, count);
 	}
+	
 
 	@Override
 	public void addRequired() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public NativeMemoryBlock map(long bytes) {
-		// TODO Auto-generated method stub
-		return null;
+		if (block == null) {
+			block = MasterMemoryBlock.allocate(bytes);
+			getDeallocator().block = this.block;
+		} else {
+			// Reset it
+			block.setPosition(0);
+			block.require(bytes);
+		}
+		return block;
 	}
 
 	@Override
 	public void unmap(NativeMemoryBlock block) {
-		// TODO Auto-generated method stub
-		
+		//Nothing.
 	}
 
 	@Override
 	public void require(long bytes) {
-		// TODO Auto-generated method stub
-		
+		//fread does everything for us
 	}
 
 }

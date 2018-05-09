@@ -26,18 +26,18 @@ import java.io.File;
 import java.nio.file.Path;
 
 import com.troy.empireserialization.exception.EmpireSerializationIOException;
-import com.troy.empireserialization.exception.NoBufferException;
 import com.troy.empireserialization.memory.MasterMemoryBlock;
 import com.troy.empireserialization.memory.NativeMemoryBlock;
 import com.troy.empireserialization.util.SerializationUtils;
 
 public class NativeFileOutput extends AbstractNativeOutput<com.troy.empireserialization.io.out.NativeFileOutput.Deallocator> {
 
-	private MasterMemoryBlock block;
-
 	static {
 		SerializationUtils.init();
 	}
+
+	private MasterMemoryBlock block;
+
 
 	private long fd;
 
