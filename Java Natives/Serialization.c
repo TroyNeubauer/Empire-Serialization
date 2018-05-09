@@ -16,28 +16,28 @@ const jbyte SIX_BIT_ENCODING_CACHE[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 #define VLE8_HAS_NEXT_BYTE 0b10000000
 #define VLE8_DOESNT_HAVE_NEXT_BYTE 0b00000000
 
-void putError(jlong pointer, jbyte code, jchar character, jint index) {
-	*((jbyte*)pointer) = code;
-	*((jchar*)(pointer + 1)) = character;
-	*((jint*)(pointer + 3)) = index;
-}
-
-JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_fflush
+JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_fflush
 (JNIEnv * env, jclass class, jlong fd) {
 	if (fd == 0) return INVALID_ARGUMENT;
-	return fflush((FILE*)fd);
+	fflush((FILE*)fd);
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_fputc
+JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_fputc
 (JNIEnv * env, jclass class, jbyte c, jlong fd) {
 	if (fd == 0) return INVALID_ARGUMENT;
-	return fputc(c, (FILE*)fd);
+	fputc(c, (FILE*)fd);
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_fclose
+JNIEXPORT jbyte JNICALL Java_com_troy_empireserialization_util_NativeUtils_fgetc
 (JNIEnv * env, jclass class, jlong fd) {
 	if (fd == 0) return INVALID_ARGUMENT;
-	return fclose((FILE*)fd);
+	return fgetc((FILE*)fd);
+}
+
+JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_fclose
+(JNIEnv * env, jclass class, jlong fd) {
+	if (fd == 0) return INVALID_ARGUMENT;
+	fclose((FILE*)fd);
 }
 
 JNIEXPORT jlong JNICALL Java_com_troy_empireserialization_util_NativeUtils_fopen
@@ -129,14 +129,20 @@ inline jdouble swapJdouble(jdouble value) {
 JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_nativeToFWrite(JNIEnv * env, jclass class, jlong fd, jlong srcJ, jlong bytes) {
 	if (srcJ == 0 || fd == 0)
 		return INVALID_ARGUMENT;
-	
 	fwrite((jbyte*)srcJ, 1, (size_t)bytes, (FILE*)fd);
 }
 
+JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_fReadToNative(JNIEnv * env, jclass class, jlong fd, jlong destJ, jlong bytes) {
+	if (destJ == 0 || fd == 0)
+		return INVALID_ARGUMENT;
+	fread((void*)destJ, bytes, 1, (FILE*)fd);
+	return 0;
+}
+
 #define xsToFWrite(type, swapFunc) \
-JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_##type##sToFWrite(JNIEnv * env, jclass class, jlong fd, j##type##Array srcJ, jint srcOffset, jint elements, jboolean swapEndianess) {\
+JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_##type##sToFWrite(JNIEnv * env, jclass class, jlong fd, j##type##Array srcJ, jint srcOffset, jint elements, jboolean swapEndianess) {\
 	if (fd == 0 || srcJ == NULL) {											\
-		return INVALID_ARGUMENT;											\
+		return;																\
 	}																		\
 	j##type* src = (*env)->GetPrimitiveArrayCritical(env, srcJ, NULL);		\
 	if (src == NULL) return OUT_OF_MEMORY;									\
@@ -145,14 +151,13 @@ JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_##type
 		for (int i = 0; i < elements; i++) {								\
 			int srcIndex = i + srcOffset;									\
 			dest = swapFunc(src[srcIndex]);									\
-			fwrite(&dest, sizeof(j##type), 1, (FILE*)fd);					\
+			fwrite(&dest, sizeof(j##type), 1, (FILE*) fd);					\
 		}																	\
 	}																		\
 	else {																	\
 		fwrite(src, (size_t)(elements * sizeof(j##type)), 1, (FILE*)fd);   	\
 	}																		\
 	(*env)->ReleasePrimitiveArrayCritical(env, srcJ, src, JNI_ABORT);		\
-	return 0;																\
 }
 xsToFWrite(byte, )
 xsToFWrite(boolean, )
@@ -164,15 +169,14 @@ xsToFWrite(double, swapJdouble)
 xsToFWrite(char, swapJchar)
 
 #define xToFWrite(type, swapFunc) \
-JNIEXPORT j##type JNICALL Java_com_troy_empireserialization_util_NativeUtils_##type##ToFWrite(JNIEnv * env, jclass class, jlong fd, j##type value, jboolean swapEndianess) {\
+JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_##type##ToFWrite(JNIEnv * env, jclass class, jlong fd, j##type value, jboolean swapEndianess) {\
 	if (fd == 0) {													\
-		return INVALID_ARGUMENT;									\
+		return;														\
 	}																\
 	if(sizeof(j##type) > 1 && swapEndianess) {						\
 		value = swapFunc(value);									\
 	}																\
 	fwrite(&value, (size_t)(sizeof(j##type)), 1, (FILE*)fd);		\
-	return 0;														\
 }
 
 xToFWrite(byte, )
@@ -184,15 +188,38 @@ xToFWrite(double, swapJdouble)
 xToFWrite(char, swapJchar)
 xToFWrite(boolean, )
 
-#define xToNative(type, swapFunc)														\
+
+#define fReadToX(type, capitalType, swapFunc) \
+JNIEXPORT j##type JNICALL Java_com_troy_empireserialization_util_NativeUtils_fReadTo##capitalType(JNIEnv * env, jclass class, jlong fd, jboolean swapEndianess) {\
+	if (fd == 0) {													\
+		return -1;													\
+	}																\
+	j##type value = 0;												\
+	fread(&value, sizeof(j##type), 1, (FILE*) fd);					\
+	if(sizeof(j##type) > 1 && swapEndianess) {						\
+		value = swapFunc(value);									\
+	}																\
+	return value;													\
+}
+
+fReadToX(byte, Byte, )
+fReadToX(short, Short, swapJshort)
+fReadToX(int, Int, swapJint)
+fReadToX(long, Long, swapJlong)
+fReadToX(float, Float, swapJfloat)
+fReadToX(double, Double, swapJdouble)
+fReadToX(char, Char, swapJchar)
+fReadToX(boolean, Boolean, )
+
+#define xToNative(type, swapFunc)															\
 JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_##type##ToNative	\
-(JNIEnv * env, jclass class, jlong addressJ, j##type value, jboolean swapEndianness) {	\
-	if (addressJ == NULL) return;														\
-	j##type* address = (j##type*) addressJ;												\
-	if (sizeof(j##type) > 1 && swapEndianness) {										\
-		value = swapFunc(value);														\
-	}																					\
-	*address = value;																	\
+(JNIEnv * env, jclass class, jlong addressJ, j##type value, jboolean swapEndianness) {		\
+	if (addressJ == NULL) return;															\
+	j##type* address = (j##type*) addressJ;													\
+	if (sizeof(j##type) > 1 && swapEndianness) {											\
+		value = swapFunc(value);															\
+	}																						\
+	*address = value;																		\
 }
 
 xToNative(byte, )
@@ -204,20 +231,26 @@ xToNative(float, swapJfloat)
 xToNative(double, swapJdouble)
 xToNative(char, swapJchar)
 
-JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_shortToVLENative
+JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_shortToVLENative
 (JNIEnv * env, jclass class, jlong addressJ, jshort value) {
 	if (addressJ == NULL) return;
+
+	return 0;
 }
 
 
-JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_intToVLENative
+JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_intToVLENative
 (JNIEnv * env, jclass class, jlong addressJ, jint value) {
 	if (addressJ == NULL) return;
+
+	return 0;
 }
 
-JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_longToVLENative
+JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_longToVLENative
 (JNIEnv * env, jclass class, jlong addressJ, jlong value) {
 	if (addressJ == NULL) return;
+
+	return 0;
 }
 
 JNIEXPORT jbyteArray JNICALL Java_com_troy_empireserialization_util_NativeUtils_ngetBuffer
@@ -312,7 +345,7 @@ JNIEXPORT jint JNICALL Java_com_troy_empireserialization_charset_SixBitCharset_n
 		*dest = SIX_BIT_ENCODING_CACHE[src[end]];
 		dest++;
 	}
-	return dest - inital;
+	return (jint) (dest - inital);
 }
 
 JNIEXPORT jint JNICALL Java_com_troy_empireserialization_charset_EmpireCharsets_nIdentifyCharset
@@ -359,7 +392,7 @@ JNIEXPORT jint JNICALL Java_com_troy_empireserialization_charset_VLE8Charset_nEn
 	const int end = srcOffset + chars;//round down to next mutiple of two
 	if (info == 0) {
 		while (i < end) {
-			dest[bytesWritten++] = src[i++];
+			dest[bytesWritten++] = (jbyte) src[i++];
 		}
 	}
 	else {
@@ -383,9 +416,6 @@ JNIEXPORT jint JNICALL Java_com_troy_empireserialization_charset_VLE8Charset_nEn
 	(*env)->ReleasePrimitiveArrayCritical(env, srcJ, src, 0);
 	return bytesWritten;
 }
-
-
-//public static native void shortsToBytes(byte[] dest, short[] src, int srcOffset, int destOffset, int elements);
 
 #define xToBytes(type, swapFunc) \
 JNIEXPORT j##type JNICALL Java_com_troy_empireserialization_util_NativeUtils_##type##sToBytes(JNIEnv * env, jclass class, jbyteArray destJ, j##type##Array srcJ, jint srcOffset, jint destOffset, jint elements, jboolean swapEndianess) {\
@@ -473,7 +503,7 @@ xToNative(boolean, Boolean, )
 #define nativeToX(type, capitalType) \
 JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_nativeTo##capitalType##s(JNIEnv * env, jclass class, j##type##Array dest, jlong src, jint offset, jint elements) {\
 	if(src == 0 || dest == 0) return INVALID_ARGUMENT;\
-	(*env)->Set##capitalType##ArrayRegion(env, dest, offset, elements, (jbyte*) src);\
+	(*env)->Set##capitalType##ArrayRegion(env, dest, offset, elements, (j##type*) src);\
 	return 0;\
 }
 
