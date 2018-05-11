@@ -1,7 +1,6 @@
 package com.troy.byteviewer.guess;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,7 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.type.filter.AssignableTypeFilter;
 
 import com.troy.empireserialization.io.in.Input;
-import com.troy.empireserialization.io.in.InputStreamInput;
+import com.troy.empireserialization.io.in.NativeFileInput;
 
 public class GuessCoordinator {
 	public static final List<Class<AbstractGuess>> guessClasses = new ArrayList<Class<AbstractGuess>>();
@@ -52,13 +51,9 @@ public class GuessCoordinator {
 			}
 		}
 		inputs = new Input[guessClasses.size()];
-		for (int i = 0; i < inputs.length; i++) {
-			try {
-				inputs[i] = new InputStreamInput(new FileInputStream(file));
-			} catch (FileNotFoundException e) {
-				throw new RuntimeException(e);
-			}
-		}
+		for (int i = 0; i < inputs.length; i++)
+			inputs[i] = new NativeFileInput(file);
+
 	}
 
 	public void ensureAnalyzed(long maxOffset) {

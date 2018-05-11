@@ -27,7 +27,7 @@ public class EmpireStringGuess extends AbstractGuess {
 					guesses.add(new AnnotatedSection(count + getOffset(), 1, "Empty String: \"\"",
 							"The opcode " + EmpireOpCodes.EMPTY_STRING_CONST + " indicates an empty string", nextColor()));
 				} else if ((b & EmpireOpCodes.MAJOR_CODE_MASK) == EmpireOpCodes.STRING_TYPE_MAJOR_CODE) {
-					long start = count + getOffset();
+					long start = count - 1 + getOffset();
 					int charset = b >> 4 & 0b11;
 					int length = b & 0b1111;
 					if (length == 0) {
@@ -58,16 +58,20 @@ public class EmpireStringGuess extends AbstractGuess {
 					EmpireCharset set = EmpireCharsets.get(charset);
 					if (length * set.getBytesPerCharacter() > input.remaining())
 						continue;
+					System.out.println(input.remaining());
 					char[] chars = new char[length];
 					long decoded = set.decode(input, chars, 0, length);
 					count += decoded;
 					String name = "String: \"" + MiscUtil.createString(chars) + "\"";
-					String description = "Charset: " + set.getClass().getSimpleName() + "\nCharacters: " + length + "\nEncoded in " + decoded + " bytes";
+					String description = "Charset: " + set.getClass().getSimpleName() + "\nCharacters: " + length + "\nEncoded in " + decoded
+							+ " bytes";
 					guesses.add(new AnnotatedSection(start, (count + getOffset()) - start, name, description, nextColor()));
 				}
 			} catch (Throwable e) {
-				//Ignore.. If an exception is thrown we don't care because it wasn't a string anyway
-				System.out.println(e.getMessage());
+				// Ignore.. If an exception is thrown we don't care because it wasn't a string
+				// anyway
+				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 		return count;
