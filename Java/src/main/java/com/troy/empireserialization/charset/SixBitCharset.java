@@ -22,12 +22,12 @@ public class SixBitCharset implements EmpireCharset {
 	public static final int[] ENCODING_CACHE = SerializationUtils.constructEncodingFromDecoding(DECODING_CACHE);
 
 	@Override
-	public long decode(Input src, char[] dest, int destOffset, int chars) {
+	public long decodeImpl(Input src, char[] dest, int destOffset, int chars, int info) {
 		int result;
 		final int end = (chars / 3) * 3;// round down to next multiple of two
 		long count = 0;
 		while (count < end) {
-			result = ((int) src.readByte() << 16) | ((int) src.readByte() << 8) | (int) src.readByte();
+			result = (src.readByte() << 16) | (src.readByte() << 8) | src.readByte();
 			System.out.println(StringFormatter.toHexString(result));
 			int c0 = (result >> 18) & 0b111111;
 			int c1 = (result >> 12) & 0b111111;

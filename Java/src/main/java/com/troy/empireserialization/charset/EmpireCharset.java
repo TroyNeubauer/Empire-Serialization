@@ -13,13 +13,24 @@ public interface EmpireCharset {
 	 *            The source of encoded bytes to draw from
 	 * @param dest
 	 *            The resulting array to write to
-	 * @param destOffset
+	 * @param srcOffset
 	 *            The offset on where to start writing to into dest
 	 * @param chars
 	 *            The number of characters to decode
 	 * @return The number of bytes read from src
 	 */
-	public long decode(Input src, final char[] dest, int destOffset, final int chars);
+	public default long decode(Input src, final char[] dest, int srcOffset, final int chars) {
+		if (NativeUtils.NATIVES_ENABLED && chars > NativeUtils.MIN_NATIVE_THRESHOLD) {
+			long size = (long) Math.ceil((float) chars / getMinCharactersPerByte());
+			NativeMemoryBlock block = src.map(size);
+			long bytesEncoded = nDecodeImpl(dest, src, srcOffset, chars);
+			block.setPosition(bytesEncoded);
+			src.unmap(block);
+			return bytesEncoded;
+		} else {
+			return decodeImpl(dest, src, srcOffset, chars);
+		}
+	}
 
 	/**
 	 * Encodes bytes from a char array into an output
@@ -54,6 +65,20 @@ public interface EmpireCharset {
 	 * @see #encode(char[], Output, int, int)
 	 */
 	public long encodeImpl(final char[] src, Output dest, int srcOffset, final int chars, int info);
+
+	/**
+	 * Encodes a subset of the given character array to the desired output
+	 * 
+	 * @see #encode(char[], Output, int, int)
+	 */
+	public long decodeImpl(final char[] dest, Input src, int srcOffset, final int chars);
+
+	/**
+	 * Encodes a subset of the given character array to the desired output
+	 * 
+	 * @see #encode(char[], Output, int, int)
+	 */
+	public long nDecodeImpl(final char[] dest, Input src, int srcOffset, final int chars);
 
 	/**
 	 * Encodes a subset of the given character array to the desired output using a

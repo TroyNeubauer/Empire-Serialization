@@ -143,6 +143,8 @@ public class NativeUtils {
 	public static native long fopen(String file, String access);
 
 	public static native void fclose(long fd);
+	
+	public static native long remaining(long fd);
 
 	public static native void fflush(long fd);
 
@@ -172,7 +174,8 @@ public class NativeUtils {
 	public static void booleanToFWrite(long fd, boolean value) {
 		booleanToFWrite(fd, value, false);
 	}
-//112901
+
+	// 112901
 	private static native void booleanToFWrite(long fd, boolean value, boolean swapEndianess);
 
 	// Arrays
@@ -284,6 +287,9 @@ public class NativeUtils {
 	public static int fReadToBooleans(long fd, boolean[] destJ, int destOffset, int elements) {
 		return fReadToBooleans(fd, destJ, destOffset, elements, false);
 	}
+
+	public static native int fReadToNative(long fd, long destJ, long bytes);
+
 
 	/**
 	 * Copies n bytes from the source address to the destination address<br>
