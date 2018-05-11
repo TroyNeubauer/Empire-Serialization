@@ -88,12 +88,15 @@ public abstract class AbstractInput implements Input {
 
 	@Override
 	public short readVLEShort() {
+		require(1);
 		int b = readByte();
 		int result = b & EmpireConstants.VLE_MASK;
 		if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+			require(1);
 			b = readByte();
 			result |= (b & EmpireConstants.VLE_MASK) << 7;
 			if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+				require(1);
 				b = readByte();
 				result |= (b & EmpireConstants.VLE_MASK) << 14;
 			}
@@ -103,18 +106,23 @@ public abstract class AbstractInput implements Input {
 
 	@Override
 	public int readVLEInt() {
+		require(1);
 		int b = readByte();
 		int result = b & EmpireConstants.VLE_MASK;
 		if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+			require(1);
 			b = readByte();
 			result |= (b & EmpireConstants.VLE_MASK) << 7;
 			if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+				require(1);
 				b = readByte();
 				result |= (b & EmpireConstants.VLE_MASK) << 14;
 				if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+					require(1);
 					b = readByte();
 					result |= (b & EmpireConstants.VLE_MASK) << 21;
 					if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+						require(1);
 						b = readByte();
 						result |= (b & EmpireConstants.VLE_MASK) << 28;
 					}
@@ -126,33 +134,43 @@ public abstract class AbstractInput implements Input {
 
 	@Override
 	public long readVLELong() {
+		require(1);
 		long b = readByte();
 		long result = b & EmpireConstants.VLE_MASK;
 		if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+			require(1);
 			b = readByte();
 			result |= (b & EmpireConstants.VLE_MASK) << 7;
 			if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+				require(1);
 				b = readByte();
 				result |= (b & EmpireConstants.VLE_MASK) << 14;
 				if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+					require(1);
 					b = readByte();
 					result |= (b & EmpireConstants.VLE_MASK) << 21;
 					if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+						require(1);
 						b = readByte();
 						result |= (b & EmpireConstants.VLE_MASK) << 28;
 						if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+							require(1);
 							b = readByte();
 							result |= (b & EmpireConstants.VLE_MASK) << 35;
 							if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+								require(1);
 								b = readByte();
 								result |= (b & EmpireConstants.VLE_MASK) << 42;
 								if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+									require(1);
 									b = readByte();
 									result |= (b & EmpireConstants.VLE_MASK) << 49;
 									if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+										require(1);
 										b = readByte();
 										result |= (b & EmpireConstants.VLE_MASK) << 56;
 										if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+											require(1);
 											b = readByte();
 											result |= (b & EmpireConstants.VLE_MASK) << 63;
 										}
@@ -169,12 +187,15 @@ public abstract class AbstractInput implements Input {
 
 	@Override
 	public char readVLEChar() {
+		require(1);
 		int b = readByte();
 		int result = b & EmpireConstants.VLE_MASK;
 		if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+			require(1);
 			b = readByte();
 			result |= (b & EmpireConstants.VLE_MASK) << 7;
 			if ((b & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+				require(1);
 				b = readByte();
 				result |= (b & EmpireConstants.VLE_MASK) << 14;
 			}
@@ -190,57 +211,81 @@ public abstract class AbstractInput implements Input {
 
 	@Override
 	public void readShorts(short[] src, int offset, int elements) {
+		require(elements * Short.BYTES);
 		for (int i = offset; i < offset + elements; i++) {
-			
+			if (bigEndian) {
+				src[i] = (short) ((readByteImpl() << 8) | readByteImpl());
+			} else {
+				src[i] = (short) (readByteImpl() | (readByteImpl() << 8));
+			}
 		}
 	}
 
 	@Override
 	public void readInts(int[] src, int offset, int elements) {
+		require(elements * Integer.BYTES);
 		for (int i = offset; i < offset + elements; i++) {
-
+			if (bigEndian) {
+				src[i] = (readByteImpl() << 24) | (readByteImpl() << 16) | (readByteImpl() << 8) | readByteImpl();
+			} else {
+				src[i] = readByteImpl() | (readByteImpl() << 8) | (readByteImpl() << 16) | (readByteImpl() << 24);
+			}
 		}
 	}
 
 	@Override
 	public void readLongs(long[] src, int offset, int elements) {
+		require(elements * Long.BYTES);
 		for (int i = offset; i < offset + elements; i++) {
-
+			if (bigEndian) {
+				src[i] = (readByteImpl() << 56) | (readByteImpl() << 48) | (readByteImpl() << 40) | (readByteImpl() << 32) | (readByteImpl() << 24)
+						| (readByteImpl() << 16) | (readByteImpl() << 8) | readByteImpl();
+			} else {
+				src[i] = readByteImpl() | (readByteImpl() << 8) | (readByteImpl() << 16) | (readByteImpl() << 24) | (readByteImpl() << 32)
+						| (readByteImpl() << 40) | (readByteImpl() << 48) | (readByteImpl() << 56);
+			}
 		}
 	}
 
 	@Override
 	public void readFloats(float[] src, int offset, int elements) {
+		// Read float does require every time so we don't need to do anything
 		for (int i = offset; i < offset + elements; i++) {
-
+			src[i] = readFloat();
 		}
 	}
 
 	@Override
 	public void readDoubles(double[] src, int offset, int elements) {
+		// Read float does require every time so we don't need to do anything
 		for (int i = offset; i < offset + elements; i++) {
-
+			src[i] = readDouble();
 		}
 	}
 
 	@Override
 	public void readChars(char[] src, int offset, int elements) {
+		require(elements * Character.BYTES);
 		for (int i = offset; i < offset + elements; i++) {
-
+			if (bigEndian) {
+				src[i] = (char) (readByteImpl() << 8 | readByteImpl());
+			} else {
+				src[i] = (char) (readByteImpl() | readByteImpl() << 8);
+			}
 		}
 	}
 
 	@Override
 	public void readBooleans(boolean[] src, int offset, int elements) {
 		for (int i = offset; i < offset + elements; i++) {
-
+			src[i] = readByteImpl() != 0;
 		}
 	}
 
 	@Override
 	public void readBooleansCompact(boolean[] src, int offset, int elements) {
 		for (int i = offset; i < offset + elements; i++) {
-
+			// TODO
 		}
 	}
 
