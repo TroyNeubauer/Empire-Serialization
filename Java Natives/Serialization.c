@@ -34,6 +34,17 @@ JNIEXPORT jbyte JNICALL Java_com_troy_empireserialization_util_NativeUtils_fgetc
 	return fgetc((FILE*)fd);
 }
 
+JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_remaining
+(JNIEnv * env, jclass class, jlong fd) {
+	if (fd == 0) return INVALID_ARGUMENT;
+	FILE* file = (FILE*) fd;
+	jlong start = ftell(file);
+	fseek(file, 0L, SEEK_END);
+	jlong remaining = ftell(file);
+	fseek(file, start, SEEK_SET);
+	return remaining - start;
+}
+
 JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_fclose
 (JNIEnv * env, jclass class, jlong fd) {
 	if (fd == 0) return INVALID_ARGUMENT;
@@ -130,12 +141,13 @@ JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_native
 	if (srcJ == 0 || fd == 0)
 		return INVALID_ARGUMENT;
 	fwrite((jbyte*)srcJ, 1, (size_t)bytes, (FILE*)fd);
+	return 0;
 }
 
 JNIEXPORT jint JNICALL Java_com_troy_empireserialization_util_NativeUtils_fReadToNative(JNIEnv * env, jclass class, jlong fd, jlong destJ, jlong bytes) {
 	if (destJ == 0 || fd == 0)
 		return INVALID_ARGUMENT;
-	fread((void*)destJ, bytes, 1, (FILE*)fd);
+	fread((void*)destJ, 1, bytes, (FILE*)fd);
 	return 0;
 }
 
@@ -210,6 +222,30 @@ fReadToX(float, Float, swapJfloat)
 fReadToX(double, Double, swapJdouble)
 fReadToX(char, Char, swapJchar)
 fReadToX(boolean, Boolean, )
+
+#define fReadToXs(type, capitalType, swapFunc) \
+JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_fReadTo##capitalType##s(JNIEnv * env, jclass class, jlong fd, j##type##Array destJ, jint srcOffset, jint elements, jboolean swapEndianess) {\
+	if (fd == 0 || destJ == NULL) {											\
+		return;																\
+	}																		\
+	j##type* dest = (*env)->GetPrimitiveArrayCritical(env, destJ, NULL);	\
+	if (dest == NULL) return OUT_OF_MEMORY;									\
+	fread(dest + srcOffset, sizeof(j##type), elements, (FILE*)fd);			\
+	if (swapEndianess && (sizeof(j##type) != 1)) {							\
+		for (int i = srcOffset; i < elements + srcOffset; i++) {			\
+			dest[i] = swapFunc(dest[i]);									\
+		}																	\
+	}																		\
+	(*env)->ReleasePrimitiveArrayCritical(env, destJ, dest, 0);				\
+}
+fReadToXs(byte, Byte, )
+fReadToXs(boolean, Boolean, )
+fReadToXs(short, Short, swapJshort)
+fReadToXs(int, Int, swapJint)
+fReadToXs(long, Long, swapJlong)
+fReadToXs(float, Float, swapJfloat)
+fReadToXs(double, Double, swapJdouble)
+fReadToXs(char, Char, swapJchar)
 
 #define xToNative(type, swapFunc)															\
 JNIEXPORT void JNICALL Java_com_troy_empireserialization_util_NativeUtils_##type##ToNative	\
