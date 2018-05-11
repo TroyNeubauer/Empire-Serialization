@@ -12,6 +12,8 @@ import java.util.TreeMap;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.troy.empireserialization.EmpireOutput;
+import com.troy.empireserialization.charset.EmpireCharsets;
+import com.troy.empireserialization.io.in.NativeFileInput;
 import com.troy.empireserialization.io.out.ByteArrayOutput;
 import com.troy.empireserialization.io.out.NativeFileOutput;
 import com.troy.empireserialization.util.ReflectionUtils;
@@ -20,6 +22,20 @@ import com.troy.empireserialization.util.StringFormatter;
 public class Main {
 	// C:\Empire Serialization\Java Natives\bin\x64\Release
 	public static void main(String[] args) throws Throwable {
+		System.out.println("e");
+		NativeFileInput i = new NativeFileInput(new File("./out.emp"));
+		i.readByte();
+		char[] chars = new char[12];
+		System.out.println(EmpireCharsets.SIX_BIT_CHARSET.decode(i, chars, 0, chars.length));
+		
+		System.out.println(StringFormatter.toHexString(i.readShort()));
+		short[] shorts = new short[2];
+		i.readShorts(shorts);
+		System.out.println(StringFormatter.toHexString(shorts));
+		i.close();
+		
+		System.exit(0);
+		
 		NativeFileOutput out = new NativeFileOutput(new File("./out.emp"));
 		EmpireOutput emp = new EmpireOutput(out);
 		emp.writeString("Test String!");
