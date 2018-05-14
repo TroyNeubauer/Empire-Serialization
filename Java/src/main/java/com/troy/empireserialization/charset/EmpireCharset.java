@@ -67,14 +67,15 @@ public interface EmpireCharset {
 	public long encodeImpl(final char[] src, Output dest, int srcOffset, final int chars, int info);
 
 	/**
-	 * Encodes a subset of the given character array to the desired output
+	 * Decodes the given number of input chars and stores them starting at index offset in dest
 	 * 
 	 * @see #encode(char[], Output, int, int)
 	 */
 	public long decodeImpl(final char[] dest, Input src, int srcOffset, final int chars);
 
 	/**
-	 * Encodes a subset of the given character array to the desired output
+	 * Decodes the given number of input chars and stores them starting at index offset in dest 
+	 * using a native method for speed
 	 * 
 	 * @see #encode(char[], Output, int, int)
 	 */

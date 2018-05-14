@@ -10,22 +10,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.util.ClassUtils;
-
-import com.troy.empireserialization.cache.IntCache;
+import com.troy.empireserialization.cache.IntValueCache;
 import com.troy.empireserialization.cache.IntValue;
-import com.troy.empireserialization.charset.*;
-import com.troy.empireserialization.io.out.*;
+import com.troy.empireserialization.charset.EmpireCharset;
+import com.troy.empireserialization.charset.EmpireCharsets;
+import com.troy.empireserialization.io.out.NativeFileOutput;
+import com.troy.empireserialization.io.out.Output;
 import com.troy.empireserialization.serializers.Serializer;
 import com.troy.empireserialization.serializers.Serializers;
-import com.troy.empireserialization.util.*;
+import com.troy.empireserialization.util.ClassHelper;
+import com.troy.empireserialization.util.MiscUtil;
+import com.troy.empireserialization.util.ReflectionUtils;
+import com.troy.empireserialization.util.StringInfo;
 
 public class EmpireOutput implements ObjectOut {
 
 	private Output out;
-	private IntCache<String> stringCache = new IntCache<String>(100, 1.0);
-	private IntCache<Class<?>> classCache = new IntCache<Class<?>>(100, 1.0);
-	private IntCache<Object> objectCache = new IntCache<Object>(200, 1.0);
+	private IntValueCache<String> stringCache = new IntValueCache<String>(100, 1.0);
+	private IntValueCache<Class<?>> classCache = new IntValueCache<Class<?>>(100, 1.0);
+	private IntValueCache<Object> objectCache = new IntValueCache<Object>(200, 1.0);
 	private SerializationSettings settings;
 
 	public EmpireOutput(File file) {
