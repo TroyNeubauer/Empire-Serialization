@@ -1,16 +1,16 @@
 package com.troy.empireserialization.cache;
 
-public class IntCache<E> extends Cache<IntValue<E>, E> {
+public class IntValueCache<E> extends Cache<IntValue<E>> {
 
-	public IntCache() {
+	public IntValueCache() {
 		this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
 	}
 
-	public IntCache(int initalCapacity) {
+	public IntValueCache(int initalCapacity) {
 		this(initalCapacity, DEFAULT_LOAD_FACTOR);
 	}
 
-	public IntCache(int initalCapacity, double loadFactor) {
+	public IntValueCache(int initalCapacity, double loadFactor) {
 		super(initalCapacity, loadFactor);
 
 	}
@@ -43,7 +43,7 @@ public class IntCache<E> extends Cache<IntValue<E>, E> {
 		IntValue<E> entry = table[index];
 		if (entry != null) {
 			while (entry.next != null) {
-				if (entry.equals(key))
+				if (entry.key.equals(key))
 					return entry;
 				entry = entry.next;
 			}
