@@ -22,7 +22,10 @@ public class SixBitCharset implements EmpireCharset {
 	public static final int[] ENCODING_CACHE = SerializationUtils.constructEncodingFromDecoding(DECODING_CACHE);
 
 	@Override
-	public long decodeImpl(Input src, char[] dest, int destOffset, int chars, int info) {
+	public native long nDecodeImpl(char[] dest, Input src, int srcOffset, int chars);
+
+	@Override
+	public long decodeImpl(final char[] dest, Input src, int srcOffset, final int chars) {
 		int result;
 		final int end = (chars / 3) * 3;// round down to next multiple of two
 		long count = 0;
@@ -33,10 +36,10 @@ public class SixBitCharset implements EmpireCharset {
 			int c1 = (result >> 12) & 0b111111;
 			int c2 = (result >> 6) & 0b111111;
 			int c3 = (result >> 0) & 0b111111;
-			dest[destOffset++] = DECODING_CACHE[c0];
-			dest[destOffset++] = DECODING_CACHE[c1];
-			dest[destOffset++] = DECODING_CACHE[c2];
-			dest[destOffset++] = DECODING_CACHE[c3];
+			dest[srcOffset++] = DECODING_CACHE[c0];
+			dest[srcOffset++] = DECODING_CACHE[c1];
+			dest[srcOffset++] = DECODING_CACHE[c2];
+			dest[srcOffset++] = DECODING_CACHE[c3];
 			count += 3;
 		}
 		if (chars % 4 == 3) {// Write the remaining byte if there was an odd number
@@ -44,19 +47,19 @@ public class SixBitCharset implements EmpireCharset {
 			int c1 = (result >> 12) & 0b111111;
 			int c2 = (result >> 6) & 0b111111;
 			int c3 = (result >> 0) & 0b111111;
-			dest[destOffset++] = DECODING_CACHE[c1];
-			dest[destOffset++] = DECODING_CACHE[c2];
-			dest[destOffset++] = DECODING_CACHE[c3];
+			dest[srcOffset++] = DECODING_CACHE[c1];
+			dest[srcOffset++] = DECODING_CACHE[c2];
+			dest[srcOffset++] = DECODING_CACHE[c3];
 			count += 3;
 		} else if (chars % 4 == 2) {// Write the remaining byte if there was an odd number
 			result = src.readByte() << 8 | src.readByte();
 			int c2 = (result >> 6) & 0b111111;
 			int c3 = (result >> 0) & 0b111111;
-			dest[destOffset++] = DECODING_CACHE[c2];
-			dest[destOffset++] = DECODING_CACHE[c3];
+			dest[srcOffset++] = DECODING_CACHE[c2];
+			dest[srcOffset++] = DECODING_CACHE[c3];
 			count += 2;
 		} else if (chars % 4 == 1) {// Write the remaining byte if there was an odd number
-			dest[destOffset++] = DECODING_CACHE[src.readByte()];
+			dest[srcOffset++] = DECODING_CACHE[src.readByte()];
 			count += 1;
 		}
 		return count;

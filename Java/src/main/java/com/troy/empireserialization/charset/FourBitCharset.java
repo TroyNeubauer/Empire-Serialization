@@ -87,4 +87,12 @@ public final class FourBitCharset implements EmpireCharset {
 		return ENCODING_CACHE;
 	}
 
+	@Override
+	public long decodeImpl(char[] dest, Input src, int srcOffset, int chars) {
+
+		return 0;
+	}
+
+	public native long nDecodeImpl(char[] dest, Input src, int srcOffset, int chars);
+
 }

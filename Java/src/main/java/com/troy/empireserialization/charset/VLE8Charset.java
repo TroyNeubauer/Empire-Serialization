@@ -1,5 +1,6 @@
 package com.troy.empireserialization.charset;
 
+import com.troy.empireserialization.EmpireConstants;
 import com.troy.empireserialization.io.in.*;
 import com.troy.empireserialization.io.out.*;
 import com.troy.empireserialization.util.*;
@@ -53,7 +54,6 @@ public class VLE8Charset implements EmpireCharset {
 
 	@Override
 	public long encodeImpl(char[] src, Output dest, int srcOffset, int chars, int info) {
-
 		final int end = srcOffset + chars;
 		if (info == StringInfo.ALL_ASCII) {
 			while (srcOffset < end)
@@ -110,5 +110,33 @@ public class VLE8Charset implements EmpireCharset {
 	public int[] getEncodingCache() {
 		return ENCODING_CACHE;
 	}
+
+	@Override
+	public long decodeImpl(char[] dest, Input src, int srcOffset, int chars) {
+		int value;
+		long count = 0;
+		for (int i = 0; i < chars; i++) {
+			value = src.readByte();
+			count++;
+			int result = value & EmpireConstants.VLE_MASK;
+			if ((value & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+				value = src.readByte();
+				count++;
+				result |= (value & EmpireConstants.VLE_MASK) << 7;
+				if ((value & EmpireConstants.NEXT_BYTE_VLE) != 0) {
+					value = src.readByte();
+					count++;
+					result |= (value & EmpireConstants.VLE_MASK) << 14;
+				}
+			}
+			
+			dest[srcOffset++] = (char) (value & 0xFFFF);
+		}
+
+		return count;
+	}
+
+	@Override
+	public native long nDecodeImpl(char[] dest, Input src, int srcOffset, int chars);
 
 }
