@@ -1,5 +1,7 @@
 package com.troy.empireserialization;
 
+import static com.troy.empireserialization.EmpireOpCodes.*;
+
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -128,7 +130,7 @@ public class EmpireOutput implements ObjectOut {
 		IntValue<Class<?>> classEntry = classCache.get(type);
 		if (classEntry == null) {// Determine if the class hasn't been written before
 			// We need to define the class and object
-			out.writeByte(EmpireOpCodes.TYPE_DEF_OBJ_DEF_TYPE);
+			out.writeByte(TYPE_DEF_OBJ_DEF_TYPE);
 			writeTypeDefinition(type);
 			writeObjectDefinition(obj);
 		} else {// The class has been written before - we either need to define the fields, or reference the previously
@@ -142,12 +144,12 @@ public class EmpireOutput implements ObjectOut {
 		if (objEntry == null) {// We need to define the object but not the type
 			objectCache.add(obj, objectCache.size());
 
-			out.writeByte(EmpireOpCodes.TYPE_REF_OBJ_DEF_TYPE);
+			out.writeByte(TYPE_REF_OBJ_DEF_TYPE);
 			// Write the type's id
 			out.writeVLEInt(classEntry.value);
 			writeObjectDefinition(obj);
 		} else {// The object already exists so just reference it
-			out.writeByte(EmpireOpCodes.OBJ_REF_TYPE);
+			out.writeByte(OBJ_REF_TYPE);
 			// Write only the object's id
 			out.writeVLEInt(objEntry.value);
 		}
@@ -209,20 +211,20 @@ public class EmpireOutput implements ObjectOut {
 	@Override
 	public void writeString(String str) {
 		if (str.equals(EmpireConstants.HELLO_WORLD_STRING)) {
-			out.writeByte(EmpireOpCodes.HELLO_WORLD_STRING_CONST);
+			out.writeByte(HELLO_WORLD_STRING_CONST);
 		} else {
 			int len = str.length();
 			if (len == 0) {
-				out.writeByte(EmpireOpCodes.EMPTY_STRING_CONST);
+				out.writeByte(EMPTY_STRING_CONST);
 			} else {
 				IntValue<String> cached = stringCache.get(str);
 				if (cached != null) {
-					out.writeByte(EmpireOpCodes.STRING_REF_TYPE);
+					out.writeByte(STRING_REF_TYPE);
 					out.writeVLEInt(cached.value);
 				} else {
 					StringInfo info = EmpireCharsets.identifyCharset(str, 0, str.length());
 					EmpireCharset charset = info.charset;
-					int opCode = EmpireOpCodes.STRING_TYPE_MAJOR_CODE;
+					int opCode = STRING_TYPE_MAJOR_CODE;
 					opCode |= (charset.getCharsetCode() & 0b11) << 4;
 					boolean lengthFitsIntoOpCode = len < (1 << 4);
 					if (lengthFitsIntoOpCode) {
@@ -270,14 +272,14 @@ public class EmpireOutput implements ObjectOut {
 		if (sameType) {
 			IntValue<Class<?>> entry = classCache.get(lastType);
 			if (ClassHelper.isPrimitive(lastType)) {
-				out.writeByte(EmpireOpCodes.PRIMITIVE_ARRAY_TYPE);
+				out.writeByte(PRIMITIVE_ARRAY_TYPE);
 			} else if (entry == null) {
-				out.writeByte(EmpireOpCodes.USER_DEFINED_ARRAY_TYPE_DEF_TYPE);
+				out.writeByte(USER_DEFINED_ARRAY_TYPE_DEF_TYPE);
 			} else {
-				out.writeByte(EmpireOpCodes.USER_DEFINED_ARRAY_TYPE_REF_TYPE);
+				out.writeByte(USER_DEFINED_ARRAY_TYPE_REF_TYPE);
 			}
 		} else {
-			out.writeByte(EmpireOpCodes.WILD_CARD_ARRAY_TYPE);
+			out.writeByte(WILD_CARD_ARRAY_TYPE);
 		}
 		out.writeVLEInt(length);
 		if (sameType) {
@@ -301,7 +303,7 @@ public class EmpireOutput implements ObjectOut {
 
 	@Override
 	public void writeList(List<?> list) {
-		out.writeByte(EmpireOpCodes.LIST_TYPE);
+		out.writeByte(LIST_TYPE);
 		int size = list.size();
 		if (list instanceof LinkedList) {
 		} else if (list instanceof ArrayList) {
@@ -334,9 +336,9 @@ public class EmpireOutput implements ObjectOut {
 		if (ClassHelper.isPrimitive(type)) {
 			opcode = EmpireConstants.PRIMITIVE_TYPE;
 			if (settings.useVLE) {
-				opcode |= EmpireOpCodes.PRIMITIVE_TYPE_VLE_MAPPING.get(type);
+				opcode |= PRIMITIVE_TYPE_VLE_MAPPING.get(type);
 			} else {
-				opcode |= EmpireOpCodes.PRIMITIVE_TYPE_MAPPING.get(type);
+				opcode |= PRIMITIVE_TYPE_MAPPING.get(type);
 			}
 			out.writeByte(opcode);
 		} else {

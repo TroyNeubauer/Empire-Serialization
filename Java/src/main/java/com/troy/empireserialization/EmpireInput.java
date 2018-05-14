@@ -6,8 +6,10 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import static com.troy.empireserialization.EmpireConstants.*;
+import static com.troy.empireserialization.EmpireOpCodes.*;
 
-import com.troy.empireserialization.cache.IntValueCache;
+import com.troy.empireserialization.cache.IntKeyCache;
 import com.troy.empireserialization.cache.IntStringCache;
 import com.troy.empireserialization.charset.EmpireCharset;
 import com.troy.empireserialization.charset.EmpireCharsets;
@@ -22,8 +24,8 @@ public class EmpireInput implements ObjectIn {
 	private Input in;
 
 	private IntStringCache stringCache = new IntStringCache(100, 1.0);
-	private IntValueCache<Class<?>> classCache = new IntValueCache<Class<?>>(100, 1.0);
-	private IntValueCache<Object> objectCache = new IntValueCache<Object>(200, 1.0);
+	private IntKeyCache<Class<?>> classCache = new IntKeyCache<Class<?>>(100, 1.0);
+	private IntKeyCache<Object> objectCache = new IntKeyCache<Object>(200, 1.0);
 	private SerializationSettings settings;
 
 	public EmpireInput(Input in) {
@@ -44,21 +46,30 @@ public class EmpireInput implements ObjectIn {
 	}
 
 	@Override
-	public <T> T readObject() {
+	public Object readObject() {
 		int opcode = in.readByte();
-		if (opcode == EmpireOpCodes.TYPE_REF_OBJ_DEF_TYPE) {
+		if (opcode == TYPE_REF_OBJ_DEF_TYPE) {
 
-		} else if (opcode == EmpireOpCodes.OBJ_REF_TYPE) {
+		} else if (opcode == OBJ_REF_TYPE) {
+			return objectCache.get(in.readVLEInt()).value;
+		} else if (opcode == TYPE_DEF_OBJ_DEF_TYPE) {
 
-		} else if (opcode == EmpireOpCodes.TYPE_DEF_OBJ_DEF_TYPE) {
-
-		} else if (opcode == EmpireOpCodes.NULL_REF_CONST) {
+		} else if (opcode == NULL_REF_CONST) {
 			return null;
-		} else if (opcode == EmpireOpCodes.STRING_REF_TYPE) {
-
-		} else if ((opcode & EmpireOpCodes.MAJOR_CODE_MASK) == EmpireOpCodes.STRING_TYPE_MAJOR_CODE) {
+		} else if (opcode == STRING_REF_TYPE) {
+			return stringCache.get(in.readVLEInt());
+		} else if ((opcode & MAJOR_CODE_MASK) == STRING_TYPE_MAJOR_CODE) {
 			String s = readStringImpl(opcode);
 
+		} else if (opcode == EMPTY_STRING_CONST) {
+			return "";
+		} else if (opcode == HELLO_WORLD_STRING_CONST) {
+			return HELLO_WORLD_STRING;
+		} else if (opcode == LIST_TYPE) {
+		} else if (opcode == STACK_TYPE) {
+		} else if (opcode == QUEUE_TYPE) {
+		} else if (opcode == SET_TYPE) {
+		} else if (opcode == MAP_TYPE) {
 		}
 
 		return null;
@@ -110,14 +121,14 @@ public class EmpireInput implements ObjectIn {
 	}
 
 	private String readStringImpl(int opcode) {
-		if ((opcode & EmpireOpCodes.MAJOR_CODE_MASK) != EmpireOpCodes.STRING_TYPE_MAJOR_CODE) {
+		if ((opcode & MAJOR_CODE_MASK) != STRING_TYPE_MAJOR_CODE) {
 			throw new MismatchedInputException(
 					"Expected a String major opcode " + StringFormatter.toBinaryString(EmpireOpCodes.STRING_TYPE_MAJOR_CODE) + " but instead read "
-							+ StringFormatter.toBinaryString(opcode & EmpireOpCodes.MAJOR_CODE_MASK));
+							+ StringFormatter.toBinaryString(opcode & MAJOR_CODE_MASK));
 		}
-		int charsetCode = (opcode & EmpireOpCodes.STRING_CHARSET_MASK) >> 4;
+		int charsetCode = (opcode & STRING_CHARSET_MASK) >> 4;
 		EmpireCharset charset = EmpireCharsets.get(charsetCode);
-		int length = opcode & EmpireOpCodes.STRING_LENGTH_MASK;
+		int length = opcode & STRING_LENGTH_MASK;
 		if (length == 0) {
 			length = in.readVLEInt();
 		}

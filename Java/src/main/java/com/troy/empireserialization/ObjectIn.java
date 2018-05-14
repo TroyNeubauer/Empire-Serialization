@@ -8,7 +8,7 @@ import java.util.Set;
 
 public interface ObjectIn extends AutoCloseable {
 	
-	public <T> T readObject();
+	public Object readObject();
 
 	// For writing "primitives"
 
