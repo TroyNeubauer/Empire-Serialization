@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.troy.empireserialization.util.ClassHelper;
-
 /**
  * 
  * See <a href=
@@ -17,13 +15,16 @@ import com.troy.empireserialization.util.ClassHelper;
 public class EmpireOpCodes {
 
 	//format:off
-	public static final int MAJOR_CODE_MASK 					= 0b11_000000;
-	public static final int MINIOR_CODE_MASK 					= 0b00_111111;
+	public static final int MAJOR_CODE_MASK 					= 0b11 << 6;
+	public static final int MINIOR_CODE_MASK 					= 0b00 << 6;
 	
 	public static final int GENERAL_OPCODE_MAJOR_CODE 			= 0b00 << 6;
 	public static final int STRING_TYPE_MAJOR_CODE 				= 0b01 << 6;
 	public static final int UNSIGNED_INTEGER_MAJOR_CODE 		= 0b10 << 6;
 	public static final int SIGNED_INTEGER_MAJOR_CODE 			= 0b11 << 6;
+	
+	public static final int STRING_CHARSET_MASK					= 0b11 << 4;
+	public static final int STRING_LENGTH_MASK					= 0b00001111;
 	
 	//General minor codes
 	public static final int NULL_REF_CONST 						= 0x00 | GENERAL_OPCODE_MAJOR_CODE;
