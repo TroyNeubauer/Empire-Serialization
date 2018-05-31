@@ -26,7 +26,7 @@ public class EmpireStringGuess extends AbstractGuess {
 				} else if (b == EmpireOpCodes.EMPTY_STRING_CONST) {
 					guesses.add(new AnnotatedSection(count + getOffset(), 1, "Empty String: \"\"",
 							"The opcode " + EmpireOpCodes.EMPTY_STRING_CONST + " indicates an empty string", nextColor()));
-				} else if ((b & EmpireOpCodes.MAJOR_CODE_MASK) == EmpireOpCodes.STRING_TYPE_MAJOR_CODE) {
+				} else if ((b & EmpireOpCodes.MAJOR_CODE_MASK) == EmpireOpCodes.STRING_MAJOR_CODE) {
 					long start = count - 1 + getOffset();
 					int charset = b >> 4 & 0b11;
 					int length = b & 0b1111;
