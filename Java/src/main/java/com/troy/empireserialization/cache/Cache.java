@@ -16,7 +16,7 @@ public abstract class Cache<Entry> {
 	protected abstract void resize(int newSize);
 
 	public int hash(Object key) {
-		return Math.floorMod(key == null ? 0 : key.hashCode(), table.length);
+		return key == null ? 0 : ((table.length - 1) & key.hashCode());
 	}
 
 	public int size() {
