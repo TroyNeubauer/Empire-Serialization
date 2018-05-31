@@ -1,6 +1,5 @@
 package com.troy.empireserialization.io.out;
 
-import com.troy.empireserialization.exception.NoBufferException;
 import com.troy.empireserialization.memory.MasterMemoryBlock;
 import com.troy.empireserialization.memory.NativeMemoryBlock;
 import com.troy.empireserialization.util.MiscUtil;

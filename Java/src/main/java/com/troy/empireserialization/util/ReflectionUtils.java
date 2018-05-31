@@ -8,6 +8,8 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class ReflectionUtils {
 	private static final Method BIG_DOUBLE_INFLATED;
@@ -41,7 +43,8 @@ public class ReflectionUtils {
 			throw new RuntimeException(e1);
 		}
 
-		// Reflection code that ensures all reflection related final static fields can be accessed without worry
+		// Reflection code that ensures all reflection related final static fields can
+		// be accessed without worry
 		// Works by calling the setAccessible method on each static field
 		for (Field reflectionThing : ReflectionUtils.class.getDeclaredFields()) {
 			try {
@@ -50,7 +53,8 @@ public class ReflectionUtils {
 				if (Modifier.isStatic(mods) && Modifier.isFinal(mods) && field instanceof AccessibleObject) {
 					// Lets us call the method
 					accessibleObjMethod.setAccessible(true);
-					// Sets the calls the method's of field's setAccessible method so that we can access them
+					// Sets the calls the method's of field's setAccessible method so that we can
+					// access them
 					accessibleObjMethod.invoke(field, true);
 				}
 			} catch (Exception e) {
@@ -84,5 +88,17 @@ public class ReflectionUtils {
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static Object[] getListData(List<?> list) {
+		if (list instanceof ArrayList) {
+			return getData((ArrayList<?>) list);
+		} else {
+			return list.toArray();
+		}
+	}
+
+	public static Object[] getSetData(Set<?> set) {
+		return set.toArray();
 	}
 }

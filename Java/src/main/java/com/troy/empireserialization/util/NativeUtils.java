@@ -5,6 +5,11 @@ import java.nio.*;
 
 import com.troy.empireserialization.nativelibrary.*;
 
+/**
+ * A class that contains utilities for using native code as well as all native methods
+ * @author Troy Neubauer
+ *
+ */
 public class NativeUtils {
 
 	private static final int ERROR_CODE_OFFSET = 0;// The error code is one byte
@@ -46,7 +51,7 @@ public class NativeUtils {
 		InternalLog.log("Called " + count + " methods in " + (end - start) / 1000000.0 + " milliseconds");
 	}
 
-	public static boolean NATIVES_ENABLED = false;
+	public static boolean NATIVES_ENABLED = true;
 
 	// Always use native
 	public static final int MIN_NATIVE_THRESHOLD = 0;

@@ -1,66 +1,38 @@
 package com.troy.empireserialization;
 
-import java.io.*;
-import java.math.*;
-import java.util.*;
+import java.io.Flushable;
 
-public interface ObjectOut extends ClassIDProvider, Flushable, AutoCloseable {
+import com.troy.empireserialization.cache.IntValue;
+import com.troy.empireserialization.cache.IntValueCache;
 
-	public void writeObject(Object obj);
+public interface ObjectOut extends Flushable, AutoCloseable {
 
-	// For writing "primitives"
-
-	public void writeByte(byte b);
-
-	public void writeShort(short s);
-
-	public void writeInt(int i);
-
-	public void writeLong(long l);
-
-	public void writeFloat(float f);
-
-	public void writeDouble(double d);
-
-	public void writeChar(char c);
-
-	public void writeBoolean(boolean b);
-
-	public void writeString(String str);
-
-	public void writeBigInteger(BigInteger integer);
-
-	public void writeBigDecimal(BigDecimal decimal);
-
-	public void writeArray(Object[] array);
-
-	public void writeList(List<?> list);
-
-	public void writeSet(Set<?> set);
-
-	public void writeMap(Map<?, ?> map);
-
-	/**
-	 * Handles cases where the user passes a "primitive" into the write object method as an object (ie a set, list, map,
-	 * Integer, Float, Character) This ,method checks all primitives as opposed to
-	 * {@link #checkForPrimitiveFast(Object, Class)}
-	 * 
-	 * @return {@code true} If the type passed in was a primitive and was written using the correct writeX() method
-	 *         {@code false} otherwise
-	 */
-	public boolean checkForPrimitiveSlow(Object obj, Class<?> clazz);
-
-	/**
-	 * Handles cases where the user passes a "primitive" into the write object method as an object (ie a string, set,
-	 * list, map) This method only checks the primitive non wrapper classes.
-	 * 
-	 * @return {@code true} If the type passed in was a primitive and was written using the correct writeX() method
-	 *         {@code false} otherwise
-	 */
-	public boolean checkForPrimitiveFast(Object obj, Class<?> clazz);
+	public <T> void writeObject(T obj);
 
 	public void flush();
 
 	public void close();
+
+	/**
+	 * Called recursively to write an instance variable of an object
+	 * 
+	 * @param object
+	 *            The object to write
+	 */
+	<T> void writeObjectRecursive(T object, long extra);
+	
+	public void writeString(String str);
+	
+	void writeTypeReference(IntValue<Class<?>> entry);
+
+	void writeTypeDefinition(Class<?> type);
+	
+	public void writeTypeComplete(Class<?> type);
+
+	public IntValueCache<Object> getObjectCache();
+
+	public IntValueCache<Class<?>> getClassCache();
+
+	public IntValueCache<String> getStringCache();
 
 }
