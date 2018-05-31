@@ -25,6 +25,8 @@ public class EmpireCharsets {
 	}
 
 	public static StringInfo identifyCharset(char[] chars, int offset, int length) {
+		if (true)
+			return new StringInfo(VLE8_CHARSET, StringInfo.ALL_ASCII);
 		if (NativeUtils.NATIVES_ENABLED) {
 			int result = nIdentifyCharset(chars, offset, length);
 			int value = result & 0b11;
@@ -80,9 +82,16 @@ public class EmpireCharsets {
 
 	public static void write(String str, Output out) {
 		char[] chars = MiscUtil.getCharsFast(str);
-		int len = chars.length;
-		StringInfo charset = identifyCharset(chars, 0, len);
-		charset.charset.encode(chars, out, 0, len, charset.info);
+		write(chars, 0, chars.length, out);
+	}
+
+	public static void write(char[] chars, Output out) {
+		write(chars, 0, chars.length, out);
+	}
+
+	public static void write(char[] chars, int offset, int len, Output out) {
+		StringInfo info = identifyCharset(chars, offset, len);
+		info.charset.encode(chars, out, offset, len, info.info);
 	}
 
 	public static EmpireCharset get(int charset) {

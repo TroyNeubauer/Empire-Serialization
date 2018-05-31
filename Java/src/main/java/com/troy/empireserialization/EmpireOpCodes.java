@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.troy.empireserialization.util.ClassHelper;
+
 /**
  * 
  * See <a href=
@@ -16,14 +18,14 @@ public class EmpireOpCodes {
 
 	//format:off
 	public static final int MAJOR_CODE_MASK 					= 0b11 << 6;
-	public static final int MINIOR_CODE_MASK 					= 0b00 << 6;
+	public static final int MINIOR_CODE_MASK 					= 0b00111111;
 	
 	public static final int GENERAL_OPCODE_MAJOR_CODE 			= 0b00 << 6;
-	public static final int STRING_TYPE_MAJOR_CODE 				= 0b01 << 6;
-	public static final int UNSIGNED_INTEGER_MAJOR_CODE 		= 0b10 << 6;
-	public static final int SIGNED_INTEGER_MAJOR_CODE 			= 0b11 << 6;
+	public static final int STRING_MAJOR_CODE 					= 0b01 << 6;
+	public static final int DATA_STRUCTURES_MAJOR_CODE 			= 0b10 << 6;
+	public static final int NUMBER_MAJOR_CODE 					= 0b11 << 6;
 	
-	public static final int STRING_CHARSET_MASK					= 0b11 << 4;
+	public static final int STRING_CHARSET_MASK					= 0b00110000;
 	public static final int STRING_LENGTH_MASK					= 0b00001111;
 	
 	//General minor codes
@@ -61,60 +63,38 @@ public class EmpireOpCodes {
 	public static final int QUADRUPLE_TYPE						= 0x1C | GENERAL_OPCODE_MAJOR_CODE;
 	public static final int OCTUPLE_TYPE						= 0x1D | GENERAL_OPCODE_MAJOR_CODE;
 	
-	public static final int FLOAT_0_CONST						= 0x1E | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int FLOAT_1_CONST						= 0x1F | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int FLOAT_2_CONST						= 0x20 | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int DOUBLE_0_CONST						= 0x21 | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int DOUBLE_1_CONST						= 0x22 | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int DOUBLE_2_CONST						= 0x23 | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int HELLO_WORLD_STRING_CONST 			= 0x1E | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int EMPTY_STRING_CONST		 			= 0x1F | GENERAL_OPCODE_MAJOR_CODE;
 	
-	public static final int VLE_UNSIGNED_SHORT_TYPE 			= 0x24 | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int VLE_UNSIGNED_INT_TYPE 				= 0x25 | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int VLE_UNSIGNED_LONG_TYPE 				= 0x26 | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int VLE_UNSIGNED_SHORT_TYPE 			= 0x20 | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int VLE_UNSIGNED_INT_TYPE 				= 0x21 | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int VLE_UNSIGNED_LONG_TYPE 				= 0x22 | GENERAL_OPCODE_MAJOR_CODE;
 	
-	public static final int VLE_SIGNED_SHORT_TYPE 				= 0x27 | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int VLE_SIGNED_INT_TYPE 				= 0x28 | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int VLE_SIGNED_LONG_TYPE 				= 0x29 | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int VLE_SIGNED_SHORT_TYPE 				= 0x23 | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int VLE_SIGNED_INT_TYPE 				= 0x24 | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int VLE_SIGNED_LONG_TYPE 				= 0x25 | GENERAL_OPCODE_MAJOR_CODE;
 	
-	public static final int PRIMITIVE_ARRAY_TYPE 				= 0x2A | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int USER_DEFINED_ARRAY_TYPE_DEF_TYPE 	= 0x2B | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int USER_DEFINED_ARRAY_TYPE_REF_TYPE 	= 0x2C | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int WILD_CARD_ARRAY_TYPE 				= 0x2D | GENERAL_OPCODE_MAJOR_CODE;
+	//Data Structures
 	
-	public static final int HELLO_WORLD_STRING_CONST 			= 0x30 | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int EMPTY_STRING_CONST		 			= 0x31 | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int PRIMITIVE_ARRAY_TYPE		 		= 0x00 | DATA_STRUCTURES_MAJOR_CODE;
+	public static final int USER_DEFINED_TYPE_DEF_ARRAY_TYPE	= 0x01 | DATA_STRUCTURES_MAJOR_CODE;
+	public static final int USER_DEFINED_TYPE_REF_ARRAY_TYPE	= 0x02 | DATA_STRUCTURES_MAJOR_CODE;
+	public static final int POLYMORPHIC_ARRAY_TYPE				= 0x03 | DATA_STRUCTURES_MAJOR_CODE;
 	
-	public static final int LIST_TYPE		 					= 0x34 | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int STACK_TYPE			 				= 0x35 | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int QUEUE_TYPE		 					= 0x36 | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int SET_TYPE			 				= 0x37 | GENERAL_OPCODE_MAJOR_CODE;
-	public static final int MAP_TYPE		 					= 0x38 | GENERAL_OPCODE_MAJOR_CODE;
+	public static final int PRIMITIVE_MAP_TYPE		 			= 0x08 | DATA_STRUCTURES_MAJOR_CODE;
+	public static final int USER_DEFINED_TYPE_DEF_MAP_TYPE		= 0x09 | DATA_STRUCTURES_MAJOR_CODE;
+	public static final int USER_DEFINED_TYPE_REF_MAP_TYPE		= 0x0A | DATA_STRUCTURES_MAJOR_CODE;
+	public static final int POLYMORPHIC_MAP_TYPE				= 0x0B | DATA_STRUCTURES_MAJOR_CODE;
 	
 	
 	
 	//format:on
-	private static class MyHashMap<K, V> extends HashMap<K, V> {
-		@Override
-		public V get(Object key) {
-			Class<?> type = (Class<?>) key;
-			if (List.class.isAssignableFrom(type)) {
-				return get(List.class);
-			}
-			if (Set.class.isAssignableFrom(type)) {
-				return get(Set.class);
-			}
-			if (Map.class.isAssignableFrom(type)) {
-				return get(Map.class);
-			}
-			return super.get(key);
-		}
-	}
-
 	public static final HashMap<Class<?>, Integer> PRIMITIVE_TYPE_MAPPING;
 	public static final HashMap<Class<?>, Integer> PRIMITIVE_TYPE_VLE_MAPPING;
 
 	static {
 		PRIMITIVE_TYPE_MAPPING = new HashMap<Class<?>, Integer>();
+		PRIMITIVE_TYPE_MAPPING.put(boolean.class, UNSIGNED_BYTE_TYPE);
 		PRIMITIVE_TYPE_MAPPING.put(byte.class, SIGNED_BYTE_TYPE);
 		PRIMITIVE_TYPE_MAPPING.put(short.class, SIGNED_SHORT_TYPE);
 		PRIMITIVE_TYPE_MAPPING.put(int.class, SIGNED_INT_TYPE);
@@ -123,6 +103,7 @@ public class EmpireOpCodes {
 		PRIMITIVE_TYPE_MAPPING.put(double.class, DOUBLE_TYPE);
 		PRIMITIVE_TYPE_MAPPING.put(char.class, UNSIGNED_SHORT_TYPE);
 
+		PRIMITIVE_TYPE_MAPPING.put(Boolean.class, UNSIGNED_BYTE_TYPE);
 		PRIMITIVE_TYPE_MAPPING.put(Byte.class, SIGNED_BYTE_TYPE);
 		PRIMITIVE_TYPE_MAPPING.put(Short.class, SIGNED_SHORT_TYPE);
 		PRIMITIVE_TYPE_MAPPING.put(Integer.class, SIGNED_INT_TYPE);
@@ -131,11 +112,25 @@ public class EmpireOpCodes {
 		PRIMITIVE_TYPE_MAPPING.put(Double.class, DOUBLE_TYPE);
 		PRIMITIVE_TYPE_MAPPING.put(Character.class, SIGNED_SHORT_TYPE);
 
-		PRIMITIVE_TYPE_MAPPING.put(String.class, STRING_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(boolean[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(byte[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(short[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(int[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(long[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(float[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(double[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(char[].class, PRIMITIVE_ARRAY_TYPE);
 
-		PRIMITIVE_TYPE_MAPPING.put(List.class, LIST_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(Set.class, SET_TYPE);
-		PRIMITIVE_TYPE_MAPPING.put(Map.class, MAP_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Boolean[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Byte[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Short[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Integer[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Long[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Float[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Double[].class, PRIMITIVE_ARRAY_TYPE);
+		PRIMITIVE_TYPE_MAPPING.put(Character[].class, PRIMITIVE_ARRAY_TYPE);
+
+		PRIMITIVE_TYPE_MAPPING.put(String.class, STRING_TYPE);
 
 		PRIMITIVE_TYPE_VLE_MAPPING = new HashMap<Class<?>, Integer>(PRIMITIVE_TYPE_MAPPING);
 
