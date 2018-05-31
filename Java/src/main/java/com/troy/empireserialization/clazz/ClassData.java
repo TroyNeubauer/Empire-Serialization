@@ -1,17 +1,16 @@
 package com.troy.empireserialization.clazz;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 
-import com.troy.empireserialization.ClassIDProvider;
-import com.troy.empireserialization.EmpireOpCodes;
+import com.troy.empireserialization.EmpireOutput;
 import com.troy.empireserialization.SerializationSettings;
-import com.troy.empireserialization.charset.EmpireCharsets;
-import com.troy.empireserialization.io.out.*;
+import com.troy.empireserialization.io.out.Output;
 import com.troy.empireserialization.serializers.FieldType;
-import com.troy.empireserialization.util.*;
+import com.troy.empireserialization.util.MiscUtil;
 
-import sun.misc.*;
+import sun.misc.Unsafe;
 
 public class ClassData<T> {
 	private static final Unsafe unsafe = MiscUtil.getUnsafe();
@@ -24,18 +23,16 @@ public class ClassData<T> {
 	public long[] fieldOffsets;
 	public FieldType[] myFieldTypes;
 
-	private byte[] typeDefinition;
-
-	public ClassData(Class<T> type, ClassIDProvider provider) {
-		this(type, SerializationSettings.defaultSettings, provider);
+	public ClassData(Class<T> type) {
+		this(type, SerializationSettings.defaultSettings);
 	}
 
-	public ClassData(Class<T> type, SerializationSettings settings, ClassIDProvider provider) {
+	public ClassData(Class<T> type, SerializationSettings settings) {
 		this.type = type;
-		init(settings, provider);
+		init(settings);
 	}
 
-	private void init(SerializationSettings settings, ClassIDProvider provider) {
+	private void init(SerializationSettings settings) {
 		Class<?> superType = type.getSuperclass();
 		if (type == null) {
 		} else {
@@ -96,7 +93,6 @@ public class ClassData<T> {
 				}
 			}
 		}
-		writeTypeDefinition(settings, provider);
 	}
 
 	private boolean isValidField(Field field) {
@@ -104,43 +100,15 @@ public class ClassData<T> {
 		return !Modifier.isStatic(mods) && !Modifier.isTransient(mods);
 	}
 
-	private void writeTypeDefinition(SerializationSettings settings, ClassIDProvider provider) {
+	public void writeTypeDefinition(EmpireOutput out) {
 		int length = rawFields.length;
-		int bitFieldBytes = (length + 3) / 4;
-		ByteArrayOutput out = new ByteArrayOutput(100 + bitFieldBytes);
-		byte[] bitfield = out.getBuffer();
-
-		EmpireCharsets.write(type.getName(), out);
-		out.writeVLEInt(length);
+		Output impl = out.getImpl();
+		out.writeString(type.getSimpleName());
+		impl.writeVLEInt(length);
 		for (int i = 0; i < length; i++) {
-			Field field = rawFields[i];
-			int shift = 6 - (i % 4) * 2;
-			FieldType type = myFieldTypes[i];
-			bitfield[out.getBufferPosition() + i / 4] |= (type.getCode() << shift);
+			out.writeTypeComplete(fieldTypes[i]);
+			out.writeString(fieldNames[i]);
 		}
-		out.setBufferPosition(out.getBufferPosition() + bitFieldBytes);
-		for (int i = 0; i < length; i++) {
-			Class<?> fieldType = fieldTypes[i];
-			FieldType myType = myFieldTypes[i];
-			switch (myType) {
-			case PRIMITIVE:
-				out.writeByte((settings.useVLE ? EmpireOpCodes.PRIMITIVE_TYPE_VLE_MAPPING
-						: EmpireOpCodes.PRIMITIVE_TYPE_MAPPING).get(fieldType));
-				break;
-			case USER_DEFINED:
-				out.writeVLEInt(provider.getTypeID(fieldType));
-				break;
-			case WILDCARD:
-				break;
-			default:
-				throw new Error();
-			}
-			EmpireCharsets.write(fieldNames[i], out);
-		}
-
-		// Write it
-		typeDefinition = Arrays.copyOf(out.getBuffer(), out.getBufferPosition());
-		out.close();
 	}
 
 	private void addField(Field field, int index) {
@@ -151,10 +119,6 @@ public class ClassData<T> {
 		myFieldTypes[index] = FieldType.identifyFieldType(field);
 		if (unsafe != null)
 			fieldOffsets[index] = unsafe.objectFieldOffset(field);
-	}
-
-	public byte[] getTypeDefinition() {
-		return typeDefinition;
 	}
 
 	public Field[] getFields() {

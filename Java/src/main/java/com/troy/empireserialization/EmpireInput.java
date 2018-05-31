@@ -1,13 +1,14 @@
 package com.troy.empireserialization;
 
+import static com.troy.empireserialization.EmpireConstants.HELLO_WORLD_STRING;
+import static com.troy.empireserialization.EmpireOpCodes.*;
+
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import static com.troy.empireserialization.EmpireConstants.*;
-import static com.troy.empireserialization.EmpireOpCodes.*;
 
 import com.troy.empireserialization.cache.IntKeyCache;
 import com.troy.empireserialization.cache.IntStringCache;
@@ -47,84 +48,84 @@ public class EmpireInput implements ObjectIn {
 
 	@Override
 	public Object readObject() {
+		return readObjectImpl();
+	}
+	
+	@Override
+	public Object readObjectRecursive() {
+		return readObjectImpl();
+	}
+	
+	private Object readObjectImpl() {
 		int opcode = in.readByte();
-		if (opcode == TYPE_REF_OBJ_DEF_TYPE) {
+		int majorOpcode = opcode & MAJOR_CODE_MASK;
+		int minorOpcode = opcode & MINIOR_CODE_MASK;
+		if (majorOpcode == GENERAL_OPCODE_MAJOR_CODE) {
+			if (opcode == TYPE_REF_OBJ_DEF_TYPE) {
+			} else if (opcode == OBJ_REF_TYPE) {
+				return objectCache.get(in.readVLEInt()).value;
+			} else if (opcode == TYPE_DEF_OBJ_DEF_TYPE) {
 
-		} else if (opcode == OBJ_REF_TYPE) {
-			return objectCache.get(in.readVLEInt()).value;
-		} else if (opcode == TYPE_DEF_OBJ_DEF_TYPE) {
-
-		} else if (opcode == NULL_REF_CONST) {
-			return null;
-		} else if (opcode == STRING_REF_TYPE) {
-			return stringCache.get(in.readVLEInt());
-		} else if ((opcode & MAJOR_CODE_MASK) == STRING_TYPE_MAJOR_CODE) {
-			String s = readStringImpl(opcode);
-
-		} else if (opcode == EMPTY_STRING_CONST) {
-			return "";
-		} else if (opcode == HELLO_WORLD_STRING_CONST) {
-			return HELLO_WORLD_STRING;
-		} else if (opcode == LIST_TYPE) {
-		} else if (opcode == STACK_TYPE) {
-		} else if (opcode == QUEUE_TYPE) {
-		} else if (opcode == SET_TYPE) {
-		} else if (opcode == MAP_TYPE) {
+			} else if (opcode == NULL_REF_CONST) {
+				return null;
+			} else if (opcode == STRING_REF_TYPE) {
+				return stringCache.get(in.readVLEInt());
+			} else if (opcode == EMPTY_STRING_CONST) {
+				return "";// Hope that its not a data structure
+			} else if (opcode == HELLO_WORLD_STRING_CONST) {
+				return HELLO_WORLD_STRING;
+			}
+		} else if (majorOpcode == DATA_STRUCTURES_MAJOR_CODE) {
+			int opcodeOver4 = minorOpcode / 4;
+			if (opcodeOver4 / 4 == PRIMITIVE_ARRAY_TYPE / 4) {
+				return readArrayImpl(opcode);
+			} else if (opcodeOver4 / 4 == PRIMITIVE_MAP_TYPE / 4) {
+				return readMapImpl(opcode);
+			}
+		} else if (majorOpcode == NUMBER_MAJOR_CODE) {
+			return Integer.valueOf(minorOpcode);
+		} else if (majorOpcode == STRING_MAJOR_CODE) {
+			return readStringImpl(opcode);
+		} else {// There should be no other major codes unless something is very wrong
+			throw new Error();
 		}
-
 		return null;
 	}
 
-	@Override
-	public byte readByte() {
-		return in.readByte();
+	private Object[] readArrayImpl(int opcode) {
+		if (opcode == PRIMITIVE_ARRAY_TYPE) {
+
+		} else if (opcode == USER_DEFINED_TYPE_DEF_ARRAY_TYPE) {
+
+		} else if (opcode == USER_DEFINED_TYPE_REF_ARRAY_TYPE) {
+
+		} else if (opcode == POLYMORPHIC_ARRAY_TYPE) {
+
+		}
+		return null;
 	}
 
-	@Override
-	public short readShort() {
-		return in.readShort();
-	}
+	private Map<?, ?> readMapImpl(int opcode) {
+		if (opcode == PRIMITIVE_MAP_TYPE) {
 
-	@Override
-	public int readInt() {
-		return in.readInt();
-	}
+		} else if (opcode == USER_DEFINED_TYPE_DEF_MAP_TYPE) {
 
-	@Override
-	public long readLong() {
-		return in.readLong();
-	}
+		} else if (opcode == USER_DEFINED_TYPE_REF_MAP_TYPE) {
 
-	@Override
-	public float readFloat() {
-		return in.readFloat();
-	}
+		} else if (opcode == POLYMORPHIC_MAP_TYPE) {
 
-	@Override
-	public double readDouble() {
-		return in.readDouble();
+		}
+		return null;
 	}
-
-	@Override
-	public char readChar() {
-		return in.readChar();
-	}
-
-	@Override
-	public boolean readBoolean() {
-		return in.readBoolean();
-	}
-
-	@Override
+	
 	public String readString() {
 		return readStringImpl(in.readByte());
 	}
 
 	private String readStringImpl(int opcode) {
-		if ((opcode & MAJOR_CODE_MASK) != STRING_TYPE_MAJOR_CODE) {
-			throw new MismatchedInputException(
-					"Expected a String major opcode " + StringFormatter.toBinaryString(EmpireOpCodes.STRING_TYPE_MAJOR_CODE) + " but instead read "
-							+ StringFormatter.toBinaryString(opcode & MAJOR_CODE_MASK));
+		if ((opcode & MAJOR_CODE_MASK) != STRING_MAJOR_CODE) {
+			throw new MismatchedInputException("Expected a String major opcode " + StringFormatter.toBinaryString(EmpireOpCodes.STRING_MAJOR_CODE)
+					+ " but instead read " + StringFormatter.toBinaryString(opcode & MAJOR_CODE_MASK));
 		}
 		int charsetCode = (opcode & STRING_CHARSET_MASK) >> 4;
 		EmpireCharset charset = EmpireCharsets.get(charsetCode);
@@ -137,7 +138,7 @@ public class EmpireInput implements ObjectIn {
 
 		return MiscUtil.createString(dest);
 	}
-
+/*
 	@Override
 	public BigInteger readBigInteger() {
 		return new BigInteger(in.readBytes(in.readVLEInt()));
@@ -148,35 +149,7 @@ public class EmpireInput implements ObjectIn {
 		BigInteger integer = readBigInteger();
 		int scale = in.readVLEInt();
 		return new BigDecimal(integer, scale);
-	}
-
-	@Override
-	public Object[] readArray() {
-		int length = in.readVLEInt();
-		Object[] array = new Object[length];
-		for (int i = 0; i < length; i++) {
-			array[i] = readObject();
-		}
-		return array;
-	}
-
-	@Override
-	public List<?> readList() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Set<?> readSet() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Map<?, ?> readMap() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	}*/
 
 	@Override
 	public void close() {
