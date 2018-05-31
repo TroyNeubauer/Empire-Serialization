@@ -20,27 +20,33 @@ import com.troy.empireserialization.util.ReflectionUtils;
 import com.troy.empireserialization.util.StringFormatter;
 
 public class Main {
+	public static void main(String[] args) {
+		arrayTest();
+		System.exit(0);
+
+	}
+
 	// C:\Empire Serialization\Java Natives\bin\x64\Release
-	public static void main(String[] args) throws Throwable {
+	public static void test() {
 		System.out.println("e");
 		NativeFileInput i = new NativeFileInput(new File("./out.emp"));
 		i.readByte();
 		char[] chars = new char[12];
 		System.out.println(EmpireCharsets.SIX_BIT_CHARSET.decode(i, chars, 0, chars.length));
-		
+
 		System.out.println(StringFormatter.toHexString(i.readShort()));
 		short[] shorts = new short[2];
 		i.readShorts(shorts);
 		System.out.println(StringFormatter.toHexString(shorts));
 		i.close();
-		
+
 		System.exit(0);
-		
+
 		NativeFileOutput out = new NativeFileOutput(new File("./out.emp"));
 		EmpireOutput emp = new EmpireOutput(out);
 		emp.writeString("Test String!");
 		emp.close();
-		
+
 		System.exit(0);
 		init();
 
@@ -48,15 +54,25 @@ public class Main {
 		TestSuper sup = new TestSuper(10, "test String");
 		ClassA instance = new ClassA("Class A test!", 5);
 
-		//k.writeClassAndObject(new Output(1000), instance);
-/*
-		ByteArrayOutput out = new ByteArrayOutput();
-		EmpireOutput eo = new EmpireOutput(out);
-		eo.writeTypeComplete(String.class);
-		// eo.writeObject(instance);
-		eo.writeArray(new String[] { "one", "one", "one", "one", "one" });
-		System.out.println(StringFormatter.toBinaryString(out.getBuffer()));
-		eo.close();*/
+		// k.writeClassAndObject(new Output(1000), instance);
+		/*
+		 * ByteArrayOutput out = new ByteArrayOutput(); EmpireOutput eo = new
+		 * EmpireOutput(out); eo.writeTypeComplete(String.class); //
+		 * eo.writeObject(instance); eo.writeArray(new String[] { "one", "one", "one",
+		 * "one", "one" });
+		 * System.out.println(StringFormatter.toBinaryString(out.getBuffer()));
+		 * eo.close();
+		 */
+	}
+
+	private static void arrayTest() {
+		Object[] objects = new Object[3];
+		objects[0] = new TestSuper(15, "test0");
+		objects[1] = new TestSub(-1, "sub", 0xFF00FF);
+		ByteArrayOutput oout = new ByteArrayOutput();
+		EmpireOutput ooout = new EmpireOutput(oout);
+		ooout.writeObject(objects);
+		ooout.close();
 	}
 
 	private static void arrayListTest() {
@@ -129,8 +145,7 @@ public class Main {
 			for (Entry<Character, Integer> entry : r.entrySet()) {
 				char key = entry.getKey().charValue();
 				int value = entry.getValue().intValue();
-				System.out.println(key + " (" + ((int) key) + ") count " + value + " = "
-						+ ((double) value / counter * 100.0) + "%");
+				System.out.println(key + " (" + ((int) key) + ") count " + value + " = " + ((double) value / counter * 100.0) + "%");
 			}
 			map.clear();
 		}
