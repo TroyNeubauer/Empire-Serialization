@@ -19,10 +19,10 @@ public class ByteArrayOutput extends AbstractOutput {
 
 	private byte[] buffer;
 	private int position;
-	private int requested = 0;
+	private int requested;
 
 	public ByteArrayOutput() {
-		this(20);// A Hotspot array header is 12 bytes so 20 + 12 = 32 therefore no bytes are
+		this(116);// A Hotspot array header is 12 bytes so 116 + 12 = 128 therefore no bytes are
 					// wasted due to multiple of eight packing
 	}
 
@@ -50,10 +50,11 @@ public class ByteArrayOutput extends AbstractOutput {
 	public int getBufferPosition() {
 		return position;
 	}
-	
+
 	@Override
 	public void setBufferPosition(int newPosition) {
-		if(newPosition < 0 || newPosition >= buffer.length) throw new IllegalArgumentException("New position out of range! " + newPosition);
+		if (newPosition < 0 || newPosition >= buffer.length)
+			throw new IllegalArgumentException("New position out of range! " + newPosition);
 		this.position = newPosition;
 	}
 
@@ -100,7 +101,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeShorts(short[] src, int offset, int elements) {
 		require(elements * Short.BYTES);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.shortsToBytes(buffer, src, offset, position, elements, bigEndian);
+			NativeUtils.shortsToBytes(buffer, src, offset, position, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeShorts(src, offset, elements);
@@ -112,7 +113,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeInts(int[] src, int offset, int elements) {
 		require(elements * Integer.BYTES);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.intsToBytes(buffer, src, offset, position, elements, bigEndian);
+			NativeUtils.intsToBytes(buffer, src, offset, position, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeInts(src, offset, elements);
@@ -123,7 +124,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeLongs(long[] src, int offset, int elements) {
 		require(elements * Long.BYTES);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.longsToBytes(buffer, src, offset, position, elements, bigEndian);
+			NativeUtils.longsToBytes(buffer, src, offset, position, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeLongs(src, offset, elements);
@@ -134,7 +135,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeFloats(float[] src, int offset, int elements) {
 		require(elements * Float.BYTES);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.floatsToBytes(buffer, src, offset, position, elements, bigEndian);
+			NativeUtils.floatsToBytes(buffer, src, offset, position, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeFloats(src, offset, elements);
@@ -145,7 +146,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeDoubles(double[] src, int offset, int elements) {
 		require(elements * Double.BYTES);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.doublesToBytes(buffer, src, offset, position, elements, bigEndian);
+			NativeUtils.doublesToBytes(buffer, src, offset, position, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeDoubles(src, offset, elements);
@@ -156,7 +157,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeChars(char[] src, int offset, int elements) {
 		require(elements * Character.BYTES);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.charsToBytes(buffer, src, offset, position, elements, bigEndian);
+			NativeUtils.charsToBytes(buffer, src, offset, position, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeChars(src, offset, elements);
@@ -167,7 +168,7 @@ public class ByteArrayOutput extends AbstractOutput {
 	public void writeBooleans(boolean[] src, int offset, int elements) {
 		require(elements * 1);
 		if (NativeUtils.NATIVES_ENABLED) {
-			NativeUtils.booleansToBytes(buffer, src, offset, position, elements, bigEndian);
+			NativeUtils.booleansToBytes(buffer, src, offset, position, elements, swapEndinessInNative());
 			addRequired();
 		} else {
 			super.writeBooleans(src, offset, elements);
@@ -217,6 +218,6 @@ public class ByteArrayOutput extends AbstractOutput {
 
 	@Override
 	public boolean isNative() {
-		return false;//We use a Java array. So no
+		return false;// We use a Java array. So no
 	}
 }

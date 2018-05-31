@@ -90,7 +90,8 @@ public class ByteArrayInput extends AbstractInput {
 
 	@Override
 	public void readBytes(byte[] dest, int offset, int count) {
-		// TODO Auto-generated method stub
+		System.arraycopy(buffer, position, dest, offset, count);
+		position += count;
 
 	}
 
