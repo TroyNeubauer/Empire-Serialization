@@ -5,6 +5,5 @@ repositories {
 }
 
 dependencies {
-	compile 'org.apache.commons:commons-pool2:2.5.0'
-	compile 'org.springframework:spring-context:5.0.5.RELEASE'
+	compile group: 'io.github.lukehutch', name: 'fast-classpath-scanner', version: '2.21'
 }
