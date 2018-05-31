@@ -210,6 +210,14 @@ public abstract class AbstractInput implements Input {
 	}
 
 	@Override
+	public void readBytes(byte[] src, int offset, int elements) {
+		require(elements);
+		for (int i = offset; i < offset + elements; i++) {
+			src[i] = readByteImpl();
+		}
+	}
+
+	@Override
 	public void readShorts(short[] src, int offset, int elements) {
 		require(elements * Short.BYTES);
 		for (int i = offset; i < offset + elements; i++) {
@@ -284,6 +292,94 @@ public abstract class AbstractInput implements Input {
 
 	@Override
 	public void readBooleansCompact(boolean[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+			// TODO
+		}
+	}
+
+	@Override
+	public void readBytes(Byte[] src, int offset, int elements) {
+		require(elements);
+		for (int i = offset; i < offset + elements; i++) {
+			src[i] = Byte.valueOf(readByteImpl());
+		}
+	}
+
+	@Override
+	public void readShorts(Short[] src, int offset, int elements) {
+		require(elements * Short.BYTES);
+		for (int i = offset; i < offset + elements; i++) {
+			if (bigEndian) {
+				src[i] = Short.valueOf((short) ((readByteImpl() << 8) | readByteImpl()));
+			} else {
+				src[i] = Short.valueOf((short) (readByteImpl() | (readByteImpl() << 8)));
+			}
+		}
+	}
+
+	@Override
+	public void readInts(Integer[] src, int offset, int elements) {
+		require(elements * Integer.BYTES);
+		for (int i = offset; i < offset + elements; i++) {
+			if (bigEndian) {
+				src[i] = Integer.valueOf((readByteImpl() << 24) | (readByteImpl() << 16) | (readByteImpl() << 8) | readByteImpl());
+			} else {
+				src[i] = Integer.valueOf(readByteImpl() | (readByteImpl() << 8) | (readByteImpl() << 16) | (readByteImpl() << 24));
+			}
+		}
+	}
+
+	@Override
+	public void readLongs(Long[] src, int offset, int elements) {
+		require(elements * Long.BYTES);
+		for (int i = offset; i < offset + elements; i++) {
+			if (bigEndian) {
+				src[i] = Long.valueOf((long) ((readByteImpl() << 56) | (readByteImpl() << 48) | (readByteImpl() << 40) | (readByteImpl() << 32)
+						| (readByteImpl() << 24) | (readByteImpl() << 16) | (readByteImpl() << 8) | readByteImpl()));
+			} else {
+				src[i] = Long.valueOf((long) (readByteImpl() | (readByteImpl() << 8) | (readByteImpl() << 16) | (readByteImpl() << 24)
+						| (readByteImpl() << 32) | (readByteImpl() << 40) | (readByteImpl() << 48) | (readByteImpl() << 56)));
+			}
+		}
+	}
+
+	@Override
+	public void readFloats(Float[] src, int offset, int elements) {
+		// Read float does require every time so we don't need to do anything
+		for (int i = offset; i < offset + elements; i++) {
+			src[i] = Float.valueOf(readFloat());
+		}
+	}
+
+	@Override
+	public void readDoubles(Double[] src, int offset, int elements) {
+		// Read float does require every time so we don't need to do anything
+		for (int i = offset; i < offset + elements; i++) {
+			src[i] = Double.valueOf(readDouble());
+		}
+	}
+
+	@Override
+	public void readChars(Character[] src, int offset, int elements) {
+		require(elements * Character.BYTES);
+		for (int i = offset; i < offset + elements; i++) {
+			if (bigEndian) {
+				src[i] = Character.valueOf((char) (readByteImpl() << 8 | readByteImpl()));
+			} else {
+				src[i] = Character.valueOf((char) (readByteImpl() | readByteImpl() << 8));
+			}
+		}
+	}
+
+	@Override
+	public void readBooleans(Boolean[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+			src[i] = Boolean.valueOf(readByteImpl() != 0);
+		}
+	}
+
+	@Override
+	public void readBooleansCompact(Boolean[] src, int offset, int elements) {
 		for (int i = offset; i < offset + elements; i++) {
 			// TODO
 		}

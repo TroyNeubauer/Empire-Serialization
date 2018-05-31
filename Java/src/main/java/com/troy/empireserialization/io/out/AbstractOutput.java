@@ -6,7 +6,7 @@ import com.troy.empireserialization.EmpireConstants;
 
 public abstract class AbstractOutput implements Output {
 
-	//Weather or not were writing in big endian
+	// Weather or not were writing in big endian
 	protected boolean bigEndian = true;
 	private boolean alreadyMapped = false;
 
@@ -329,35 +329,137 @@ public abstract class AbstractOutput implements Output {
 
 	@Override
 	public void writeFloats(float[] src, int offset, int elements) {
-		for(int i = offset; i < offset + elements; i++) {
+		for (int i = offset; i < offset + elements; i++) {
 			writeFloat(src[i]);
 		}
 	}
 
 	@Override
 	public void writeDoubles(double[] src, int offset, int elements) {
-		for(int i = offset; i < offset + elements; i++) {
+		for (int i = offset; i < offset + elements; i++) {
 			writeDouble(src[i]);
 		}
 	}
 
 	@Override
 	public void writeChars(char[] src, int offset, int elements) {
-		for(int i = offset; i < offset + elements; i++) {
+		for (int i = offset; i < offset + elements; i++) {
 			writeChar(src[i]);
 		}
 	}
 
 	@Override
 	public void writeBooleans(boolean[] src, int offset, int elements) {
-		for(int i = offset; i < offset + elements; i++) {
+		for (int i = offset; i < offset + elements; i++) {
 			writeBoolean(src[i]);
 		}
 	}
 
 	@Override
 	public void writeBooleansCompact(boolean[] src, int offset, int elements) {
-		//TODO
+		// TODO
+	}
+
+	@Override
+	public void writeBytes(Byte[] src, int offset, int elements) {
+		require(elements * Byte.BYTES);
+		for (int i = offset; i < offset + elements; i++) {
+			writeByteImpl(src[i].byteValue());
+		}
+	}
+
+	@Override
+	public void writeShorts(Short[] src, int offset, int elements) {
+		require(elements * Short.BYTES);
+		for (int i = offset; i < offset + elements; i++) {
+			short b = src[i].shortValue();
+			if (bigEndian) {
+				writeByteImpl((byte) ((b >> 8) & 0xFF));
+				writeByteImpl((byte) ((b >> 0) & 0xFF));
+			} else {
+				writeByteImpl((byte) ((b >> 0) & 0xFF));
+				writeByteImpl((byte) ((b >> 8) & 0xFF));
+			}
+		}
+	}
+
+	@Override
+	public void writeInts(Integer[] src, int offset, int elements) {
+		require(elements * Integer.BYTES);
+		for (int i = offset; i < offset + elements; i++) {
+			int b = src[i].intValue();
+			if (bigEndian) {
+				writeByteImpl((byte) ((b >> 24) & 0xFF));
+				writeByteImpl((byte) ((b >> 16) & 0xFF));
+				writeByteImpl((byte) ((b >> 8) & 0xFF));
+				writeByteImpl((byte) ((b >> 0) & 0xFF));
+			} else {
+				writeByteImpl((byte) ((b >> 0) & 0xFF));
+				writeByteImpl((byte) ((b >> 8) & 0xFF));
+				writeByteImpl((byte) ((b >> 16) & 0xFF));
+				writeByteImpl((byte) ((b >> 24) & 0xFF));
+			}
+		}
+	}
+
+	@Override
+	public void writeLongs(Long[] src, int offset, int elements) {
+		require(elements * Long.BYTES);
+		for (int i = offset; i < offset + elements; i++) {
+			long b = src[i].longValue();
+			if (bigEndian) {
+				writeByteImpl((byte) ((b >> 56) & 0xFF));
+				writeByteImpl((byte) ((b >> 48) & 0xFF));
+				writeByteImpl((byte) ((b >> 40) & 0xFF));
+				writeByteImpl((byte) ((b >> 32) & 0xFF));
+				writeByteImpl((byte) ((b >> 24) & 0xFF));
+				writeByteImpl((byte) ((b >> 16) & 0xFF));
+				writeByteImpl((byte) ((b >> 8) & 0xFF));
+				writeByteImpl((byte) ((b >> 0) & 0xFF));
+			} else {
+				writeByteImpl((byte) ((b >> 0) & 0xFF));
+				writeByteImpl((byte) ((b >> 8) & 0xFF));
+				writeByteImpl((byte) ((b >> 16) & 0xFF));
+				writeByteImpl((byte) ((b >> 24) & 0xFF));
+				writeByteImpl((byte) ((b >> 32) & 0xFF));
+				writeByteImpl((byte) ((b >> 40) & 0xFF));
+				writeByteImpl((byte) ((b >> 48) & 0xFF));
+				writeByteImpl((byte) ((b >> 56) & 0xFF));
+			}
+		}
+	}
+
+	@Override
+	public void writeFloats(Float[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+			writeFloat(src[i].floatValue());
+		}
+	}
+
+	@Override
+	public void writeDoubles(Double[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+			writeDouble(src[i].doubleValue());
+		}
+	}
+
+	@Override
+	public void writeChars(Character[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+			writeChar(src[i].charValue());
+		}
+	}
+
+	@Override
+	public void writeBooleans(Boolean[] src, int offset, int elements) {
+		for (int i = offset; i < offset + elements; i++) {
+			writeBoolean(src[i].booleanValue());
+		}
+	}
+
+	@Override
+	public void writeBooleansCompact(Boolean[] src, int offset, int elements) {
+		// TODO
 	}
 
 	@Override

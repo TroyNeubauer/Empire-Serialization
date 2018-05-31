@@ -1,33 +1,27 @@
 package com.troy.empireserialization.serializers;
 
-import com.troy.empireserialization.ClassIDProvider;
-import com.troy.empireserialization.clazz.ClassData;
-import com.troy.empireserialization.io.out.*;
+import com.troy.empireserialization.EmpireOutput;
+import com.troy.empireserialization.util.ClassHelper;
 
-public abstract class AbstractSerializer<T> implements Serializer<T> {
+public abstract class AbstractObjectSerializer<T> implements ObjectSerializer<T> {
 	protected Class<T> type;
-	protected ClassData<T> data;
 
-	public AbstractSerializer(Class<T> type, ClassIDProvider provider) {
+	public AbstractObjectSerializer(Class<T> type) {
 		this.type = type;
-		this.data = new ClassData<T>(type, provider);
 	}
 
 	@Override
 	public Class<T> getType() {
 		return type;
 	}
-	
-	public T newInstance() {
-		return null;//Delegate. Sub classes can override this if necessary
-	}
-	
-	@Override
-	public void writeTypeDefinition(Output out) {
-		out.writeBytes(data.getTypeDefinition());
-	}
-	
-	
 
+	public T newInstance() {
+		return null;// Delegate. Sub classes can override this if necessary
+	}
+
+	@Override
+	public void writeTypeDefinition(EmpireOutput out) {
+		ClassHelper.getClassData(type).writeTypeDefinition(out);
+	}
 
 }
