@@ -5,6 +5,12 @@ import com.troy.empireserialization.util.*;
 
 import sun.misc.Unsafe;
 
+/**
+ * Represents a block of native memory that os owned by this object
+ * 
+ * @author Troy Neubauer
+ *
+ */
 public class MasterMemoryBlock implements NativeMemoryBlock {
 	private static final Unsafe unsafe = MiscUtil.getUnsafe();
 
@@ -22,7 +28,8 @@ public class MasterMemoryBlock implements NativeMemoryBlock {
 
 	@Override
 	public long address() {
-		if(address == 0) throw new AlreadyClosedException();
+		if (address == 0)
+			throw new AlreadyClosedException();
 		return address;
 	}
 
@@ -60,7 +67,8 @@ public class MasterMemoryBlock implements NativeMemoryBlock {
 
 	@Override
 	public void resize(long bytes) {
-		if(address == 0) throw new AlreadyClosedException();
+		if (address == 0)
+			throw new AlreadyClosedException();
 		if (bytes > capacity) {
 			address = unsafe.reallocateMemory(address, bytes);
 			capacity = bytes;
@@ -76,7 +84,7 @@ public class MasterMemoryBlock implements NativeMemoryBlock {
 	public void checkOffset(long offset) {
 		if (offset < 0)
 			throw new RuntimeException("Negative offset not allowed! Offset " + offset);
-		if (offset > capacity)
+		if (offset >= capacity)
 			throw new RuntimeException("Offset out of range! Buffer Capacity: " + capacity + " offset " + offset);
 	}
 

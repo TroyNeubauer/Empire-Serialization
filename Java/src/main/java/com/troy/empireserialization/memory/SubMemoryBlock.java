@@ -4,6 +4,12 @@ import com.troy.empireserialization.util.*;
 
 import sun.misc.*;
 
+/**
+ * Represents a sub section of a larger block of memory
+ * 
+ * @author Troy Neubauer
+ *
+ */
 public class SubMemoryBlock implements NativeMemoryBlock {
 	private static final Unsafe unsafe = MiscUtil.getUnsafe();
 
@@ -50,7 +56,7 @@ public class SubMemoryBlock implements NativeMemoryBlock {
 
 	@Override
 	public void free() {
-		//Nothing as we do not own this memory, our parent does
+		// Nothing as we do not own this memory, our parent does
 	}
 
 	@Override
@@ -66,10 +72,9 @@ public class SubMemoryBlock implements NativeMemoryBlock {
 
 	@Override
 	public void checkOffset(long offset) {
-		//Add this offset so that the parent receives an offset relative to them, not us
+		// Add this offset so that the parent receives an offset relative to them, not
+		// us
 		parent.checkOffset(offset + this.offset);
 	}
-	
-	
 
 }

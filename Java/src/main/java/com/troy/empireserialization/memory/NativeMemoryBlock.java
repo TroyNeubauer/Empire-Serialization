@@ -1,5 +1,10 @@
 package com.troy.empireserialization.memory;
 
+/**
+ * Represents a block of native memory
+ * @author Troy Neubauer
+ *
+ */
 public interface NativeMemoryBlock {
 	/**
 	 * Returns the address of the start of the memory block
