@@ -7,15 +7,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class LineCounter {
-
+	static int files = 0;
 	// Prints out the number of lines
 	public static void main(String[] args) throws IOException {
 		File file = new File("C:\\Empire Serialization");
 		System.out.println(countLines(file));
+		System.out.println("Files count: " + files);
 
-		FileWriter writer = new FileWriter(new File("putFilesTogther.txt"));
+		/*FileWriter writer = new FileWriter(new File("putFilesTogther.txt"));
 		putFilesTogther(file, writer);
-		writer.close();
+		writer.close();*/
 	}
 
 	public static long countLines(File file) {
@@ -29,6 +30,7 @@ public class LineCounter {
 				}
 			}
 		} else {
+			files++;
 			try {
 				BufferedReader reader = new BufferedReader(new FileReader(file));
 				while (reader.readLine() != null)
@@ -42,6 +44,7 @@ public class LineCounter {
 	}
 
 	public static void putFilesTogther(File file, FileWriter writer) {
+		
 		if (file.isDirectory()) {
 			for (File child : file.listFiles()) {
 				if (child.isDirectory() || (child.getName().endsWith(".java") || child.getName().endsWith(".c"))) {

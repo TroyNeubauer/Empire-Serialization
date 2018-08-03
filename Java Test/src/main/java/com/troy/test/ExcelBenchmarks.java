@@ -145,7 +145,7 @@ public class ExcelBenchmarks {
 
 	}
 
-	public static final int TESTS = 10_000_000;
+	public static final int TESTS = 10_000;
 	public static final String[] colums = { "Test        ", "Library", "Total time (nanoseconds)", "Total file size (bytes)",
 			"Average time (nanoseconds/object)", "Average size (bytes/object)", "X slower than Empire", "X larger than Empire",
 			"Average time (seconds/object)" };
